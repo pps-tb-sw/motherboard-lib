@@ -3,7 +3,7 @@ RM = rm
 
 CFLAGS = -fPIC
 LDFLAGS = -shared
-RMFLAGS = -f
+RMFLAGS = -rf
 
 OBJ_DIR = obj/
 INC_DIR = include/
@@ -18,22 +18,27 @@ OBJ = $(patsubst $(SRC_DIR)%,$(OBJ_DIR)%,$(SRC:.cpp=.o))
 all: $(LIB_DIR)$(LIBFILE)
 
 nice:
-	@$(RM) $(RMFLAGS) $(OBJ_DIR)*.o
+	@$(RM) $(RMFLAGS) $(OBJ_DIR) $(OBJ_DIR)*.o
 
 clean: nice
-	@$(RM) $(RMFLAGS) $(LIB_DIR)$(LIBFILE)
+	@$(RM) $(RMFLAGS) $(LIB_DIR) $(LIB_DIR)$(LIBFILE)
 	@cd test && $(MAKE) clean
 
 tests:
 	@echo "Building tests..."
 	cd test && $(MAKE)
 
-$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp $(INC_DIR)%.h
+$(OBJ_DIR)%.o: $(SRC_DIR)%.cpp $(INC_DIR)%.h | $(OBJ_DIR)
 	@echo "Building $<..."
 	@$(CC) -c $(CFLAGS) $< -o $@ -I$(INC_DIR)
 
-$(LIB_DIR)$(LIBFILE): $(OBJ)
+$(LIB_DIR)$(LIBFILE): $(OBJ) | $(LIB_DIR)
 	@echo "Linking library $<..."
 	@$(CC) $^ $(LDFLAGS) -o $@
 
+$(LIB_DIR):
+	@mkdir $(LIB_DIR)
+
+$(OBJ_DIR):
+	@mkdir $(OBJ_DIR)
 
