@@ -3,13 +3,16 @@ TOP_DIR = ../
 INC_DIR = $(TOP_DIR)include/
 LIB_DIR = $(TOP_DIR)lib/
 
-all: register reverse
+all: register reverse pre
 
-register: register.cpp
+pre:
+	@cd .. && $(MAKE)
+
+register: register.cpp | pre
 	@echo "Building $@..."
 	@$(CC) $^ -o $@ -L$(LIB_DIR) -Llib -lMB -Wl,-R$(LIB_DIR),-Rlib -I$(INC_DIR) -g
 
-reverse: reverse.cpp
+reverse: reverse.cpp | pre
 	@echo "Building $@..."
 	@$(CC) $^ -o $@ -L$(LIB_DIR) -Llib -lMB -Wl,-R$(LIB_DIR),-Rlib -I$(INC_DIR) -g
 
