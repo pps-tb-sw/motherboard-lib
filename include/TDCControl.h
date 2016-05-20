@@ -14,7 +14,7 @@
 class TDCControl : public TDCRegister
 {
   public:
-    typedef enum {  } EnablePattern;
+    typedef enum { kOutputEnabled=0x5, kOutputDisabled=0x4 } EnablePattern;
     typedef enum { R_EnablePattern, R_GlobalReset, R_DLLReset, R_PLLReset } RegisterName;
   
   public:
@@ -26,7 +26,7 @@ class TDCControl : public TDCRegister
     }
     inline TDCControl(const std::vector<uint8_t>& words) : TDCRegister(TDC_CONTROL_BITS_NUM, words) {;}
     
-    inline void SetEnablePattern(const EnablePattern& ep) {
+    inline void SetEnablePattern(const EnablePattern& ep=kOutputEnabled) {
       SetBits(kEnablePattern, static_cast<unsigned int>(ep), 4);
     }
     inline EnablePattern GetEnablePattern() const { 
