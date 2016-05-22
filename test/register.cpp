@@ -8,9 +8,9 @@ int main(int argc, char* argv[])
   s.Dump(2);
 
   TDCControl c;
-  c.SetEnablePattern(TDCControl::kOutputDisabled);
+  c.SetEnablePattern(TDCControl::OutputDisabled);
   c.DumpRegister(3);
-  c.SetEnablePattern(TDCControl::kOutputEnabled);
+  c.SetEnablePattern(TDCControl::OutputEnabled);
   c.DisableAllChannels();
   c.DumpRegister(3);
 

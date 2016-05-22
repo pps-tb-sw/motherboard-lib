@@ -17,17 +17,57 @@ class TDCStatus : public TDCRegister
       TDCRegister(TDC_STATUS_BITS_NUM, s) { SetConstantValues(); }
     inline TDCStatus(const std::vector<uint8_t>& words) : TDCRegister(TDC_STATUS_BITS_NUM, words) {;}
     
-    inline void SetConstantValues() {}
+    void SetConstantValues();
 
-    inline uint16_t Error() const { return static_cast<bool>(GetBits(kError, 11)); } //FIXME
-    inline bool HaveToken() const { return static_cast<bool>(GetBits(kHaveToken, 1)); }
-    inline uint8_t FIFOOccupancy() const { return static_cast<bool>(GetBits(kReadoutFIFOOccupancy, 8)); }
+    /// Type of error encountered by the HPTDC
+    typedef struct ErrorType {
+      bool Vernier, Coarse, ChannelSelect;
+      bool L1BufferParity;
+      bool TriggerFIFOParity, TriggerMatchingState;
+      bool ReadoutFIFOParity, ReadoutState;
+      bool SetupParity, ControlParity, JTAGInstruction;
+    } ErrorType;
+    /// Printout the error type(s) into the output stream
+    friend std::ostream& operator<<(std::ostream& out, const ErrorType& err);
+    
+    /// Retrieve the list of errors monitored
+    inline ErrorType Error() const {
+      ErrorType out;
+      word_t word = GetBits(kError, 11);
+      out.Vernier              =  word     &0x1;
+      out.Coarse               = (word>> 1)&0x1;
+      out.ChannelSelect        = (word>> 2)&0x1;
+      out.L1BufferParity       = (word>> 3)&0x1;
+      out.TriggerFIFOParity    = (word>> 4)&0x1;
+      out.TriggerMatchingState = (word>> 5)&0x1;
+      out.ReadoutFIFOParity    = (word>> 6)&0x1;
+      out.ReadoutState         = (word>> 7)&0x1;
+      out.SetupParity          = (word>> 8)&0x1;
+      out.ControlParity        = (word>> 9)&0x1;
+      out.JTAGInstruction      = (word>>10)&0x1;
+      return out;
+    }
+    /// TDC have read-out token
+    inline bool HasToken() const { return static_cast<bool>(GetBits(kHaveToken, 1)); }
+    /// Occupancy of readout FIFO
+    inline uint16_t FIFOOccupancy() const { return static_cast<uint16_t>(GetBits(kReadoutFIFOOccupancy, 8)); }
+    /// It the readout FIFO full?
     inline bool FIFOFull() const { return static_cast<bool>(GetBits(kReadoutFIFOFull, 1)); }
+    /// It the readout FIFO empty?
     inline bool FIFOEmpty() const { return static_cast<bool>(GetBits(kReadoutFIFOEmpty, 1)); }
-    inline uint32_t L1Occupancy() const { return static_cast<bool>(GetBits(kL1Occupancy, 32)); }
-    inline uint8_t TriggerFIFOOccupancy() const { return static_cast<bool>(GetBits(kTriggerFIFOOccupancy, 4)); }
+    /// Occupancy of L1 buffer in channels of a group (or all groups)
+    inline uint32_t L1Occupancy(unsigned short group=-1) const {
+      uint32_t out = static_cast<uint32_t>(GetBits(kL1Occupancy, 32));
+      if (group<0 or group>3) return out; // whole 32-bit word combining all groups
+      return static_cast<uint32_t>((out>>group)&0xff); // only 8 bits of selected group
+    }
+    /// Occupancy of trigger FIFO
+    inline uint16_t TriggerFIFOOccupancy() const { return static_cast<uint16_t>(GetBits(kTriggerFIFOOccupancy, 4)); }
+    /// Is the trigger FIFO full?
     inline bool TriggerFIFOFull() const { return static_cast<bool>(GetBits(kTriggerFIFOFull, 1)); }
+    /// Is the trigger FIFO empty?
     inline bool TriggerFIFOEmpty() const { return static_cast<bool>(GetBits(kTriggerFIFOEmpty, 1)); }
+    /// Is the DLL in lock state?
     inline bool DLLLock() const { return static_cast<bool>(GetBits(kDLLLock, 1)); }
 
     void Dump(int verb=1, std::ostream& os=std::cout) const;
