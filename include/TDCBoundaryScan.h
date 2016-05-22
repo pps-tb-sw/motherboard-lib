@@ -16,6 +16,35 @@ class TDCBoundaryScan : public TDCRegister
       SetConstantValues(); }
     inline TDCBoundaryScan(const TDCBoundaryScan& bs) :
       TDCRegister(TDC_BS_BITS_NUM, bs) { SetConstantValues(); }
+
+    inline bool IsTokenOut() const { return GetBits(kTokenOut, 1); }
+    inline bool IsStrobeOut() const { return GetBits(kStrobeOut, 1); }
+    inline bool IsSerialOut() const { return GetBits(kSerialOut, 1); }
+    inline bool IsTest() const { return GetBits(kTest, 1); }
+    inline bool IsError() const { return GetBits(kError, 1); }
+    inline bool IsDataReady() const { return GetBits(kDataReady, 1); }
+    inline bool IsParallelEnabled() const { return GetBits(kParallelEnable, 1); }
+    inline bool HasParallelDataOut(unsigned short channel_id) const {
+      if (channel_id<0 or channel_id>31) return false;
+      return GetBits(kParallelDataOut+channel_id, 1);
+    }
+    inline bool IsEncodedControl() const { return GetBits(kEncodedControl, 1); }
+    inline bool IsTrigger() const { return GetBits(kTrigger, 1); }
+    inline bool HasTrigger() const { return GetBits(kTrigger, 1); }
+    inline bool HasEventReset() const { return GetBits(kEventReset, 1); }
+    inline bool HasBunchReset() const { return GetBits(kBunchReset, 1); }
+    inline bool IsGettingData() const { return GetBits(kGetData, 1); }
+    inline bool IsSerialBypassIn() const { return GetBits(kSerialBypassIn, 1); }
+    inline bool IsSerialIn() const { return GetBits(kSerialIn, 1); }
+    inline bool IsTokenBypassIn() const { return GetBits(kTokenBypassIn, 1); }
+    inline bool IsTokenIn() const { return GetBits(kTokenIn, 1); }
+    inline bool IsReset() const { return GetBits(kReset, 1); }
+    inline bool HasAuxiliaryClock() const { return GetBits(kAuxClock, 1); }
+    inline bool HasClock() const { return GetBits(kClk, 1); }
+    inline bool HasHit(unsigned short channel_id) const {
+      if (channel_id<0 or channel_id>31) return false;
+      return GetBits(kHit+channel_id, 1);
+    }
     
     void SetConstantValues();
     void Dump() const;

@@ -6,7 +6,7 @@ LIB_DIR = $(TOP_DIR)lib/
 all: register reverse pre
 
 pre:
-	@cd .. && $(MAKE)
+	@cd .. && $(MAKE) -s
 
 register: register.cpp | pre
 	@echo "Building $@..."

@@ -22,11 +22,11 @@ nice:
 
 clean: nice
 	@$(RM) $(RMFLAGS) $(LIB_DIR) $(LIB_DIR)$(LIBFILE)
-	@cd test && $(MAKE) clean
+	@cd test && $(MAKE) -s clean
 
 tests:
 	@echo "Building tests..."
-	cd test && $(MAKE)
+	@cd test && $(MAKE) -s
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp $(INC_DIR)%.h | $(OBJ_DIR)
 	@echo "Building $<..."

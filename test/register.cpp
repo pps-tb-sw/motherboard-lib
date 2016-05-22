@@ -1,5 +1,6 @@
 #include "TDCControl.h"
 #include "TDCSetup.h"
+#include "TDCStatus.h"
 
 int main(int argc, char* argv[])
 {
@@ -12,6 +13,9 @@ int main(int argc, char* argv[])
   c.SetEnablePattern(TDCControl::kOutputEnabled);
   c.DisableAllChannels();
   c.DumpRegister(3);
+
+  TDCStatus st;
+  st.Dump(3);
 
   return 0;
 }
