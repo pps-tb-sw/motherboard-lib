@@ -7,6 +7,7 @@
  * 
  * \author Laurent Forthomme <laurent.forthomme@cern.ch>
  * \date 24 Apr 2015
+ * \date May 2016
  * \ingroup HPTDC
  */
 class TDCBoundaryScan : public TDCRegister
@@ -46,7 +47,9 @@ class TDCBoundaryScan : public TDCRegister
       return GetBits(kHit+channel_id, 1);
     }
     
+    /// Set all hardcoded values to this register
     void SetConstantValues();
+    /// Printout all useful values of this status register into an output stream
     void Dump() const;
 
   private:

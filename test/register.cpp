@@ -2,6 +2,8 @@
 #include "TDCSetup.h"
 #include "TDCStatus.h"
 
+using namespace std;
+
 int main(int argc, char* argv[])
 {
   TDCSetup s;
@@ -16,6 +18,8 @@ int main(int argc, char* argv[])
 
   TDCStatus st;
   st.Dump(3);
+  TDCStatus::ErrorType err = st.Error();
+  cout << "Global error? " << err.GlobalError() << endl;
 
   return 0;
 }

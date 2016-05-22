@@ -27,18 +27,21 @@ class TDCRegister
     typedef uint32_t word_t;
 
   public:
+    /// Initialise an empty register
     inline TDCRegister(const unsigned int size) :
       fNumWords(ceil(size/WORD_SIZE)+1), fWordSize(size) {
       if (size%WORD_SIZE==0) fNumWords = size/WORD_SIZE;
       fWord = new word_t[fNumWords];
       Clear();
     }
+    /// Initialise and fill a register
     inline TDCRegister(const unsigned int size, const TDCRegister& r) :
       fNumWords(ceil(size/WORD_SIZE)+1), fWordSize(size) {
       if (size%WORD_SIZE==0) fNumWords = size/WORD_SIZE;
       fWord = new word_t[fNumWords];
       for (unsigned int i=0; i<GetNumWords(); i++) { fWord[i] = r.fWord[i]; }
     }
+    /// Initialise and fill a register
     inline TDCRegister(const unsigned int size, const std::vector<uint8_t>& words, bool reversed=false) :
       fNumWords(ceil(size/WORD_SIZE)+1), fWordSize(size) {
       if (size%WORD_SIZE==0) fNumWords = size/WORD_SIZE;
@@ -46,9 +49,11 @@ class TDCRegister
       if (reversed) { for (unsigned int i=0; i<fNumWords; i++) { SetWord(i, words[fNumWords-1-i]); } }
       else { for (unsigned int i=0; i<fNumWords; i++) { SetWord(i, words[i]); } }
     }
+    /// Destroy the register and its content
     inline virtual ~TDCRegister() {
       if (fWord) delete [] fWord;
     }
+    /// Assign values from another register to this one
     inline TDCRegister& operator=(const TDCRegister& r) {
       if (&r!=this) {
         fWordSize = r.fWordSize;
@@ -72,7 +77,9 @@ class TDCRegister
       if (i<0 or i>=fNumWords) return -1;
       return fWord[i];
     }
+    /// Retrieve the whole array of sub-words composing this register
     inline word_t* GetWords() const { return fWord; }
+    /// Retrieve a vector of 8-bit words composing this register
     inline std::vector<uint8_t> GetBytesVector() const { //FIXME more complicated if != 8-bit words!
       return std::vector<uint8_t>(fWord, fWord+fNumWords);
     }
@@ -82,6 +89,7 @@ class TDCRegister
      */
     inline uint8_t GetNumWords() const { return fNumWords; }
     
+    /// Printout all useful information handled by the register
     void DumpRegister(unsigned short verb=1, std::ostream& os=std::cout, const bit max_bits=-1) const;
     /// Ensure that the critical constant values are properly set in the
     /// register word

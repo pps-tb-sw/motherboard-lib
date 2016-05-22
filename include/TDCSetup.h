@@ -11,7 +11,9 @@
  * Object handling the setup word provided by/to the HPTDC chip
  * \brief Setup word to be sent to the HPTDC chip
  * \author Laurent Forthomme <laurent.forthomme@cern.ch>
+ * \author Lara Lloret <lara@cern.ch>
  * \date 16 Apr 2015
+ * \date May 2016
  * \ingroup HPTDC
  */
 class TDCSetup : public TDCRegister
@@ -360,13 +362,16 @@ class TDCSetup : public TDCRegister
     inline uint16_t GetTriggerLatency() const {
       return ((GetCoarseCountOffset()-GetTriggerCountOffset())%(0x1<<12));
     }
+    /// Set the unique identifier of the TDC object on the board
     inline void SetTDCId(const uint8_t id=0x0) {
       SetBits(kTDCId, id, 4);
     }
+    /// Get the unique identifier of the TDC object on the board
     inline uint16_t GetTDCId() const {
       return static_cast<uint16_t>(GetBits(kTDCId, 4));
     }
     
+    /// Printout all useful values of this setup register into an output stream
     void Dump(int verb=1, std::ostream& os=std::cout) const;
     
   private:    

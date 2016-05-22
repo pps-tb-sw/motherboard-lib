@@ -8,6 +8,7 @@
  * Object handling the control word provided by/to the HPTDC chip
  * \brief Control word to be sent to the HPTDC chip
  * \author Laurent Forthomme <laurent.forthomme@cern.ch>
+ * \author Lara Lloret <lara@cern.ch>
  * \date 24 Apr 2015
  * \ingroup HPTDC
  */
@@ -45,6 +46,7 @@ class TDCControl : public TDCRegister
       for (unsigned int i=0; i<TDC_NUM_CHANNELS; i++) { DisableChannel(i); }
     }
     
+    /// Printout all useful values of this control register into an output stream
     void Dump(int verb=1, std::ostream& os=std::cout) const;
     void SetConstantValues();
     

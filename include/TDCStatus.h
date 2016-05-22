@@ -6,21 +6,31 @@
 /**
  * 
  * \author Laurent Forthomme <laurent.forthomme@cern.ch>
+ * \author Lara Lloret <lara@cern.ch>
  * \date 27 Apr 2015
+ * \date May 2016
  * \ingroup HPTDC
  */
 class TDCStatus : public TDCRegister
 {
   public:
+    /// Initialise a status register with all hardcoded values
     inline TDCStatus() : TDCRegister(TDC_STATUS_BITS_NUM) { SetConstantValues(); }
-    inline TDCStatus(const TDCStatus& s) :
-      TDCRegister(TDC_STATUS_BITS_NUM, s) { SetConstantValues(); }
+    /// Initialise a status register from a vector of 8-bit words
     inline TDCStatus(const std::vector<uint8_t>& words) : TDCRegister(TDC_STATUS_BITS_NUM, words) {;}
     
+    /// Set the hardcoded values to the register
     void SetConstantValues();
 
     /// Type of error encountered by the HPTDC
     typedef struct ErrorType {
+      /// Error related on the parity of any register/buffer
+      bool ParityError() const { return (L1BufferParity or TriggerFIFOParity or ReadoutFIFOParity or SetupParity or ControlParity); }
+      /// Error related to the Vernier or Coarse measurement
+      bool MeasurementError() const { return (Vernier or Coarse); }
+      /// Has any error occured?
+      bool GlobalError() const { return (MeasurementError() or ChannelSelect or ParityError() or JTAGInstruction); }
+
       bool Vernier, Coarse, ChannelSelect;
       bool L1BufferParity;
       bool TriggerFIFOParity, TriggerMatchingState;
@@ -70,6 +80,7 @@ class TDCStatus : public TDCRegister
     /// Is the DLL in lock state?
     inline bool DLLLock() const { return static_cast<bool>(GetBits(kDLLLock, 1)); }
 
+    /// Printout all useful values of this status register into an output stream
     void Dump(int verb=1, std::ostream& os=std::cout) const;
     
   private:
