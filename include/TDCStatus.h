@@ -24,6 +24,19 @@ class TDCStatus : public TDCRegister
 
     /// Type of error encountered by the HPTDC
     typedef struct ErrorType {
+      ErrorType(uint16_t word) {
+        Vernier              =  word     &0x1;
+        Coarse               = (word>> 1)&0x1;
+        ChannelSelect        = (word>> 2)&0x1;
+        L1BufferParity       = (word>> 3)&0x1;
+        TriggerFIFOParity    = (word>> 4)&0x1;
+        TriggerMatchingState = (word>> 5)&0x1;
+        ReadoutFIFOParity    = (word>> 6)&0x1;
+        ReadoutState         = (word>> 7)&0x1;
+        SetupParity          = (word>> 8)&0x1;
+        ControlParity        = (word>> 9)&0x1;
+        JTAGInstruction      = (word>>10)&0x1;      
+      }
       /// Error related on the parity of any register/buffer
       bool ParityError() const { return (L1BufferParity or TriggerFIFOParity or ReadoutFIFOParity or SetupParity or ControlParity); }
       /// Error related to the Vernier or Coarse measurement
@@ -42,20 +55,7 @@ class TDCStatus : public TDCRegister
     
     /// Retrieve the list of errors monitored
     inline ErrorType Error() const {
-      ErrorType out;
-      word_t word = GetBits(kError, 11);
-      out.Vernier              =  word     &0x1;
-      out.Coarse               = (word>> 1)&0x1;
-      out.ChannelSelect        = (word>> 2)&0x1;
-      out.L1BufferParity       = (word>> 3)&0x1;
-      out.TriggerFIFOParity    = (word>> 4)&0x1;
-      out.TriggerMatchingState = (word>> 5)&0x1;
-      out.ReadoutFIFOParity    = (word>> 6)&0x1;
-      out.ReadoutState         = (word>> 7)&0x1;
-      out.SetupParity          = (word>> 8)&0x1;
-      out.ControlParity        = (word>> 9)&0x1;
-      out.JTAGInstruction      = (word>>10)&0x1;
-      return out;
+      return ErrorType(static_cast<uint16_t>(GetBits(kError, 11)));
     }
     /// TDC have read-out token
     inline bool HasToken() const { return static_cast<bool>(GetBits(kHaveToken, 1)); }
