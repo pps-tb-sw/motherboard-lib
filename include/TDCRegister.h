@@ -29,16 +29,19 @@ class TDCRegister
   public:
     inline TDCRegister(const unsigned int size) :
       fNumWords(ceil(size/WORD_SIZE)+1), fWordSize(size) {
+      if (size%WORD_SIZE==0) fNumWords = size/WORD_SIZE;
       fWord = new word_t[fNumWords];
       Clear();
     }
     inline TDCRegister(const unsigned int size, const TDCRegister& r) :
       fNumWords(ceil(size/WORD_SIZE)+1), fWordSize(size) {
+      if (size%WORD_SIZE==0) fNumWords = size/WORD_SIZE;
       fWord = new word_t[fNumWords];
       for (unsigned int i=0; i<GetNumWords(); i++) { fWord[i] = r.fWord[i]; }
     }
     inline TDCRegister(const unsigned int size, const std::vector<uint8_t>& words, bool reversed=false) :
       fNumWords(ceil(size/WORD_SIZE)+1), fWordSize(size) {
+      if (size%WORD_SIZE==0) fNumWords = size/WORD_SIZE;
       fWord = new word_t[fNumWords];
       if (reversed) { for (unsigned int i=0; i<fNumWords; i++) { SetWord(i, words[fNumWords-1-i]); } }
       else { for (unsigned int i=0; i<fNumWords; i++) { SetWord(i, words[i]); } }

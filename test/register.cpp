@@ -10,6 +10,7 @@ int main(int argc, char* argv[])
   c.SetEnablePattern(TDCControl::kOutputDisabled);
   c.DumpRegister(3);
   c.SetEnablePattern(TDCControl::kOutputEnabled);
+  c.DisableAllChannels();
   c.DumpRegister(3);
 
   return 0;
