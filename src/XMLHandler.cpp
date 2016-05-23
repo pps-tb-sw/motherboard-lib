@@ -64,6 +64,36 @@ XMLHandler::WriteRegister(const TDCControl& r)
 std::string
 XMLHandler::WriteRegister(const TDCSetup& r)
 {
+  XMLCh str[100];
+
+  XMLString::transcode("TDCSetup", str, 99);
+  fDocument = fImpl->createDocument(0, str, 0);
+  fROOT = fDocument->getDocumentElement();
+
+  AddProperty("setup_parity", r.GetSetupParity());
+  AddProperty("enable_ttl_hit", r.GetEnableTTLHit());
+  AddProperty("enable_ttl_clock", r.GetEnableTTLClock());
+  AddProperty("enable_ttl_reset", r.GetEnableTTLReset());
+  AddProperty("enable_ttl_control", r.GetEnableTTLControl());
+  AddProperty("enable_ttl_serial", r.GetEnableTTLSerial());
+  AddProperty("enable_pair", r.GetEdgesPairing());
+  AddProperty("enable_matching", r.GetTriggerMatchingMode());
+  AddProperty("roll_over", r.GetRollOver());
+  AddProperty("pll_control", r.GetPLLControlWord());
+  AddProperty("dll_mode", static_cast<unsigned int>(r.GetDLLMode()));
+  AddProperty("mode_rc", r.GetModeRC());
+  AddProperty("mode_rc_compression", r.GetModeRCCompression());
+  AddProperty("enable_leading", r.GetLeadingMode());
+  AddProperty("enable_trailing", r.GetTrailingMode());
+  AddProperty("rc_adjust", r.GetRCAdjustmentWord());
+  AddProperty("coarse_count_offset", r.GetCoarseCountOffset());
+  AddProperty("trigger_count_offset", r.GetTriggerCountOffset());
+  AddProperty("enable_relative", r.GetEnableRelative());
+  AddProperty("match_window", r.GetMatchWindow());
+  AddProperty("search_window", r.GetSearchWindow());
+  AddProperty("reject_count_offset", r.GetRejectCountOffset());
+  AddProperty("tdc_id", r.GetTDCId());
+
   return XMLString();
 }
 

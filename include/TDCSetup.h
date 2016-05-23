@@ -278,6 +278,7 @@ class TDCSetup : public TDCRegister
       if (tap>3 or tap<0) return -1;
       return static_cast<uint8_t>(GetBits(kRCAdjust0+3*tap, 3));
     }
+    inline uint16_t GetRCAdjustmentWord() const { return static_cast<uint16_t>(GetBits(kRCAdjust0, 12)); }
     /// Set the pulse width resolution when paired measurements are performed
     inline void SetWidthResolution(const WidthResolution r) {
       SetBits(kWidthSelect, r, 4);
@@ -370,6 +371,17 @@ class TDCSetup : public TDCRegister
     inline uint16_t GetTDCId() const {
       return static_cast<uint16_t>(GetBits(kTDCId, 4));
     }
+    inline bool GetEnableTTLHit() const { return static_cast<bool>(GetBits(kEnableTTLHit, 1)); }
+    inline bool GetEnableTTLClock() const { return static_cast<bool>(GetBits(kEnableTTLClock, 1)); }
+    inline bool GetEnableTTLReset() const { return static_cast<bool>(GetBits(kEnableTTLReset, 1)); }
+    inline bool GetEnableTTLControl() const { return static_cast<bool>(GetBits(kEnableTTLControl, 1)); }
+    inline bool GetEnableTTLSerial() const { return static_cast<bool>(GetBits(kEnableTTLSerial, 1)); }
+    inline uint16_t GetRollOver() const { return static_cast<uint16_t>(GetBits(kRollOver, 12)); }
+    inline uint16_t GetPLLControlWord() const { return static_cast<uint16_t>(GetBits(kPLLControl, 8)); }
+    inline DLLSpeedMode GetDLLMode() const { return static_cast<DLLSpeedMode>(GetBits(kDLLMode, 2)); }
+    inline bool GetModeRC() const { return static_cast<bool>(GetBits(kModeRC, 1)); }
+    inline bool GetModeRCCompression() const { return static_cast<bool>(GetBits(kModeRCCompression, 1)); }
+    inline bool GetEnableRelative() const { return static_cast<bool>(GetBits(kEnableRelative, 1)); }
     
     /// Printout all useful values of this setup register into an output stream
     void Dump(int verb=1, std::ostream& os=std::cout) const;
