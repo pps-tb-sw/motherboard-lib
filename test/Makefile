@@ -21,4 +21,4 @@ xml: xml.cpp | pre
 	@$(CC) $^ -o $@ -L$(LIB_DIR) -Llib -lMB -Wl,-R$(LIB_DIR),-Rlib -I$(INC_DIR) -g -lxerces-c
 
 clean:
-	@rm -f register reverse
+	@rm -f register reverse xml

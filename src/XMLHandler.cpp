@@ -115,10 +115,12 @@ XMLHandler::AddProperty(const char* name, const char* value)
 std::string
 XMLHandler::XMLString()
 {
-  //Initialize();
-  std::string str;
   if (!fImpl) return "ERROR";
   DOMLSSerializer* serial = static_cast<DOMImplementationLS*>(fImpl)->createLSSerializer();
+  XMLCh str[100];
+  XMLString::transcode("format-pretty-print", str, 99);
+  if (serial->getDomConfig()->canSetParameter(str, true))
+    serial->getDomConfig()->setParameter(str, true);
 
   DOMLSOutput* out = fImpl->createLSOutput();
   if (!out) return "ERROR";
@@ -132,8 +134,6 @@ XMLHandler::XMLString()
   for (unsigned int i=0; i<ft.getLen(); i++) {
     os << (char)w[i];
   }
-  //os << r.GetGlobalReset();
-  //Terminate();
   return os.str();
 }
 
