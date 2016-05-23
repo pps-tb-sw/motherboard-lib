@@ -2,7 +2,7 @@ CC = g++
 RM = rm
 
 CFLAGS = -fPIC
-LDFLAGS = -shared
+LDFLAGS = -shared -lxerces-c
 RMFLAGS = -rf
 
 OBJ_DIR = obj/

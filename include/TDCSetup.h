@@ -373,6 +373,7 @@ class TDCSetup : public TDCRegister
     
     /// Printout all useful values of this setup register into an output stream
     void Dump(int verb=1, std::ostream& os=std::cout) const;
+    std::string GetXML() const;
     
   private:    
     //////////////////////// Private set'ers and get'ers ////////////////////////

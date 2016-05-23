@@ -4,6 +4,8 @@
 #include "TDCRegister.h"
 #include "TDCConstants.h"
 
+//#include "XMLHandler.h"
+
 /**
  * Object handling the control word provided by/to the HPTDC chip
  * \brief Control word to be sent to the HPTDC chip
@@ -45,9 +47,12 @@ class TDCControl : public TDCRegister
     inline void DisableAllChannels() {
       for (unsigned int i=0; i<TDC_NUM_CHANNELS; i++) { DisableChannel(i); }
     }
+    inline uint32_t GetEnabledChannels() const { return static_cast<uint32_t>(GetBits(kEnableChannel, 32)); }
+    inline bool GetControlParity() const { return GetBits(kControlParity, 1); }
     
     /// Printout all useful values of this control register into an output stream
     void Dump(int verb=1, std::ostream& os=std::cout) const;
+    //inline std::string GetXML() const { return XMLHandler::WriteRegister(this); }
     void SetConstantValues();
     
   private:
