@@ -1,0 +1,7 @@
+doc/
+test/
+lib/*.so
+obj/*.o
+!doc/refman.pdf
+!test/Makefile
+!test/*.cpp
