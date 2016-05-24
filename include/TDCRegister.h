@@ -94,6 +94,7 @@ class TDCRegister
     /// Ensure that the critical constant values are properly set in the
     /// register word
     virtual void SetConstantValues()=0;
+    template<class T> inline uint32_t GetValue(const T&) { return 0; }
     
   protected:
     /**
