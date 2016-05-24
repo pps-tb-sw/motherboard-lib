@@ -278,6 +278,7 @@ class TDCSetup : public TDCRegister
       if (tap>3 or tap<0) return -1;
       return static_cast<uint8_t>(GetBits(kRCAdjust0+3*tap, 3));
     }
+    inline void SetRCAdjustmentWord(uint16_t word) { SetBits(kRCAdjust0, word, 12); }
     inline uint16_t GetRCAdjustmentWord() const { return static_cast<uint16_t>(GetBits(kRCAdjust0, 12)); }
     /// Set the pulse width resolution when paired measurements are performed
     inline void SetWidthResolution(const WidthResolution r) {
@@ -371,16 +372,94 @@ class TDCSetup : public TDCRegister
     inline uint16_t GetTDCId() const {
       return static_cast<uint16_t>(GetBits(kTDCId, 4));
     }
-    inline bool GetEnableTTLHit() const { return static_cast<bool>(GetBits(kEnableTTLHit, 1)); }
-    inline bool GetEnableTTLClock() const { return static_cast<bool>(GetBits(kEnableTTLClock, 1)); }
-    inline bool GetEnableTTLReset() const { return static_cast<bool>(GetBits(kEnableTTLReset, 1)); }
-    inline bool GetEnableTTLControl() const { return static_cast<bool>(GetBits(kEnableTTLControl, 1)); }
+    /** Enable LV TTL input on:
+     * * serial_in,
+     * * serial_bypass_in,
+     * * token_in,
+     * * token_bypass_in,
+     * otherwise uses LVDS input levels.
+     * Disable LVDS drivers on:
+     * * serial_out,
+     * * strobe_out,
+     * * token_out.
+     * \brief Enable LV TTL inputs on serial registers, and disable their drivers
+     */
+    inline void SetEnableTTLSerial(const bool ts=true) {
+      SetBits(kEnableTTLSerial, ts, 1);
+    }
     inline bool GetEnableTTLSerial() const { return static_cast<bool>(GetBits(kEnableTTLSerial, 1)); }
+    /** Enable LV TTL input on:
+     * * trigger,
+     * * bunch_reset,
+     * * event_reset,
+     * * encoded_control,
+     * otherwise uses LVDS input levels.
+     * \brief Enable LV TTL inputs on control registers
+     */
+    inline void SetEnableTTLControl(const bool tc=true) {
+      SetBits(kEnableTTLControl, tc, 1);
+    }
+    inline bool GetEnableTTLControl() const { return static_cast<bool>(GetBits(kEnableTTLControl, 1)); }
+
+    /// Enable LV TTL input on reset, otherwise uses LVDS input levels
+    inline void SetEnableTTLReset(const bool tr=true) {
+      SetBits(kEnableTTLReset, tr, 1);
+    }
+    inline bool GetEnableTTLReset() const { return static_cast<bool>(GetBits(kEnableTTLReset, 1)); }
+    /// Enable LV TTL inputs on: clk, aux_clock, otherwise uses LVDS input levels
+    inline void SetEnableTTLClock(const bool tc=true) {
+      SetBits(kEnableTTLClock, tc, 1);
+    }
+    inline bool GetEnableTTLClock() const { return static_cast<bool>(GetBits(kEnableTTLClock, 1)); }
+    /// Enable LV TTL input on hit[31:0], otherwise uses LVDS input levels
+    inline void SetEnableTTLHit(const bool th=true) {
+      SetBits(kEnableTTLHit, th, 1);
+    }
+    inline bool GetEnableTTLHit() const { return static_cast<bool>(GetBits(kEnableTTLHit, 1)); }
+
+    /// Counter roll over value, defining maximal count value from where counters will be reset to 0
+    inline void SetRollOver(const uint16_t ro=0xFFF) { SetBits(kRollOver, ro, 12); }
     inline uint16_t GetRollOver() const { return static_cast<uint16_t>(GetBits(kRollOver, 12)); }
+
+    /// Control of PLL
+    inline void SetPLLControl(const uint8_t charge_pump_current=0x4,
+                              const bool power_down_mode=false,
+                              const bool enable_test_outputs=false,
+                              const bool invert_connection_to_status=false) {
+      uint8_t word = (charge_pump_current&0x1F)|((power_down_mode&0x1)<<5);
+      word |= ((enable_test_outputs&0x1)<<6);
+      word |= ((invert_connection_to_status&0x1)<<7);
+      SetBits(kPLLControl, word, 8);
+    }
+    inline void SetPLLControlWord(uint16_t word) { SetBits(kPLLControl, word, 8); }
     inline uint16_t GetPLLControlWord() const { return static_cast<uint16_t>(GetBits(kPLLControl, 8)); }
+
+    /// Selection of DLL speed mode
+    inline void SetDLLMode(const DLLSpeedMode dsm) {
+      if (dsm==DLL_Illegal) {
+        std::cerr << "Warning: Using an illegal DLL mode: 0x"
+                  << std::hex << dsm << std::dec << std::endl;
+      }
+      SetBits(kDLLMode, dsm, 2);
+    }
     inline DLLSpeedMode GetDLLMode() const { return static_cast<DLLSpeedMode>(GetBits(kDLLMode, 2)); }
+
+    /// Enable of RR delay lines mode (in very high resolution mode) ; only for channels 0-4-8-12-16-20-24-28 active
+    inline void SetModeRC(const bool mr=true) {
+      SetBits(kModeRC, mr, 1);
+    }
     inline bool GetModeRC() const { return static_cast<bool>(GetBits(kModeRC, 1)); }
+    /// Perform RC interpolation on-chip (only valid in very high resolution mode)
+    inline void SetModeRCCompression(const bool mrc=true) {
+      SetBits(kModeRCCompression, mrc, 1);
+    }
     inline bool GetModeRCCompression() const { return static_cast<bool>(GetBits(kModeRCCompression, 1)); }
+
+    /// Enable read-out of relative time to trigger time tag. Only valid when
+    /// using trigger matching mode.
+    inline void SetEnableRelative(const bool er=true) {
+      SetBits(kEnableRelative, er, 1);
+    }
     inline bool GetEnableRelative() const { return static_cast<bool>(GetBits(kEnableRelative, 1)); }
     
     /// Printout all useful values of this setup register into an output stream
@@ -451,11 +530,6 @@ class TDCSetup : public TDCRegister
     inline void SetEnableOverflowDetect(const bool eod=true) {
       SetBits(kEnableOverflowDetect, eod, 1);
     }
-    /// Enable read-out of relative time to trigger time tag. Only valid when
-    /// using trigger matching mode.
-    inline void SetEnableRelative(const bool er=true) {
-      SetBits(kEnableRelative, er, 1);
-    }
     /// Enable of automatic rejection (should always be enabled if trigger matching mode!)
     inline void SetEnableAutomaticReject(const bool ear=true) {
       SetBits(kEnableAutomaticReject, ear, 1);
@@ -503,32 +577,6 @@ class TDCSetup : public TDCRegister
     /// Control of DLL (DLL charge pump levels)
     inline void SetDLLControl(const uint8_t dc) {
       SetBits(kDLLControl, dc&0x15, 4);
-    }
-    /// Perform RC interpolation on-chip (only valid in very high resolution mode)
-    inline void SetModeRCCompression(const bool mrc=true) {
-      SetBits(kModeRCCompression, mrc, 1);
-    }
-    /// Enable of RR delay lines mode (in very high resolution mode) ; only for channels 0-4-8-12-16-20-24-28 active
-    inline void SetModeRC(const bool mr=true) {
-      SetBits(kModeRC, mr, 1);
-    }
-    /// Selection of DLL speed mode
-    inline void SetDLLMode(const DLLSpeedMode dsm) {
-      if (dsm==DLL_Illegal) {
-        std::cerr << "Warning: Using an illegal DLL mode: 0x"
-                  << std::hex << dsm << std::dec << std::endl;
-      }
-      SetBits(kDLLMode, dsm, 2);
-    }
-    /// Control of PLL
-    inline void SetPLLControl(const uint8_t charge_pump_current=0x4,
-                              const bool power_down_mode=false,
-                              const bool enable_test_outputs=false,
-                              const bool invert_connection_to_status=false) {
-      uint8_t word = (charge_pump_current&0x1F)|((power_down_mode&0x1)<<5);
-      word |= ((enable_test_outputs&0x1)<<6);
-      word |= ((invert_connection_to_status&0x1)<<7);
-      SetBits(kPLLControl, word, 8);
     }
     /**
      * \brief Delay of internal serial clock
@@ -589,48 +637,6 @@ class TDCSetup : public TDCRegister
     /// Selection of clock source for DLL
     inline void SetDLLClockSource(const DLLClockSource dcs) {
       SetBits(kDLLClockSource, dcs, 3);
-    }
-    /// Counter roll over value, defining maximal count value from where counters will be reset to 0
-    inline void SetRollOver(const uint16_t ro=0xFFF) {
-      SetBits(kRollOver, ro, 12);
-    }
-    /** Enable LV TTL input on:
-     * * serial_in,
-     * * serial_bypass_in,
-     * * token_in,
-     * * token_bypass_in,
-     * otherwise uses LVDS input levels.
-     * Disable LVDS drivers on:
-     * * serial_out,
-     * * strobe_out,
-     * * token_out.
-     * \brief Enable LV TTL inputs on serial registers, and disable their drivers
-     */
-    inline void SetEnableTTLSerial(const bool ts=true) {
-      SetBits(kEnableTTLSerial, ts, 1);
-    }
-    /** Enable LV TTL input on:
-     * * trigger,
-     * * bunch_reset,
-     * * event_reset,
-     * * encoded_control,
-     * otherwise uses LVDS input levels.
-     * \brief Enable LV TTL inputs on control registers
-     */
-    inline void SetEnableTTLControl(const bool tc=true) {
-      SetBits(kEnableTTLControl, tc, 1);
-    }
-    /// Enable LV TTL input on reset, otherwise uses LVDS input levels
-    inline void SetEnableTTLReset(const bool tr=true) {
-      SetBits(kEnableTTLReset, tr, 1);
-    }
-    /// Enable LV TTL inputs on: clk, aux_clock, otherwise uses LVDS input levels
-    inline void SetEnableTTLClock(const bool tc=true) {
-      SetBits(kEnableTTLClock, tc, 1);
-    }
-    /// Enable LV TTL input on hit[31:0], otherwise uses LVDS input levels
-    inline void SetEnableTTLHit(const bool th=true) {
-      SetBits(kEnableTTLHit, th, 1);
     }
     inline void SetTest(const bool test=true) {
       SetBits(kTestSelect, test, 1);

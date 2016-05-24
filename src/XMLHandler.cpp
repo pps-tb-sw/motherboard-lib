@@ -5,7 +5,8 @@ XERCES_CPP_NAMESPACE_USE
 /*DOMDocument* XMLHandler::fDocument = NULL;
 DOMImplementation* XMLHandler::fImpl = NULL;*/
 
-XMLHandler::XMLHandler()
+XMLHandler::XMLHandler() :
+  fROOT(0), fImpl(0), fDocument(0)
 {
   Initialize();
 }
@@ -13,6 +14,9 @@ XMLHandler::XMLHandler()
 XMLHandler::~XMLHandler()
 {
   Terminate();
+  if (fROOT) delete fROOT;
+  if (fDocument) delete fDocument;
+  if (fImpl) delete fImpl;
 }
 
 void
@@ -38,8 +42,25 @@ XMLHandler::Initialize()
 void
 XMLHandler::Terminate()
 {
-  fDocument->release();
-  XMLPlatformUtils::Terminate();
+  try {
+    fROOT->release();
+    fDocument->release();
+  } catch (const DOMException& e) {
+    char* message = XMLString::transcode(e.getMessage());
+    std::cerr << "Error during termination! :\n"
+              << message << "\n";
+    XMLString::release(&message);
+    return;
+  }
+  try {
+    XMLPlatformUtils::Terminate();
+  } catch (const XMLException& e) {
+    char* message = XMLString::transcode(e.getMessage());
+    std::cerr << "Error during termination! :\n"
+              << message << "\n";
+    XMLString::release(&message);
+    return;
+  }
 }
 
 std::string
@@ -52,10 +73,10 @@ XMLHandler::WriteRegister(const TDCControl& r)
   fROOT = fDocument->getDocumentElement();
 
   AddProperty("control_parity", r.GetControlParity());
-  AddProperty("pll_reset", r.GetPLLReset());
-  AddProperty("dll_reset", r.GetDLLReset());
+  AddProperty("pll_reset",      r.GetPLLReset());
+  AddProperty("dll_reset",      r.GetDLLReset());
   AddProperty("enable_channel", r.GetEnabledChannels());
-  AddProperty("global_reset", r.GetGlobalReset());
+  AddProperty("global_reset",   r.GetGlobalReset());
   AddProperty("enable_pattern", static_cast<unsigned int>(r.GetEnablePattern()));
 
   return XMLString();
@@ -70,31 +91,76 @@ XMLHandler::WriteRegister(const TDCSetup& r)
   fDocument = fImpl->createDocument(0, str, 0);
   fROOT = fDocument->getDocumentElement();
 
-  AddProperty("setup_parity", r.GetSetupParity());
-  AddProperty("enable_ttl_hit", r.GetEnableTTLHit());
-  AddProperty("enable_ttl_clock", r.GetEnableTTLClock());
-  AddProperty("enable_ttl_reset", r.GetEnableTTLReset());
-  AddProperty("enable_ttl_control", r.GetEnableTTLControl());
-  AddProperty("enable_ttl_serial", r.GetEnableTTLSerial());
-  AddProperty("enable_pair", r.GetEdgesPairing());
-  AddProperty("enable_matching", r.GetTriggerMatchingMode());
-  AddProperty("roll_over", r.GetRollOver());
-  AddProperty("pll_control", r.GetPLLControlWord());
-  AddProperty("dll_mode", static_cast<unsigned int>(r.GetDLLMode()));
-  AddProperty("mode_rc", r.GetModeRC());
-  AddProperty("mode_rc_compression", r.GetModeRCCompression());
-  AddProperty("enable_leading", r.GetLeadingMode());
-  AddProperty("enable_trailing", r.GetTrailingMode());
-  AddProperty("rc_adjust", r.GetRCAdjustmentWord());
-  AddProperty("coarse_count_offset", r.GetCoarseCountOffset());
+  AddProperty("setup_parity",         r.GetSetupParity());
+  AddProperty("enable_ttl_hit",       r.GetEnableTTLHit());
+  AddProperty("enable_ttl_clock",     r.GetEnableTTLClock());
+  AddProperty("enable_ttl_reset",     r.GetEnableTTLReset());
+  AddProperty("enable_ttl_control",   r.GetEnableTTLControl());
+  AddProperty("enable_ttl_serial",    r.GetEnableTTLSerial());
+  AddProperty("enable_pair",          r.GetEdgesPairing());
+  AddProperty("enable_matching",      r.GetTriggerMatchingMode());
+  AddProperty("roll_over",            r.GetRollOver());
+  AddProperty("pll_control",          r.GetPLLControlWord());
+  AddProperty("dll_mode",             static_cast<unsigned int>(r.GetDLLMode()));
+  AddProperty("mode_rc",              r.GetModeRC());
+  AddProperty("mode_rc_compression",  r.GetModeRCCompression());
+  AddProperty("enable_leading",       r.GetLeadingMode());
+  AddProperty("enable_trailing",      r.GetTrailingMode());
+  AddProperty("rc_adjust",            r.GetRCAdjustmentWord());
+  AddProperty("coarse_count_offset",  r.GetCoarseCountOffset());
   AddProperty("trigger_count_offset", r.GetTriggerCountOffset());
-  AddProperty("enable_relative", r.GetEnableRelative());
-  AddProperty("match_window", r.GetMatchWindow());
-  AddProperty("search_window", r.GetSearchWindow());
-  AddProperty("reject_count_offset", r.GetRejectCountOffset());
-  AddProperty("tdc_id", r.GetTDCId());
+  AddProperty("enable_relative",      r.GetEnableRelative());
+  AddProperty("match_window",         r.GetMatchWindow());
+  AddProperty("search_window",        r.GetSearchWindow());
+  AddProperty("reject_count_offset",  r.GetRejectCountOffset());
+  AddProperty("tdc_id",               r.GetTDCId());
 
   return XMLString();
+}
+
+void
+XMLHandler::ReadRegister(std::string s, TDCControl* c)
+{
+  PropertiesMap map = ParseRegister(s);
+  if (map.GetProperty("register_name")!="TDCControl") return;
+  
+  if (map.HasProperty("control_parity")) c->SetControlParity(map.GetUIntProperty("control_parity"));
+  if (map.HasProperty("pll_reset"))      c->SetPLLReset(map.GetUIntProperty("pll_reset"));
+  if (map.HasProperty("dll_reset"))      c->SetDLLReset(map.GetUIntProperty("dll_reset"));
+  if (map.HasProperty("enable_channel")) c->SetEnabledChannels(map.GetUIntProperty("enable_channel"));
+  if (map.HasProperty("global_reset"))   c->SetGlobalReset(map.GetUIntProperty("global_reset"));
+  if (map.HasProperty("enable_pattern")) c->SetEnablePattern(static_cast<TDCControl::EnablePattern>(map.GetUIntProperty("enable_pattern")));
+}
+
+void
+XMLHandler::ReadRegister(std::string s, TDCSetup* r)
+{
+  PropertiesMap map = ParseRegister(s);
+  if (map.GetProperty("register_name")!="TDCSetup") return;
+  
+  if (map.HasProperty("setup_parity"))         r->SetSetupParity(map.GetUIntProperty("setup_parity"));
+  if (map.HasProperty("enable_ttl_hit"))       r->SetEnableTTLHit(map.GetUIntProperty("enable_ttl_hit"));
+  if (map.HasProperty("enable_ttl_clock"))     r->SetEnableTTLClock(map.GetUIntProperty("enable_ttl_clock"));
+  if (map.HasProperty("enable_ttl_reset"))     r->SetEnableTTLReset(map.GetUIntProperty("enable_ttl_reset"));
+  if (map.HasProperty("enable_ttl_control"))   r->SetEnableTTLControl(map.GetUIntProperty("enable_ttl_control"));
+  if (map.HasProperty("enable_ttl_serial"))    r->SetEnableTTLSerial(map.GetUIntProperty("enable_ttl_serial"));
+  if (map.HasProperty("enable_pair"))          r->SetEdgesPairing(map.GetUIntProperty("enable_pair"));
+  if (map.HasProperty("enable_matching"))      r->SetTriggerMatchingMode(map.GetUIntProperty("enable_matching"));
+  if (map.HasProperty("roll_over"))            r->SetRollOver(map.GetUIntProperty("roll_over"));
+  if (map.HasProperty("pll_control"))          r->SetPLLControlWord(map.GetUIntProperty("pll_control"));
+  if (map.HasProperty("dll_mode"))             r->SetDLLMode(static_cast<TDCSetup::DLLSpeedMode>(map.GetUIntProperty("dll_mode")));
+  if (map.HasProperty("mode_rc"))              r->SetModeRC(map.GetUIntProperty("mode_rc"));
+  if (map.HasProperty("mode_rc_compression"))  r->SetModeRCCompression(map.GetUIntProperty("mode_rc_compression"));
+  if (map.HasProperty("enable_leading"))       r->SetLeadingMode(map.GetUIntProperty("enable_leading"));
+  if (map.HasProperty("enable_trailing"))      r->SetTrailingMode(map.GetUIntProperty("enable_trailing"));
+  if (map.HasProperty("rc_adjust"))            r->SetRCAdjustmentWord(map.GetUIntProperty("rc_adjust"));
+  if (map.HasProperty("coarse_count_offset"))  r->SetCoarseCountOffset(map.GetUIntProperty("coarse_count_offset"));
+  if (map.HasProperty("trigger_count_offset")) r->SetTriggerCountOffset(map.GetUIntProperty("trigger_count_offset"));
+  if (map.HasProperty("enable_relative"))      r->SetEnableRelative(map.GetUIntProperty("enable_relative"));
+  if (map.HasProperty("match_window"))         r->SetMatchWindow(map.GetUIntProperty("match_window"));
+  if (map.HasProperty("search_window"))        r->SetSearchWindow(map.GetUIntProperty("search_window"));
+  if (map.HasProperty("reject_count_offset"))  r->SetRejectCountOffset(map.GetUIntProperty("reject_count_offset"));
+  if (map.HasProperty("tdc_id"))               r->SetTDCId(map.GetUIntProperty("tdc_id"));
 }
 
 void
@@ -131,9 +197,69 @@ XMLHandler::XMLString()
   const XMLByte* w = ft.getRawBuffer();
 
   std::ostringstream os;
-  for (unsigned int i=0; i<ft.getLen(); i++) {
-    os << (char)w[i];
-  }
+  for (unsigned int i=0; i<ft.getLen(); i++) { os << (char)w[i]; }
   return os.str();
+}
+
+XMLHandler::PropertiesMap
+XMLHandler::ParseRegister(std::string reg)
+{
+  fParser = new XercesDOMParser;
+  /*fParser->setValidationScheme(XercesDOMParser::Val_Never);
+  fParser->setDoNamespaces(false);
+  fParser->setDoSchema(false);
+  fParser->setLoadExternalDTD(false);*/
+
+  PropertiesMap out;
+
+  fROOT = 0;
+  fDocument = 0;
+
+  try {
+    MemBufInputSource reg_buf((const XMLByte*)reg.c_str(), reg.size(), "reg (in memory)", false);
+    fParser->parse(reg_buf);
+    DOMDocument* document = fParser->getDocument();
+    fROOT = document->getDocumentElement();
+    if (!fROOT) return out;
+    char* key = XMLString::transcode(fROOT->getNodeName());
+    out.AddProperty("register_name", key);
+    XMLString::release(&key);
+    DOMNodeList* children = fROOT->getChildNodes();
+    if (!children) return out;
+    const XMLSize_t nodeCount = children->getLength();
+    for (unsigned int i=0; i<nodeCount; i++) {
+      DOMNode* currentNode = children->item(i);
+      if (!currentNode->getNodeType() or currentNode->getNodeType()!=DOMNode::ELEMENT_NODE) continue;
+      char* key = XMLString::transcode(currentNode->getNodeName());
+      DOMText* prop = dynamic_cast<DOMText*>(currentNode->getFirstChild());
+      char* value = XMLString::transcode(prop->getWholeText());
+      //std::cout << "----->" << key << " = " << value << std::endl;
+      out.AddProperty(key, value);
+      XMLString::release(&key); XMLString::release(&value);
+    }
+  } catch (XMLException& e) {
+    char* message = XMLString::transcode(e.getMessage());
+    std::cout << "Error parsing file: " << message << std::endl;
+    XMLString::release(&message);
+  }
+
+  delete fParser;
+  return out;
+}
+
+std::string
+XMLHandler::PropertiesMap::GetProperty(const char* name)
+{
+  if (!HasProperty(name)) return "";
+  std::map<std::string,std::string>::iterator it = fMap.find(name);
+  return it->second;
+}
+
+unsigned int
+XMLHandler::PropertiesMap::GetUIntProperty(const char* name)
+{
+  std::string prop = GetProperty(name);
+  if (prop=="") return 0;
+  return atoi(prop.c_str());
 }
 
