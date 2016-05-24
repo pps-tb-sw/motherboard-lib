@@ -59,5 +59,4 @@ class XMLHandler
   DOMImplementation* fImpl;
   DOMDocument* fDocument;
   DOMElement* fROOT;
-  XercesDOMParser *fParser;
 };

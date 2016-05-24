@@ -14,9 +14,6 @@ XMLHandler::XMLHandler() :
 XMLHandler::~XMLHandler()
 {
   Terminate();
-  if (fROOT) delete fROOT;
-  if (fDocument) delete fDocument;
-  if (fImpl) delete fImpl;
 }
 
 void
@@ -34,27 +31,19 @@ XMLHandler::Initialize()
 
   XMLString::transcode("core", str, 99);
   fImpl = DOMImplementationRegistry::getDOMImplementation(str);
-  //XMLCh tempStr[100];
-  //XMLString::transcode("root", tempStr, 99);
-  //DOMDocument* doc = impl->createDocument(0, tempStr, 0);
 }
 
 void
 XMLHandler::Terminate()
 {
-  try {
-    fROOT->release();
-    fDocument->release();
-  } catch (const DOMException& e) {
+  try { if (fDocument) fDocument->release(); } catch (const DOMException& e) {
     char* message = XMLString::transcode(e.getMessage());
     std::cerr << "Error during termination! :\n"
               << message << "\n";
     XMLString::release(&message);
     return;
   }
-  try {
-    XMLPlatformUtils::Terminate();
-  } catch (const XMLException& e) {
+  try { XMLPlatformUtils::Terminate(); } catch (const XMLException& e) {
     char* message = XMLString::transcode(e.getMessage());
     std::cerr << "Error during termination! :\n"
               << message << "\n";
@@ -122,7 +111,10 @@ void
 XMLHandler::ReadRegister(std::string s, TDCControl* c)
 {
   PropertiesMap map = ParseRegister(s);
-  if (map.GetProperty("register_name")!="TDCControl") return;
+  if (map.GetProperty("register_name")!="TDCControl") {
+    std::cerr << "WARNING: trying to read a register of type " << map.GetProperty("register_name") << " in a TDCControl object" << std::endl;
+    return;
+  }
   
   if (map.HasProperty("control_parity")) c->SetControlParity(map.GetUIntProperty("control_parity"));
   if (map.HasProperty("pll_reset"))      c->SetPLLReset(map.GetUIntProperty("pll_reset"));
@@ -136,7 +128,10 @@ void
 XMLHandler::ReadRegister(std::string s, TDCSetup* r)
 {
   PropertiesMap map = ParseRegister(s);
-  if (map.GetProperty("register_name")!="TDCSetup") return;
+  if (map.GetProperty("register_name")!="TDCSetup") {
+    std::cerr << "WARNING: trying to read a register of type " << map.GetProperty("register_name") << " in a TDCSetup object" << std::endl;
+    return;
+  }
   
   if (map.HasProperty("setup_parity"))         r->SetSetupParity(map.GetUIntProperty("setup_parity"));
   if (map.HasProperty("enable_ttl_hit"))       r->SetEnableTTLHit(map.GetUIntProperty("enable_ttl_hit"));
@@ -204,27 +199,22 @@ XMLHandler::XMLString()
 XMLHandler::PropertiesMap
 XMLHandler::ParseRegister(std::string reg)
 {
-  fParser = new XercesDOMParser;
-  /*fParser->setValidationScheme(XercesDOMParser::Val_Never);
-  fParser->setDoNamespaces(false);
-  fParser->setDoSchema(false);
-  fParser->setLoadExternalDTD(false);*/
+  XercesDOMParser* parser = new XercesDOMParser;
+  /*parser->setValidationScheme(XercesDOMParser::Val_Never);
+  parser->setDoNamespaces(false);
+  parser->setDoSchema(false);
+  parser->setLoadExternalDTD(false);*/
 
   PropertiesMap out;
 
-  fROOT = 0;
-  fDocument = 0;
-
   try {
     MemBufInputSource reg_buf((const XMLByte*)reg.c_str(), reg.size(), "reg (in memory)", false);
-    fParser->parse(reg_buf);
-    DOMDocument* document = fParser->getDocument();
-    fROOT = document->getDocumentElement();
-    if (!fROOT) return out;
-    char* key = XMLString::transcode(fROOT->getNodeName());
-    out.AddProperty("register_name", key);
-    XMLString::release(&key);
-    DOMNodeList* children = fROOT->getChildNodes();
+    parser->parse(reg_buf);
+    DOMDocument* document = parser->getDocument();
+    DOMElement* root = document->getDocumentElement();
+    if (!root) return out;
+    char* key = XMLString::transcode(root->getNodeName()); out.AddProperty("register_name", key); XMLString::release(&key);
+    DOMNodeList* children = root->getChildNodes();
     if (!children) return out;
     const XMLSize_t nodeCount = children->getLength();
     for (unsigned int i=0; i<nodeCount; i++) {
@@ -237,13 +227,17 @@ XMLHandler::ParseRegister(std::string reg)
       out.AddProperty(key, value);
       XMLString::release(&key); XMLString::release(&value);
     }
+    document->release();
   } catch (XMLException& e) {
     char* message = XMLString::transcode(e.getMessage());
-    std::cout << "Error parsing file: " << message << std::endl;
+    std::cout << "[XML] Error parsing file: " << message << std::endl;
+    XMLString::release(&message);
+  } catch (DOMException& e) {
+    char* message = XMLString::transcode(e.getMessage());
+    std::cout << "[DOM] Error parsing file: " << message << std::endl;
     XMLString::release(&message);
   }
-
-  delete fParser;
+  //delete parser;
   return out;
 }
 
