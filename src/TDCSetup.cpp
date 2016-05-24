@@ -147,3 +147,86 @@ TDCSetup::GetXML() const
   return out;
 }
 
+uint32_t
+TDCSetup::GetValue(const RegisterName& reg)
+{
+  switch (reg) {
+    case rTestSelect:                            return IsTest();
+    case rEnableErrorMark:                       return GetEnableErrorMark();
+    case rEnableErrorBypass:                     return GetEnableErrorBypass();
+    case rEnableError:                           return GetEnableError();
+    case rReadoutSingleCycleSpeed:               return GetReadoutSingleCycleSpeed();
+    case rSerialDelay:                           return GetSerialDelay();
+    case rStrobeSelect:                          return GetStrobeSelect();
+    case rReadoutSpeedSelect:                    return GetReadoutSpeedSelect();
+    case rTokenDelay:                            return GetTokenDelay();
+    case rEnableLocalTrailer:                    return GetEnableLocalTrailer();
+    case rEnableLocalHeader:                     return GetEnableLocalHeader();
+    case rEnableGlobalTrailer:                   return GetEnableGlobalTrailer();
+    case rEnableGlobalHeader:                    return GetEnableGlobalHeader();
+    case rKeepToken:                             return GetKeepToken();
+    case rMaster:                                return GetMaster();
+    case rEnableBytewise:                        return GetEnableBytewise();
+    case rEnableSerial:                          return GetEnableSerial();
+    case rEnableJTAGReadout:                     return GetEnableJTAGReadout();
+    case rTDCId:                                 return GetTDCId();
+    case rSelectBypassInputs:                    return GetBypassInputs();
+    case rReadoutFIFOSize:                       return GetReadoutFIFOSize();
+    case rRejectCountOffset:                     return GetRejectCountOffset();
+    case rSearchWindow:                          return GetSearchWindow();
+    case rMatchWindow:                           return GetMatchWindow();
+    case rLeadingResolution:                     return GetEdgeResolution();
+    case rMaxEventSize:                          return GetMaxEventSize();
+    case rRejectFIFOFull:                        return GetRejectFIFOFull();
+    case rEnableReadoutOccupancy:                return GetEnableReadoutOccupancy();
+    case rEnableReadoutSeparator:                return GetEnableReadoutSeparator();
+    case rEnableOverflowDetect:                  return GetEnableOverflowDetect();
+    case rEnableRelative:                        return GetEnableRelative();
+    case rEnableAutomaticReject:                 return GetEnableAutomaticReject();
+    case rEventCountOffset:                      return GetEventCountOffset();
+    case rTriggerCountOffset:                    return GetTriggerCountOffset();
+    case rEnableSetCountersOnBunchReset:         return GetEnableSetCountersOnBunchReset();
+    case rEnableMasterResetCode:                 return GetEnableMasterResetCode();
+    case rEnableMasterResetOnEventReset:         return GetEnableMasterResetOnEventReset();
+    case rEnableResetChannelBufferWhenSeparator: return GetEnableResetChannelBufferWhenSeparator();
+    case rEnableSeparatorOnEventReset:           return GetEnableSeparatorOnEventReset();
+    case rEnableSeparatorOnBunchReset:           return GetEnableSeparatorOnBunchReset();
+    case rEnableDirectEventReset:                return GetEnableDirectEventReset();
+    case rEnableDirectBunchReset:                return GetEnableDirectBunchReset();
+    case rEnableDirectTrigger:                   return GetEnableDirectTrigger();
+    case rOffset:                                return 0; //FIXME!
+    case rCoarseCountOffset:                     return GetCoarseCountOffset();
+    case rDLLTapAdjust:                          return GetDLLAdjustmentWord();
+    case rRCAdjust:                              return GetRCAdjustmentWord();
+    case rLowPowerMode:                          return GetLowPowerMode();
+    case rWidthSelect:                           return GetWidthResolution();
+    case rVernierOffset:                         return GetVernierOffset();
+    case rDLLControl:                            return GetDLLControl();
+    case rDeadTime:                              return GetDeadTime();
+    case rTestInvert:                            return GetTestInvert();
+    case rTestMode:                              return GetTestMode();
+    case rTrailing:                              return GetTrailingMode();
+    case rLeading:                               return GetLeadingMode();
+    case rModeRCCompression:                     return GetModeRCCompression();
+    case rModeRC:                                return GetModeRC();
+    case rDLLMode:                               return GetDLLMode();
+    case rPLLControl:                            return GetPLLControlWord();
+    case rSerialClockDelay:                      return GetSerialClockDelay();
+    case rIOClockDelay:                          return GetIOClockDelay();
+    case rCoreClockDelay:                        return GetCoreClockDelay();
+    case rDLLClockDelay:                         return GetDLLClockDelay();
+    case rSerialClockSource:                     return GetSerialClockSource();
+    case rIOClockSource:                         return GetIOClockSource();
+    case rCoreClockSource:                       return GetCoreClockSource();
+    case rDLLClockSource:                        return GetDLLClockSource();
+    case rRollOver:                              return GetRollOver();
+    case rEnableMatching:                        return GetTriggerMatchingMode();
+    case rEnablePair:                            return GetEdgesPairing();
+    case rEnableTTLSerial:                       return GetEnableTTLSerial();
+    case rEnableTTLControl:                      return GetEnableTTLControl();
+    case rEnableTTLReset:                        return GetEnableTTLReset();
+    case rEnableTTLClock:                        return GetEnableTTLClock();
+    case rEnableTTLHit:                          return GetEnableTTLHit();
+    case rSetupParity:                           return GetSetupParity();
+  }
+}

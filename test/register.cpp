@@ -21,5 +21,10 @@ int main(int argc, char* argv[])
   TDCStatus::ErrorType err = st.Error();
   cout << "Global error? " << err.GlobalError() << endl;
 
+  for (unsigned int i=0; i<c.GetNumRegisters(); i++) {
+    TDCControl::RegisterName reg = static_cast<TDCControl::RegisterName>(i);
+    std::cout << "register " << reg << ": " << c.GetValue(reg) << std::endl;
+  }
+
   return 0;
 }

@@ -27,3 +27,16 @@ TDCControl::SetConstantValues()
 {
   EnableAllChannels();
 }
+
+uint32_t
+TDCControl::GetValue(const RegisterName& reg)
+{
+  switch (reg) {
+    case rEnablePattern: return GetEnablePattern();
+    case rGlobalReset:   return GetGlobalReset();
+    case rEnableChannel: return GetEnabledChannels();
+    case rDLLReset:      return GetDLLReset();
+    case rPLLReset:      return GetPLLReset();
+    case rControlParity: return GetControlParity();
+  }
+}

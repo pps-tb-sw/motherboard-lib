@@ -19,6 +19,7 @@ class TDCControl : public TDCRegister
   public:
     typedef enum { OutputEnabled=0x5, OutputDisabled=0x4 } EnablePattern;
     typedef enum { rEnablePattern=0, rGlobalReset, rEnableChannel, rDLLReset, rPLLReset, rControlParity, rNumRegisters } RegisterName;
+    inline unsigned short GetNumRegisters() const { return rNumRegisters; }
   
   public:
     inline TDCControl() : TDCRegister(TDC_CONTROL_BITS_NUM) { SetConstantValues(); }
@@ -69,7 +70,6 @@ class TDCControl : public TDCRegister
     void Dump(int verb=1, std::ostream& os=std::cout) const;
     //inline std::string GetXML() const { return XMLHandler::WriteRegister(this); }
     void SetConstantValues();
-
     uint32_t GetValue(const RegisterName& v);
     
   private:

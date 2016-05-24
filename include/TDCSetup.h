@@ -73,12 +73,14 @@ class TDCSetup : public TDCRegister
       rEnableSetCountersOnBunchReset, rEnableMasterResetCode, rEnableMasterResetOnEventReset,
       rEnableResetChannelBufferWhenSeparator, rEnableSeparatorOnEventReset, rEnableSeparatorOnBunchReset,
       rEnableDirectEventReset, rEnableDirectBunchReset, rEnableDirectTrigger,
-      rOffset0, rCoarseCountOffset, rDLLTapAdjust0, rRCAdjust0,
+      rOffset, rCoarseCountOffset, rDLLTapAdjust, rRCAdjust,
       rLowPowerMode, rWidthSelect, rVernierOffset, rDLLControl, rDeadTime, rTestInvert, rTestMode,
       rTrailing, rLeading, rModeRCCompression, rModeRC, rDLLMode, rPLLControl,
       rSerialClockDelay, rIOClockDelay, rCoreClockDelay, rDLLClockDelay, rSerialClockSource, rIOClockSource, rCoreClockSource, rDLLClockSource, rRollOver,
-      rEnableMatching, rEnablePair, rEnableTTLSerial, rEnableTTLControl, rEnableTTLReset, rEnableTTLClock, rEnableTTLHit, rSetupParity
+      rEnableMatching, rEnablePair, rEnableTTLSerial, rEnableTTLControl, rEnableTTLReset, rEnableTTLClock, rEnableTTLHit, rSetupParity,
+      rNumRegisters
     } RegisterName;
+    inline unsigned short GetNumRegisters() const { return rNumRegisters; }
   
   public:
     inline TDCSetup() : TDCRegister(TDC_SETUP_BITS_NUM) { SetConstantValues(); }
@@ -239,6 +241,9 @@ class TDCSetup : public TDCRegister
     inline void SetEventCountOffset(uint16_t eco) {
       SetBits(kEventCountOffset, eco, 12);
     }
+    inline uint16_t GetEventCountOffset() const {
+      return GetBits(kEventCountOffset, 12);
+    }
     /// Set offset for the trigger time tag counter to set effective trigger latency
     inline void SetTriggerCountOffset(uint16_t tco) {
       SetBits(kTriggerCountOffset, tco, 12);
@@ -263,6 +268,7 @@ class TDCSetup : public TDCRegister
         SetChannelOffset(i, offset);
       }
     }
+    //inline uint64_t GetAllChannelsOffset() const { return static_cast<uint16_t>(GetBits(kOffset0-9*TDC_NUM_CHANNELS, 9*TDC_NUM_CHANNELS)) }
     /// Set offset for the coarse time counter
     inline void SetCoarseCountOffset(uint16_t cco) {
       SetBits(kCoarseCountOffset, cco, 12);
@@ -286,6 +292,12 @@ class TDCSetup : public TDCRegister
       for (int i=0; i<TDC_NUM_CHANNELS; i++) {
         SetDLLAdjustment(i, adj);
       }
+    }
+    inline void SetDLLAdjustmentWord(uint16_t word) {
+      SetBits(kDLLTapAdjust0, word, 12);
+    }
+    inline uint16_t GetDLLAdjustmentWord() const {
+      return GetBits(kDLLTapAdjust0, 12);
     }
     /// Set the adjustment of the RC delay line
     inline void SetRCAdjustment(int tap, uint8_t adj) {
@@ -493,13 +505,16 @@ class TDCSetup : public TDCRegister
     inline void SetReadoutSingleCycleSpeed(const ReadoutSingleCycleSpeed rscs=RSC_40Mbits_s) {
       SetBits(kReadoutSingleCycleSpeed, static_cast<int>(rscs), 3);
     }
+    inline ReadoutSingleCycleSpeed GetReadoutSingleCycleSpeed() const { return static_cast<ReadoutSingleCycleSpeed>(GetBits(kReadoutSingleCycleSpeed, 3)); }
     /// Programmable delay of serial input, in time unit ~ 1 ns
     inline void SetSerialDelay(const uint8_t sd=0x0) {
       SetBits(kSerialDelay, sd, 4);
     }
+    inline uint8_t GetSerialDelay() const { return static_cast<uint8_t>(GetBits(kSerialDelay, 4)); }
     inline void SetStrobeSelect(const SerialStrobeType ss=SS_NoStrobe) {
       SetBits(kStrobeSelect, static_cast<int>(ss), 2);
     }
+    inline SerialStrobeType GetStrobeSelect() const { return static_cast<SerialStrobeType>(GetBits(kStrobeSelect, 2)); }
     /**
      * \brief Selection of serial read-out speed
      * \param[in] rss
@@ -510,25 +525,43 @@ class TDCSetup : public TDCRegister
     inline void SetReadoutSpeedSelect(const ReadoutSpeed rss=RO_Fixed) {
       SetBits(kReadoutSpeedSelect, static_cast<int>(rss), 1);
     }
+    inline ReadoutSpeed GetReadoutSpeedSelect() const {
+      return static_cast<ReadoutSpeed>(GetBits(kReadoutSpeedSelect, 1));
+    }
     /// Programmable delay of token input, in time unit ~ 1 ns
     inline void SetTokenDelay(const uint8_t td=0x0) {
       SetBits(kTokenDelay, td, 4);
+    }
+    inline uint8_t GetTokenDelay() const {
+      return static_cast<uint8_t>(GetBits(kTokenDelay, 4));
     }
     /// Enable of local trailers in read-out
     inline void SetEnableLocalTrailer(const bool elt=true) {
       SetBits(kEnableLocalTrailer, elt, 1);
     }
+    inline bool GetEnableLocalTrailer() const {
+      return GetBits(kEnableLocalTrailer, 1);
+    }
     /// Enable of local headers in read-out
     inline void SetEnableLocalHeader(const bool elh=true) {
       SetBits(kEnableLocalHeader, elh, 1);
+    }
+    inline bool GetEnableLocalHeader() const {
+      return GetBits(kEnableLocalHeader, 1);
     }
     /// Enable of global trailers in read-out (only valid for master TDC)
     inline void SetEnableGlobalTrailer(const bool egt=true) {
       SetBits(kEnableGlobalTrailer, egt, 1);
     }
+    inline bool GetEnableGlobalTrailer() const {
+      return GetBits(kEnableGlobalTrailer, 1);
+    }
     /// Enable of global headers in read-out (only valid for master TDC)
     inline void SetEnableGlobalHeader(const bool egh=true) {
       SetBits(kEnableGlobalHeader, egh, 1);
+    }
+    inline bool GetEnableGlobalHeader() const {
+      return GetBits(kEnableGlobalHeader, 1);
     }
     /// Keep token until end of event or no more data,
     /// otherwise pass token after each word read.
@@ -536,67 +569,112 @@ class TDCSetup : public TDCRegister
     inline void SetKeepToken(const bool kt=true) {
       SetBits(kKeepToken, kt, 1);
     }
+    inline bool GetKeepToken() const {
+      return GetBits(kKeepToken, 1);
+    }
     inline void SetMaster(const bool m=true) {
       SetBits(kMaster, m, 1);
     }
+    inline bool GetMaster() const {
+      return GetBits(kMaster, 1);
+    }
     inline void SetEnableBytewise(const bool seb=true) {
       SetBits(kEnableBytewise, seb, 1);
+    }
+    inline bool GetEnableBytewise() const {
+      return GetBits(kEnableBytewise, 1);
     }
     /// Select serial in and token in from bypass inputs
     inline void SetBypassInputs(const bool sbi=true) {
       SetBits(kSelectBypassInputs, sbi, 1);
     }
+    inline bool GetBypassInputs() const {
+      return GetBits(kSelectBypassInputs, 1);
+    }
     /// Enable overflow detection of L1 buffers (should always be enabled!)
     inline void SetEnableOverflowDetect(const bool eod=true) {
       SetBits(kEnableOverflowDetect, eod, 1);
+    }
+    inline bool GetEnableOverflowDetect() const {
+      return GetBits(kEnableOverflowDetect, 1);
     }
     /// Enable of automatic rejection (should always be enabled if trigger matching mode!)
     inline void SetEnableAutomaticReject(const bool ear=true) {
       SetBits(kEnableAutomaticReject, ear, 1);
     }
+    inline bool GetEnableAutomaticReject() const {
+      return GetBits(kEnableAutomaticReject, 1);
+    }
     /// Enable all counters to be set on bunch count reset
     inline void SetEnableSetCountersOnBunchReset(const bool escobr=true) {
       SetBits(kEnableSetCountersOnBunchReset, escobr, 1);
+    }
+    inline bool GetEnableSetCountersOnBunchReset() const {
+      return GetBits(kEnableSetCountersOnBunchReset, 1);
     }
     /// Enable master reset code on encoded_control
     inline void SetEnableMasterResetCode(const bool emrc=true) {
       SetBits(kEnableMasterResetCode, emrc, 1);
     }
+    inline bool GetEnableMasterResetCode() const {
+      return GetBits(kEnableMasterResetCode, 1);
+    }
     /// Enable master reset of whole TDC on event reset
     inline void SetEnableMasterResetOnEventReset(const bool emroer=true) {
       SetBits(kEnableMasterResetOnEventReset, emroer, 1);
+    }
+    inline bool GetEnableMasterResetOnEventReset() const {
+      return GetBits(kEnableMasterResetOnEventReset, 1);
     }
     /// Enable reset channel buffers when separator
     inline void SetEnableResetChannelBufferWhenSeparator(const bool ercbws=true) {
       SetBits(kEnableResetChannelBufferWhenSeparator, ercbws, 1);
     }
+    inline bool GetEnableResetChannelBufferWhenSeparator() const {
+      return GetBits(kEnableResetChannelBufferWhenSeparator, 1);
+    }
     /// Enable generation of separator on event reset
     inline void SetEnableSeparatorOnEventReset(const bool esoer=true) {
       SetBits(kEnableSeparatorOnEventReset, esoer, 1);
+    }
+    inline bool GetEnableSeparatorOnEventReset() const {
+      return GetBits(kEnableSeparatorOnEventReset, 1);
     }
     /// Enable generation of separator on bunch reset
     inline void SetEnableSeparatorOnBunchReset(const bool esobr=true) {
       SetBits(kEnableSeparatorOnBunchReset, esobr, 1);
     }
+    inline bool GetEnableSeparatorOnBunchReset() const {
+      return GetBits(kEnableSeparatorOnBunchReset, 1);
+    }
     /// Enable of direct event reset input pin (1), otherwise taken from encoded control
     inline void SetEnableDirectEventReset(const bool eder=true) {
       SetBits(kEnableDirectEventReset, eder, 1);
     }
+    inline bool GetEnableDirectEventReset() const { return GetBits(kEnableDirectEventReset, 1); }
     /// Enable of direct bunch reset input pin (1), otherwise taken from encoded control
     inline void SetEnableDirectBunchReset(const bool edbr=true) {
       SetBits(kEnableDirectBunchReset, edbr, 1);
     }
+    inline bool GetEnableDirectBunchReset() const { return GetBits(kEnableDirectBunchReset, 1); }
     /// Enable of direct trigger input pin
     inline void SetEnableDirectTrigger(const bool edt=true) {
       SetBits(kEnableDirectTrigger, edt, 1);
     }
+    inline bool GetEnableDirectTrigger() const { return GetBits(kEnableDirectTrigger, 1); }
     /// Low power mode of channel buffers
     inline void SetLowPowerMode(const bool lpm=true) {
       SetBits(kLowPowerMode, lpm, 1);
     }
+    inline bool GetLowPowerMode() const {
+      return GetBits(kLowPowerMode, 1);
+    }
     /// Control of DLL (DLL charge pump levels)
     inline void SetDLLControl(const uint8_t dc) {
       SetBits(kDLLControl, dc&0x15, 4);
+    }
+    inline uint8_t GetDLLControl() const {
+      return GetBits(kDLLControl, 4);
     }
     /**
      * \brief Delay of internal serial clock
@@ -607,6 +685,9 @@ class TDCSetup : public TDCRegister
       uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
       SetBits(kSerialClockDelay, word, 4);
     }
+    inline uint8_t GetSerialClockDelay() const {
+      return GetBits(kSerialClockDelay, 4);
+    }
     /**
      * \brief Delay of internal I/O clock
      * \param[in] delay_clock Use of direct clock (0) or delayed clock (1)
@@ -615,6 +696,9 @@ class TDCSetup : public TDCRegister
     inline void SetIOClockDelay(const bool delay_clock, const uint8_t delay) {
       uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
       SetBits(kIOClockDelay, word, 4);
+    }
+    inline uint8_t GetIOClockDelay() const {
+      return GetBits(kIOClockDelay, 4);
     }
     /**
      * \brief Delay of internal core clock
@@ -625,6 +709,9 @@ class TDCSetup : public TDCRegister
       uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
       SetBits(kCoreClockDelay, word, 4);
     }
+    inline uint8_t GetCoreClockDelay() const {
+      return GetBits(kCoreClockDelay, 4);
+    }
     /**
      * \brief Delay of internal DLL clock
      * \param[in] delay_clock Use of direct clock (0) or delayed clock (1)
@@ -634,6 +721,9 @@ class TDCSetup : public TDCRegister
       uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
       SetBits(kDLLClockDelay, word, 4);
     }
+    inline uint8_t GetDLLClockDelay() const {
+      return GetBits(kDLLClockDelay, 4);
+    }
     /// Selection of source for serial clock
     inline void SetSerialClockSource(const SerialClockSource scs) {
       if (scs==Serial_pll_clock_160 or scs==Serial_pll_clock_40) {
@@ -641,6 +731,9 @@ class TDCSetup : public TDCRegister
                   << std::hex << scs << std::dec << std::endl;
       }
       SetBits(kSerialClockSource, scs, 2);
+    }
+    inline SerialClockSource GetSerialClockSource() const {
+      return static_cast<SerialClockSource>(GetBits(kSerialClockSource, 2));
     }
     /// Selection of clock source for I/O signals
     inline void SetIOClockSource(const IOClockSource ics) {
@@ -650,18 +743,28 @@ class TDCSetup : public TDCRegister
       }
       SetBits(kIOClockSource, ics, 2);
     }
+    inline IOClockSource GetIOClockSource() const {
+      return static_cast<IOClockSource>(GetBits(kIOClockSource, 2));
+    }
     /// Selection of clock source for internal logic
     inline void SetCoreClockSource(const CoreClockSource ccs) {
       SetBits(kCoreClockSource, ccs, 2);
+    }
+    inline CoreClockSource GetCoreClockSource() const {
+      return static_cast<CoreClockSource>(GetBits(kCoreClockSource, 2));
     }
     /// Selection of clock source for DLL
     inline void SetDLLClockSource(const DLLClockSource dcs) {
       SetBits(kDLLClockSource, dcs, 3);
     }
+    inline DLLClockSource GetDLLClockSource() const {
+      return static_cast<DLLClockSource>(GetBits(kDLLClockSource, 3));
+    }
     inline void SetTest(const bool test=true) {
       SetBits(kTestSelect, test, 1);
       SetBits(kTestSelect+1, 0x7, 3);
     }
+    inline bool IsTest() const { return static_cast<bool>(GetBits(kTestSelect, 1)); }
 
     // List of LSBs for all sub-words in the full ~700-bits setup word
     static const bit kTestSelect = 0;
