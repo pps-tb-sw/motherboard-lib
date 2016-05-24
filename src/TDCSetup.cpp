@@ -139,3 +139,11 @@ TDCSetup::Dump(int verb, std::ostream& os) const
   os << "================================="
      << "=================================" << std::endl;
 }
+
+std::string
+TDCSetup::GetXML() const
+{
+  std::string out;
+  return out;
+}
+

@@ -4,6 +4,8 @@
 #include "TDCRegister.h"
 #include "TDCConstants.h"
 
+//#include "XMLHandler.h"
+
 /**
  * Object handling the control word provided by/to the HPTDC chip
  * \brief Control word to be sent to the HPTDC chip
@@ -37,26 +39,40 @@ class TDCControl : public TDCRegister
     inline void SetPLLReset(const bool pr=true) { SetBits(kPLLReset, pr, 1); }
     inline bool GetPLLReset() const { return GetBits(kPLLReset, 1); }
     
-    inline void EnableChannel(unsigned int id) { SetBits(kEnableChannel+id, 1, 1); }
+    inline void EnableChannel(unsigned int id) {
+      if (id<0 or id>=TDC_NUM_CHANNELS) return;
+      SetBits(kEnableChannel+id, 1, 1);
+    }
     inline void EnableAllChannels() {
-      for (unsigned int i=0; i<TDC_NUM_CHANNELS; i++) { EnableChannel(i); }
+      //SetBits(kEnableChannel, (unsigned long)0xffffffff, TDC_NUM_CHANNELS);
+      for (unsigned int i=0; i<TDC_NUM_CHANNELS; i++) EnableChannel(i);
     }
-    inline void DisableChannel(unsigned int id) { SetBits(kEnableChannel+id, 0, 1); }
-    inline void DisableAllChannels() {
-      for (unsigned int i=0; i<TDC_NUM_CHANNELS; i++) { DisableChannel(i); }
+    inline void DisableChannel(unsigned int id) {
+      if (id<0 or id>=TDC_NUM_CHANNELS) return;
+      SetBits(kEnableChannel+id, 0, 1);
     }
+    inline void DisableAllChannels() { SetBits(kEnableChannel, 0, TDC_NUM_CHANNELS); }
+    inline bool IsChannelEnabled(unsigned int id) const {
+      if (id<0 or id>=TDC_NUM_CHANNELS) return false;
+      return GetBits(kEnableChannel+id, 1);
+    }
+    inline void SetEnabledChannels(uint32_t ch) {
+      SetBits(kEnableChannel, ch&0xffff, 16);
+      SetBits(kEnableChannel+16, (ch>>16), 16);
+    }
+    inline uint32_t GetEnabledChannels() const { return static_cast<uint32_t>(GetBits(kEnableChannel, 32)); }
+
+    void SetControlParity(const bool cp=true) { SetBits(kControlParity, cp, 1); }
+    inline bool GetControlParity() const { return GetBits(kControlParity, 1); }
     
     /// Printout all useful values of this control register into an output stream
     void Dump(int verb=1, std::ostream& os=std::cout) const;
+    //inline std::string GetXML() const { return XMLHandler::WriteRegister(this); }
     void SetConstantValues();
 
     uint32_t GetValue(const RegisterName& v);
     
   private:
-    void SetControlParity(const bool cp=true) {
-      SetBits(kControlParity, cp, 1);
-    }
-    
     static const bit kEnablePattern = 0;
     static const bit kGlobalReset = 4;
     static const bit kEnableChannel = 5;
