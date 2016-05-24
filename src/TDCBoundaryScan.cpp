@@ -1,11 +1,14 @@
 #include "TDCBoundaryScan.h"
 
-void
-TDCBoundaryScan::SetConstantValues()
+namespace PPSTimingMB
 {
-}
+  void
+  TDCBoundaryScan::SetConstantValues()
+  {
+  }
 
-void
-TDCBoundaryScan::Dump() const
-{
+  void
+  TDCBoundaryScan::Dump() const
+  {
+  }
 }

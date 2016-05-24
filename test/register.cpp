@@ -6,24 +6,24 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-  TDCSetup s;
+  PPSTimingMB::TDCSetup s;
   s.Dump(2);
 
-  TDCControl c;
-  c.SetEnablePattern(TDCControl::OutputDisabled);
+  PPSTimingMB::TDCControl c;
+  c.SetEnablePattern(PPSTimingMB::TDCControl::OutputDisabled);
   c.DumpRegister(3);
-  c.SetEnablePattern(TDCControl::OutputEnabled);
+  c.SetEnablePattern(PPSTimingMB::TDCControl::OutputEnabled);
   c.DisableAllChannels();
   c.DumpRegister(3);
 
-  TDCStatus st;
+  PPSTimingMB::TDCStatus st;
   st.Dump(3);
-  TDCStatus::ErrorType err = st.Error();
+  PPSTimingMB::TDCStatus::ErrorType err = st.Error();
   cout << "Global error? " << err.GlobalError() << endl;
 
-  for (unsigned int i=0; i<c.GetNumRegisters(); i++) {
-    TDCControl::RegisterName reg = static_cast<TDCControl::RegisterName>(i);
-    std::cout << "register " << reg << ": " << c.GetValue(reg) << std::endl;
+  for (unsigned int i=0; i<s.GetNumRegisters(); i++) {
+    PPSTimingMB::TDCSetup::RegisterName reg = static_cast<PPSTimingMB::TDCSetup::RegisterName>(i);
+    std::cout << "register " << reg << ": " << s.GetValue(reg) << std::endl;
   }
 
   return 0;
