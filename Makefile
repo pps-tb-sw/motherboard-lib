@@ -1,8 +1,8 @@
 CC = g++
 RM = rm
 
-CFLAGS = -fPIC -g
-LDFLAGS = -shared -lxerces-c -g
+CFLAGS = -fPIC -g -Wall
+LDFLAGS = -shared -lxerces-c -g -Wall
 RMFLAGS = -rf
 
 OBJ_DIR = obj/

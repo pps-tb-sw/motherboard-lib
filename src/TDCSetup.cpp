@@ -230,6 +230,7 @@ namespace PPSTimingMB
       case rEnableTTLClock:                        return GetEnableTTLClock();
       case rEnableTTLHit:                          return GetEnableTTLHit();
       case rSetupParity:                           return GetSetupParity();
+      default: return 0;
     }
   }
 }

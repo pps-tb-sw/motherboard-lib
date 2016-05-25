@@ -40,6 +40,7 @@ namespace PPSTimingMB
       case rDLLReset:      return GetDLLReset();
       case rPLLReset:      return GetPLLReset();
       case rControlParity: return GetControlParity();
+      default: return 0;
     }
   }
 }

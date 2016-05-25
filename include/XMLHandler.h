@@ -69,8 +69,8 @@ namespace PPSTimingMB
     PropertiesMap ParseRegister(std::string);
     /*static DOMImplementation* fImpl;
     static DOMDocument* fDocument;*/
+    DOMElement* fROOT;
     DOMImplementation* fImpl;
     DOMDocument* fDocument;
-    DOMElement* fROOT;
   };
 }
