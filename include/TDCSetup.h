@@ -82,6 +82,7 @@ namespace PPSTimingMB
         rEnableMatching, rEnablePair, rEnableTTLSerial, rEnableTTLControl, rEnableTTLReset, rEnableTTLClock, rEnableTTLHit, rSetupParity,
         rNumRegisters
       } RegisterName;
+      friend std::ostream& operator<<(std::ostream& out, const RegisterName& sp);
       inline unsigned short GetNumRegisters() const { return rNumRegisters; }
 
     public:

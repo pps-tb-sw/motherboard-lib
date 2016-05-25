@@ -19,6 +19,7 @@ namespace PPSTimingMB
     public:
       typedef enum { OutputEnabled=0x5, OutputDisabled=0x4 } EnablePattern;
       typedef enum { rEnablePattern=0, rGlobalReset, rEnableChannel, rDLLReset, rPLLReset, rControlParity, rNumRegisters } RegisterName;
+      friend std::ostream& operator<<(std::ostream& out, const RegisterName& sp);
       inline unsigned short GetNumRegisters() const { return rNumRegisters; }
 
     public:

@@ -43,4 +43,18 @@ namespace PPSTimingMB
       default: return 0;
     }
   }
+
+  std::ostream&
+  operator<<(std::ostream& os, const TDCControl::RegisterName& reg) {
+    switch (reg) {
+      case TDCControl::rEnablePattern: os << "enable_pattern"; break;
+      case TDCControl::rGlobalReset:   os << "global_reset"; break;
+      case TDCControl::rEnableChannel: os << "enable_channel"; break;
+      case TDCControl::rDLLReset:      os << "dll_reset"; break;
+      case TDCControl::rPLLReset:      os << "pll_reset"; break;
+      case TDCControl::rControlParity: os << "control_parity"; break;
+      default: break;
+    }
+    return os;
+  }
 }
