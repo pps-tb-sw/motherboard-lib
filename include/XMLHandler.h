@@ -1,3 +1,6 @@
+#ifndef XMLHandler_h
+#define XMLHandler_h
+
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -74,3 +77,5 @@ namespace PPSTimingMB
     DOMDocument* fDocument;
   };
 }
+
+#endif
