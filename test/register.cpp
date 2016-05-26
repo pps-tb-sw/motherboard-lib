@@ -1,6 +1,7 @@
 #include "TDCControl.h"
 #include "TDCSetup.h"
 #include "TDCStatus.h"
+#include "TDCInternalCoreTest.h"
 
 using namespace std;
 
@@ -25,6 +26,9 @@ int main(int argc, char* argv[])
     PPSTimingMB::TDCSetup::RegisterName reg = static_cast<PPSTimingMB::TDCSetup::RegisterName>(i);
     std::cout << "register " << reg << ": " << s.GetValue(reg) << std::endl;
   }
+
+  PPSTimingMB::TDCInternalCoreTest ict;
+  ict.Dump();
 
   return 0;
 }
