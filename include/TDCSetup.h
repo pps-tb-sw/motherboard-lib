@@ -9,6 +9,28 @@
 
 namespace PPSTimingMB
 {
+  typedef enum TDCSetupRegister {
+    rTestSelect=0,
+    rEnableErrorMark, rEnableErrorBypass, rEnableError,
+    rReadoutSingleCycleSpeed, rSerialDelay, rStrobeSelect, rReadoutSpeedSelect, rTokenDelay,
+    rEnableLocalTrailer, rEnableLocalHeader, rEnableGlobalTrailer, rEnableGlobalHeader,
+    rKeepToken, rMaster, rEnableBytewise, rEnableSerial, rEnableJTAGReadout,
+    rTDCId, rSelectBypassInputs, rReadoutFIFOSize, rRejectCountOffset,
+    rSearchWindow, rMatchWindow, rLeadingResolution, rMaxEventSize, rRejectFIFOFull,
+    rEnableReadoutOccupancy, rEnableReadoutSeparator, rEnableOverflowDetect, rEnableRelative,
+    rEnableAutomaticReject, rEventCountOffset, rTriggerCountOffset,
+    rEnableSetCountersOnBunchReset, rEnableMasterResetCode, rEnableMasterResetOnEventReset,
+    rEnableResetChannelBufferWhenSeparator, rEnableSeparatorOnEventReset, rEnableSeparatorOnBunchReset,
+    rEnableDirectEventReset, rEnableDirectBunchReset, rEnableDirectTrigger,
+    rOffset, rCoarseCountOffset, rDLLTapAdjust, rRCAdjust,
+    rLowPowerMode, rWidthSelect, rVernierOffset, rDLLControl, rDeadTime, rTestInvert, rTestMode,
+    rTrailing, rLeading, rModeRCCompression, rModeRC, rDLLMode, rPLLControl,
+    rSerialClockDelay, rIOClockDelay, rCoreClockDelay, rDLLClockDelay, rSerialClockSource, rIOClockSource, rCoreClockSource, rDLLClockSource, rRollOver,
+    rEnableMatching, rEnablePair, rEnableTTLSerial, rEnableTTLControl, rEnableTTLReset, rEnableTTLClock, rEnableTTLHit, rSetupParity,
+    rNumSetupRegisters
+  } TDCSetupRegister;
+  std::ostream& operator<<(std::ostream& out, const TDCSetupRegister& sp);
+  inline unsigned short GetNumTDCSetupRegisters() { return rNumSetupRegisters; }
   /**
    * Object handling the setup word provided by/to the HPTDC chip
    * \brief Setup word to be sent to the HPTDC chip
@@ -62,28 +84,6 @@ namespace PPSTimingMB
         RSC_2p5Mbits_s=0x4, RSC_1p25Mbits_s=0x5, RSC_625kbits_s=0x6,
         RSC_312p5kbits_s=0x7
       } ReadoutSingleCycleSpeed;
-      typedef enum {
-        rTestSelect=0,
-        rEnableErrorMark, rEnableErrorBypass, rEnableError,
-        rReadoutSingleCycleSpeed, rSerialDelay, rStrobeSelect, rReadoutSpeedSelect, rTokenDelay,
-        rEnableLocalTrailer, rEnableLocalHeader, rEnableGlobalTrailer, rEnableGlobalHeader,
-        rKeepToken, rMaster, rEnableBytewise, rEnableSerial, rEnableJTAGReadout,
-        rTDCId, rSelectBypassInputs, rReadoutFIFOSize, rRejectCountOffset,
-        rSearchWindow, rMatchWindow, rLeadingResolution, rMaxEventSize, rRejectFIFOFull,
-        rEnableReadoutOccupancy, rEnableReadoutSeparator, rEnableOverflowDetect, rEnableRelative,
-        rEnableAutomaticReject, rEventCountOffset, rTriggerCountOffset,
-        rEnableSetCountersOnBunchReset, rEnableMasterResetCode, rEnableMasterResetOnEventReset,
-        rEnableResetChannelBufferWhenSeparator, rEnableSeparatorOnEventReset, rEnableSeparatorOnBunchReset,
-        rEnableDirectEventReset, rEnableDirectBunchReset, rEnableDirectTrigger,
-        rOffset, rCoarseCountOffset, rDLLTapAdjust, rRCAdjust,
-        rLowPowerMode, rWidthSelect, rVernierOffset, rDLLControl, rDeadTime, rTestInvert, rTestMode,
-        rTrailing, rLeading, rModeRCCompression, rModeRC, rDLLMode, rPLLControl,
-        rSerialClockDelay, rIOClockDelay, rCoreClockDelay, rDLLClockDelay, rSerialClockSource, rIOClockSource, rCoreClockSource, rDLLClockSource, rRollOver,
-        rEnableMatching, rEnablePair, rEnableTTLSerial, rEnableTTLControl, rEnableTTLReset, rEnableTTLClock, rEnableTTLHit, rSetupParity,
-        rNumRegisters
-      } RegisterName;
-      friend std::ostream& operator<<(std::ostream& out, const RegisterName& sp);
-      inline unsigned short GetNumRegisters() const { return rNumRegisters; }
 
     public:
       inline TDCSetup() : TDCRegister(TDC_SETUP_BITS_NUM) { SetConstantValues(); }
@@ -499,7 +499,7 @@ namespace PPSTimingMB
       /// Printout all useful values of this setup register into an output stream
       void Dump(int verb=1, std::ostream& os=std::cout) const;
       std::string GetXML() const;
-      uint32_t GetValue(const RegisterName& v);
+      uint32_t GetValue(const TDCSetupRegister& v);
 
     private:
       //////////////////////// Private set'ers and get'ers ////////////////////////

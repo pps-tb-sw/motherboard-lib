@@ -6,6 +6,9 @@
 
 namespace PPSTimingMB
 {
+  typedef enum TDCControlRegister { rEnablePattern=0, rGlobalReset, rEnableChannel, rDLLReset, rPLLReset, rControlParity, rNumControlRegisters } TDCControlRegister;
+  std::ostream& operator<<(std::ostream& out, const TDCControlRegister& sp);
+  inline unsigned short GetNumTDCControlRegisters() { return rNumControlRegisters; }
   /**
    * Object handling the control word provided by/to the HPTDC chip
    * \brief Control word to be sent to the HPTDC chip
@@ -17,10 +20,7 @@ namespace PPSTimingMB
   class TDCControl : public TDCRegister
   {
     public:
-      typedef enum { OutputEnabled=0x5, OutputDisabled=0x4 } EnablePattern;
-      typedef enum { rEnablePattern=0, rGlobalReset, rEnableChannel, rDLLReset, rPLLReset, rControlParity, rNumRegisters } RegisterName;
-      friend std::ostream& operator<<(std::ostream& out, const RegisterName& sp);
-      inline unsigned short GetNumRegisters() const { return rNumRegisters; }
+      typedef enum EnablePattern { OutputEnabled=0x5, OutputDisabled=0x4 } EnablePattern;
 
     public:
       inline TDCControl() : TDCRegister(TDC_CONTROL_BITS_NUM) { SetConstantValues(); }
@@ -71,7 +71,7 @@ namespace PPSTimingMB
       void Dump(int verb=1, std::ostream& os=std::cout) const;
       //inline std::string GetXML() const { return XMLHandler::WriteRegister(this); }
       void SetConstantValues();
-      uint32_t GetValue(const RegisterName& v);
+      uint32_t GetValue(const TDCControlRegister& v);
 
     private:
       static const bit kEnablePattern = 0;

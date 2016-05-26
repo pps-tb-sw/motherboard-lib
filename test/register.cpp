@@ -22,10 +22,13 @@ int main(int argc, char* argv[])
   PPSTimingMB::TDCStatus::ErrorType err = st.Error();
   cout << "Global error? " << err.GlobalError() << endl;
 
-  for (unsigned int i=0; i<s.GetNumRegisters(); i++) {
-    PPSTimingMB::TDCSetup::RegisterName reg = static_cast<PPSTimingMB::TDCSetup::RegisterName>(i);
-    std::cout << "register " << reg << ": " << s.GetValue(reg) << std::endl;
+  for (unsigned int i=0; i<PPSTimingMB::GetNumTDCSetupRegisters(); i++) {
+    PPSTimingMB::TDCSetupRegister reg = static_cast<PPSTimingMB::TDCSetupRegister>(i);
+    cout << "register " << reg << ": " << s.GetValue(reg) << endl;
   }
+
+  PPSTimingMB::TDCSetupRegister reg[] = { PPSTimingMB::rPLLControl, PPSTimingMB::rEnableMatching };
+  cout << reg[0] << " -- " << reg[1] << endl;
 
   PPSTimingMB::TDCInternalCoreTest ict;
   ict.Dump();

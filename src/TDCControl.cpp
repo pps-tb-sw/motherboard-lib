@@ -31,7 +31,7 @@ namespace PPSTimingMB
   }
 
   uint32_t
-  TDCControl::GetValue(const RegisterName& reg)
+  TDCControl::GetValue(const TDCControlRegister& reg)
   {
     switch (reg) {
       case rEnablePattern: return GetEnablePattern();
@@ -45,14 +45,14 @@ namespace PPSTimingMB
   }
 
   std::ostream&
-  operator<<(std::ostream& os, const TDCControl::RegisterName& reg) {
+  operator<<(std::ostream& os, const TDCControlRegister& reg) {
     switch (reg) {
-      case TDCControl::rEnablePattern: os << "enable_pattern"; break;
-      case TDCControl::rGlobalReset:   os << "global_reset"; break;
-      case TDCControl::rEnableChannel: os << "enable_channel"; break;
-      case TDCControl::rDLLReset:      os << "dll_reset"; break;
-      case TDCControl::rPLLReset:      os << "pll_reset"; break;
-      case TDCControl::rControlParity: os << "control_parity"; break;
+      case rEnablePattern: os << "enable_pattern"; break;
+      case rGlobalReset:   os << "global_reset"; break;
+      case rEnableChannel: os << "enable_channel"; break;
+      case rDLLReset:      os << "dll_reset"; break;
+      case rPLLReset:      os << "pll_reset"; break;
+      case rControlParity: os << "control_parity"; break;
       default: break;
     }
     return os;
