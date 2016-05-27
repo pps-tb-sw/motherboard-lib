@@ -94,6 +94,11 @@ namespace PPSTimingMB
 
       //////////////////////// Public set'ers and get'ers ////////////////////////
 
+      inline void SetTest(const bool test=true) {
+        SetBits(kTestSelect, test, 1);
+        SetBits(kTestSelect+1, 0x7, 3);
+      }
+      inline bool IsTest() const { return static_cast<bool>(GetBits(kTestSelect, 1)); }
       /// Mark events with error if global error signal is set.
       inline void SetEnableErrorMark(const bool em) {
         SetBits(kEnableErrorMark, em, 1); }
@@ -496,14 +501,6 @@ namespace PPSTimingMB
       }
       inline bool GetEnableRelative() const { return static_cast<bool>(GetBits(kEnableRelative, 1)); }
 
-      /// Printout all useful values of this setup register into an output stream
-      void Dump(int verb=1, std::ostream& os=std::cout) const;
-      std::string GetXML() const;
-      uint32_t GetValue(const TDCSetupRegister& v);
-
-    private:
-      //////////////////////// Private set'ers and get'ers ////////////////////////
-
       /// Serial transmission speed in single cycle mode
       inline void SetReadoutSingleCycleSpeed(const ReadoutSingleCycleSpeed rscs=RSC_40Mbits_s) {
         SetBits(kReadoutSingleCycleSpeed, static_cast<int>(rscs), 3);
@@ -535,150 +532,104 @@ namespace PPSTimingMB
       inline void SetTokenDelay(const uint8_t td=0x0) {
         SetBits(kTokenDelay, td, 4);
       }
-      inline uint8_t GetTokenDelay() const {
-        return static_cast<uint8_t>(GetBits(kTokenDelay, 4));
-      }
+      inline uint8_t GetTokenDelay() const { return static_cast<uint8_t>(GetBits(kTokenDelay, 4)); }
       /// Enable of local trailers in read-out
-      inline void SetEnableLocalTrailer(const bool elt=true) {
-        SetBits(kEnableLocalTrailer, elt, 1);
-      }
-      inline bool GetEnableLocalTrailer() const {
-        return GetBits(kEnableLocalTrailer, 1);
-      }
+      inline void SetEnableLocalTrailer(const bool elt=true) { SetBits(kEnableLocalTrailer, elt, 1); }
+      inline bool GetEnableLocalTrailer() const { return GetBits(kEnableLocalTrailer, 1); }
       /// Enable of local headers in read-out
-      inline void SetEnableLocalHeader(const bool elh=true) {
-        SetBits(kEnableLocalHeader, elh, 1);
-      }
-      inline bool GetEnableLocalHeader() const {
-        return GetBits(kEnableLocalHeader, 1);
-      }
+      inline void SetEnableLocalHeader(const bool elh=true) { SetBits(kEnableLocalHeader, elh, 1); }
+      inline bool GetEnableLocalHeader() const { return GetBits(kEnableLocalHeader, 1); }
       /// Enable of global trailers in read-out (only valid for master TDC)
-      inline void SetEnableGlobalTrailer(const bool egt=true) {
-        SetBits(kEnableGlobalTrailer, egt, 1);
-      }
-      inline bool GetEnableGlobalTrailer() const {
-        return GetBits(kEnableGlobalTrailer, 1);
-      }
+      inline void SetEnableGlobalTrailer(const bool egt=true) { SetBits(kEnableGlobalTrailer, egt, 1); }
+      inline bool GetEnableGlobalTrailer() const { return GetBits(kEnableGlobalTrailer, 1); }
       /// Enable of global headers in read-out (only valid for master TDC)
-      inline void SetEnableGlobalHeader(const bool egh=true) {
-        SetBits(kEnableGlobalHeader, egh, 1);
-      }
-      inline bool GetEnableGlobalHeader() const {
-        return GetBits(kEnableGlobalHeader, 1);
-      }
+      inline void SetEnableGlobalHeader(const bool egh=true) { SetBits(kEnableGlobalHeader, egh, 1); }
+      inline bool GetEnableGlobalHeader() const { return GetBits(kEnableGlobalHeader, 1); }
       /// Keep token until end of event or no more data,
       /// otherwise pass token after each word read.
       /// Must be enabled when using trigger matching.
-      inline void SetKeepToken(const bool kt=true) {
-        SetBits(kKeepToken, kt, 1);
-      }
-      inline bool GetKeepToken() const {
-        return GetBits(kKeepToken, 1);
-      }
-      inline void SetMaster(const bool m=true) {
-        SetBits(kMaster, m, 1);
-      }
-      inline bool GetMaster() const {
-        return GetBits(kMaster, 1);
-      }
-      inline void SetEnableBytewise(const bool seb=true) {
-        SetBits(kEnableBytewise, seb, 1);
-      }
-      inline bool GetEnableBytewise() const {
-        return GetBits(kEnableBytewise, 1);
-      }
+      inline void SetKeepToken(const bool kt=true) { SetBits(kKeepToken, kt, 1); }
+      inline bool GetKeepToken() const { return GetBits(kKeepToken, 1); }
+      inline void SetMaster(const bool m=true) { SetBits(kMaster, m, 1); }
+      inline bool GetMaster() const { return GetBits(kMaster, 1); }
+      inline void SetEnableBytewise(const bool seb=true) { SetBits(kEnableBytewise, seb, 1); }
+      inline bool GetEnableBytewise() const { return GetBits(kEnableBytewise, 1); }
       /// Select serial in and token in from bypass inputs
-      inline void SetBypassInputs(const bool sbi=true) {
-        SetBits(kSelectBypassInputs, sbi, 1);
-      }
-      inline bool GetBypassInputs() const {
-        return GetBits(kSelectBypassInputs, 1);
-      }
+      inline void SetBypassInputs(const bool sbi=true) { SetBits(kSelectBypassInputs, sbi, 1); }
+      inline bool GetBypassInputs() const { return GetBits(kSelectBypassInputs, 1); }
       /// Enable overflow detection of L1 buffers (should always be enabled!)
-      inline void SetEnableOverflowDetect(const bool eod=true) {
-        SetBits(kEnableOverflowDetect, eod, 1);
-      }
-      inline bool GetEnableOverflowDetect() const {
-        return GetBits(kEnableOverflowDetect, 1);
-      }
+      inline void SetEnableOverflowDetect(const bool eod=true) { SetBits(kEnableOverflowDetect, eod, 1); }
+      inline bool GetEnableOverflowDetect() const { return GetBits(kEnableOverflowDetect, 1); }
       /// Enable of automatic rejection (should always be enabled if trigger matching mode!)
-      inline void SetEnableAutomaticReject(const bool ear=true) {
-        SetBits(kEnableAutomaticReject, ear, 1);
-      }
-      inline bool GetEnableAutomaticReject() const {
-        return GetBits(kEnableAutomaticReject, 1);
-      }
+      inline void SetEnableAutomaticReject(const bool ear=true) { SetBits(kEnableAutomaticReject, ear, 1); }
+      inline bool GetEnableAutomaticReject() const { return GetBits(kEnableAutomaticReject, 1); }
       /// Enable all counters to be set on bunch count reset
-      inline void SetEnableSetCountersOnBunchReset(const bool escobr=true) {
-        SetBits(kEnableSetCountersOnBunchReset, escobr, 1);
-      }
-      inline bool GetEnableSetCountersOnBunchReset() const {
-        return GetBits(kEnableSetCountersOnBunchReset, 1);
-      }
+      inline void SetEnableSetCountersOnBunchReset(const bool escobr=true) { SetBits(kEnableSetCountersOnBunchReset, escobr, 1); }
+      inline bool GetEnableSetCountersOnBunchReset() const { return GetBits(kEnableSetCountersOnBunchReset, 1); }
       /// Enable master reset code on encoded_control
-      inline void SetEnableMasterResetCode(const bool emrc=true) {
-        SetBits(kEnableMasterResetCode, emrc, 1);
-      }
-      inline bool GetEnableMasterResetCode() const {
-        return GetBits(kEnableMasterResetCode, 1);
-      }
+      inline void SetEnableMasterResetCode(const bool emrc=true) { SetBits(kEnableMasterResetCode, emrc, 1); }
+      inline bool GetEnableMasterResetCode() const { return GetBits(kEnableMasterResetCode, 1); }
       /// Enable master reset of whole TDC on event reset
-      inline void SetEnableMasterResetOnEventReset(const bool emroer=true) {
-        SetBits(kEnableMasterResetOnEventReset, emroer, 1);
-      }
-      inline bool GetEnableMasterResetOnEventReset() const {
-        return GetBits(kEnableMasterResetOnEventReset, 1);
-      }
+      inline void SetEnableMasterResetOnEventReset(const bool emroer=true) { SetBits(kEnableMasterResetOnEventReset, emroer, 1); }
+      inline bool GetEnableMasterResetOnEventReset() const { return GetBits(kEnableMasterResetOnEventReset, 1); }
       /// Enable reset channel buffers when separator
-      inline void SetEnableResetChannelBufferWhenSeparator(const bool ercbws=true) {
-        SetBits(kEnableResetChannelBufferWhenSeparator, ercbws, 1);
-      }
-      inline bool GetEnableResetChannelBufferWhenSeparator() const {
-        return GetBits(kEnableResetChannelBufferWhenSeparator, 1);
-      }
+      inline void SetEnableResetChannelBufferWhenSeparator(const bool ercbws=true) { SetBits(kEnableResetChannelBufferWhenSeparator, ercbws, 1); }
+      inline bool GetEnableResetChannelBufferWhenSeparator() const { return GetBits(kEnableResetChannelBufferWhenSeparator, 1); }
       /// Enable generation of separator on event reset
-      inline void SetEnableSeparatorOnEventReset(const bool esoer=true) {
-        SetBits(kEnableSeparatorOnEventReset, esoer, 1);
-      }
-      inline bool GetEnableSeparatorOnEventReset() const {
-        return GetBits(kEnableSeparatorOnEventReset, 1);
-      }
+      inline void SetEnableSeparatorOnEventReset(const bool esoer=true) { SetBits(kEnableSeparatorOnEventReset, esoer, 1); }
+      inline bool GetEnableSeparatorOnEventReset() const { return GetBits(kEnableSeparatorOnEventReset, 1); }
       /// Enable generation of separator on bunch reset
-      inline void SetEnableSeparatorOnBunchReset(const bool esobr=true) {
-        SetBits(kEnableSeparatorOnBunchReset, esobr, 1);
-      }
-      inline bool GetEnableSeparatorOnBunchReset() const {
-        return GetBits(kEnableSeparatorOnBunchReset, 1);
-      }
+      inline void SetEnableSeparatorOnBunchReset(const bool esobr=true) { SetBits(kEnableSeparatorOnBunchReset, esobr, 1); }
+      inline bool GetEnableSeparatorOnBunchReset() const { return GetBits(kEnableSeparatorOnBunchReset, 1); }
       /// Enable of direct event reset input pin (1), otherwise taken from encoded control
-      inline void SetEnableDirectEventReset(const bool eder=true) {
-        SetBits(kEnableDirectEventReset, eder, 1);
-      }
+      inline void SetEnableDirectEventReset(const bool eder=true) { SetBits(kEnableDirectEventReset, eder, 1); }
       inline bool GetEnableDirectEventReset() const { return GetBits(kEnableDirectEventReset, 1); }
       /// Enable of direct bunch reset input pin (1), otherwise taken from encoded control
-      inline void SetEnableDirectBunchReset(const bool edbr=true) {
-        SetBits(kEnableDirectBunchReset, edbr, 1);
-      }
+      inline void SetEnableDirectBunchReset(const bool edbr=true) { SetBits(kEnableDirectBunchReset, edbr, 1); }
       inline bool GetEnableDirectBunchReset() const { return GetBits(kEnableDirectBunchReset, 1); }
       /// Enable of direct trigger input pin
-      inline void SetEnableDirectTrigger(const bool edt=true) {
-        SetBits(kEnableDirectTrigger, edt, 1);
-      }
+      inline void SetEnableDirectTrigger(const bool edt=true) { SetBits(kEnableDirectTrigger, edt, 1); }
       inline bool GetEnableDirectTrigger() const { return GetBits(kEnableDirectTrigger, 1); }
       /// Low power mode of channel buffers
-      inline void SetLowPowerMode(const bool lpm=true) {
-        SetBits(kLowPowerMode, lpm, 1);
-      }
-      inline bool GetLowPowerMode() const {
-        return GetBits(kLowPowerMode, 1);
-      }
+      inline void SetLowPowerMode(const bool lpm=true) { SetBits(kLowPowerMode, lpm, 1); }
+      inline bool GetLowPowerMode() const { return GetBits(kLowPowerMode, 1); }
       /// Control of DLL (DLL charge pump levels)
-      inline void SetDLLControl(const uint8_t dc) {
-        SetBits(kDLLControl, dc&0x15, 4);
+      inline void SetDLLControl(const uint8_t dc) { SetBits(kDLLControl, dc&0x15, 4); }
+      inline uint8_t GetDLLControl() const { return GetBits(kDLLControl, 4); }
+
+      /// Selection of source for serial clock
+      inline void SetSerialClockSource(const SerialClockSource scs) {
+        if (scs==Serial_pll_clock_160 or scs==Serial_pll_clock_40) {
+          std::cerr << "Warning: Using an invalid Serial clock source: 0x"
+                    << std::hex << scs << std::dec << std::endl;
+        }
+        SetBits(kSerialClockSource, scs, 2);
       }
-      inline uint8_t GetDLLControl() const {
-        return GetBits(kDLLControl, 4);
+      inline SerialClockSource GetSerialClockSource() const { return static_cast<SerialClockSource>(GetBits(kSerialClockSource, 2)); }
+      /// Selection of clock source for I/O signals
+      inline void SetIOClockSource(const IOClockSource ics) {
+        if (ics==IO_pll_clock_80 or ics==IO_pll_clock_160) {
+          std::cerr << "Warning: Using an invalid IO clock source: 0x"
+                    << std::hex << ics << std::dec << std::endl;
+        }
+        SetBits(kIOClockSource, ics, 2);
       }
+      inline IOClockSource GetIOClockSource() const { return static_cast<IOClockSource>(GetBits(kIOClockSource, 2)); }
+      /// Selection of clock source for internal logic
+      inline void SetCoreClockSource(const CoreClockSource ccs) { SetBits(kCoreClockSource, ccs, 2); }
+      inline CoreClockSource GetCoreClockSource() const { return static_cast<CoreClockSource>(GetBits(kCoreClockSource, 2)); }
+      /// Selection of clock source for DLL
+      inline void SetDLLClockSource(const DLLClockSource dcs) { SetBits(kDLLClockSource, dcs, 3); }
+      inline DLLClockSource GetDLLClockSource() const { return static_cast<DLLClockSource>(GetBits(kDLLClockSource, 3)); }
+
+      /// Printout all useful values of this setup register into an output stream
+      void Dump(int verb=1, std::ostream& os=std::cout) const;
+      std::string GetXML() const;
+      uint32_t GetValue(const TDCSetupRegister& v);
+
+    private:
+      //////////////////////// Private set'ers and get'ers ////////////////////////
+
       /**
        * \brief Delay of internal serial clock
        * \param[in] delay_clock Use of direct clock (0) or delayed clock (1)
@@ -688,9 +639,7 @@ namespace PPSTimingMB
         uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
         SetBits(kSerialClockDelay, word, 4);
       }
-      inline uint8_t GetSerialClockDelay() const {
-        return GetBits(kSerialClockDelay, 4);
-      }
+      inline uint8_t GetSerialClockDelay() const { return GetBits(kSerialClockDelay, 4); }
       /**
        * \brief Delay of internal I/O clock
        * \param[in] delay_clock Use of direct clock (0) or delayed clock (1)
@@ -700,9 +649,7 @@ namespace PPSTimingMB
         uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
         SetBits(kIOClockDelay, word, 4);
       }
-      inline uint8_t GetIOClockDelay() const {
-        return GetBits(kIOClockDelay, 4);
-      }
+      inline uint8_t GetIOClockDelay() const { return GetBits(kIOClockDelay, 4); }
       /**
        * \brief Delay of internal core clock
        * \param[in] delay_clock Use of direct clock (0) or delayed clock (1)
@@ -712,9 +659,7 @@ namespace PPSTimingMB
         uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
         SetBits(kCoreClockDelay, word, 4);
       }
-      inline uint8_t GetCoreClockDelay() const {
-        return GetBits(kCoreClockDelay, 4);
-      }
+      inline uint8_t GetCoreClockDelay() const { return GetBits(kCoreClockDelay, 4); }
       /**
        * \brief Delay of internal DLL clock
        * \param[in] delay_clock Use of direct clock (0) or delayed clock (1)
@@ -724,50 +669,7 @@ namespace PPSTimingMB
         uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
         SetBits(kDLLClockDelay, word, 4);
       }
-      inline uint8_t GetDLLClockDelay() const {
-        return GetBits(kDLLClockDelay, 4);
-      }
-      /// Selection of source for serial clock
-      inline void SetSerialClockSource(const SerialClockSource scs) {
-        if (scs==Serial_pll_clock_160 or scs==Serial_pll_clock_40) {
-          std::cerr << "Warning: Using an invalid Serial clock source: 0x"
-                    << std::hex << scs << std::dec << std::endl;
-        }
-        SetBits(kSerialClockSource, scs, 2);
-      }
-      inline SerialClockSource GetSerialClockSource() const {
-        return static_cast<SerialClockSource>(GetBits(kSerialClockSource, 2));
-      }
-      /// Selection of clock source for I/O signals
-      inline void SetIOClockSource(const IOClockSource ics) {
-        if (ics==IO_pll_clock_80 or ics==IO_pll_clock_160) {
-          std::cerr << "Warning: Using an invalid IO clock source: 0x"
-                    << std::hex << ics << std::dec << std::endl;
-        }
-        SetBits(kIOClockSource, ics, 2);
-      }
-      inline IOClockSource GetIOClockSource() const {
-        return static_cast<IOClockSource>(GetBits(kIOClockSource, 2));
-      }
-      /// Selection of clock source for internal logic
-      inline void SetCoreClockSource(const CoreClockSource ccs) {
-        SetBits(kCoreClockSource, ccs, 2);
-      }
-      inline CoreClockSource GetCoreClockSource() const {
-        return static_cast<CoreClockSource>(GetBits(kCoreClockSource, 2));
-      }
-      /// Selection of clock source for DLL
-      inline void SetDLLClockSource(const DLLClockSource dcs) {
-        SetBits(kDLLClockSource, dcs, 3);
-      }
-      inline DLLClockSource GetDLLClockSource() const {
-        return static_cast<DLLClockSource>(GetBits(kDLLClockSource, 3));
-      }
-      inline void SetTest(const bool test=true) {
-        SetBits(kTestSelect, test, 1);
-        SetBits(kTestSelect+1, 0x7, 3);
-      }
-      inline bool IsTest() const { return static_cast<bool>(GetBits(kTestSelect, 1)); }
+      inline uint8_t GetDLLClockDelay() const { return GetBits(kDLLClockDelay, 4); }
 
       // List of LSBs for all sub-words in the full ~700-bits setup word
       static const bit kTestSelect = 0;
