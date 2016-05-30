@@ -11,10 +11,12 @@ int main(int argc, char* argv[])
   s.Dump(2);
 
   PPSTimingMB::TDCControl c;
-  c.SetEnablePattern(PPSTimingMB::TDCControl::OutputDisabled);
+  /*c.SetEnablePattern(PPSTimingMB::TDCControl::OutputDisabled);
   c.DumpRegister(3);
-  c.SetEnablePattern(PPSTimingMB::TDCControl::OutputEnabled);
+  c.SetEnablePattern(PPSTimingMB::TDCControl::OutputEnabled);*/
+  cout << "Enabled channels: " << c.GetEnabledChannels() << endl;
   c.DisableAllChannels();
+  cout << "Enabled channels: " << c.GetEnabledChannels() << endl;
   c.DumpRegister(3);
 
   PPSTimingMB::TDCStatus st;
@@ -24,7 +26,7 @@ int main(int argc, char* argv[])
 
   for (unsigned int i=0; i<PPSTimingMB::GetNumTDCSetupRegisters(); i++) {
     PPSTimingMB::TDCSetupRegister reg = static_cast<PPSTimingMB::TDCSetupRegister>(i);
-    cout << "register " << reg << ": " << s.GetValue(reg) << endl;
+    //cout << "register " << reg << ": " << s.GetValue(reg) << endl;
   }
 
   PPSTimingMB::TDCSetupRegister reg[] = { PPSTimingMB::rPLLControl, PPSTimingMB::rEnableMatching };

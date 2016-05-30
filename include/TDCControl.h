@@ -53,7 +53,10 @@ namespace PPSTimingMB
         if (id<0 or id>=TDC_NUM_CHANNELS) return;
         SetBits(kEnableChannel+id, 0, 1);
       }
-      inline void DisableAllChannels() { SetBits(kEnableChannel, 0, TDC_NUM_CHANNELS); }
+      inline void DisableAllChannels() { 
+        //SetBits(kEnableChannel, 0, TDC_NUM_CHANNELS);
+        for (unsigned int i=0; i<TDC_NUM_CHANNELS; i++) DisableChannel(i);
+      }
       inline bool IsChannelEnabled(unsigned int id) const {
         if (id<0 or id>=TDC_NUM_CHANNELS) return false;
         return GetBits(kEnableChannel+id, 1);
@@ -62,7 +65,10 @@ namespace PPSTimingMB
         SetBits(kEnableChannel, ch&0xffff, 16);
         SetBits(kEnableChannel+16, (ch>>16), 16);
       }
-      inline uint32_t GetEnabledChannels() const { return static_cast<uint32_t>(GetBits(kEnableChannel, 32)); }
+      inline uint32_t GetEnabledChannels() const {
+        uint16_t word1 = GetBits(kEnableChannel, 16), word2 = GetBits(kEnableChannel+16, 16);
+        return static_cast<uint32_t>(word1|(word2<<16));
+      }
 
       void SetControlParity(const bool cp=true) { SetBits(kControlParity, cp, 1); }
       inline bool GetControlParity() const { return GetBits(kControlParity, 1); }
