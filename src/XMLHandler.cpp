@@ -59,16 +59,10 @@ namespace PPSTimingMB
   {
     XMLCh str[100];
 
-    XMLString::transcode("TDCControl", str, 99);
+    XMLString::transcode("TDCRegister", str, 99);
     fDocument = fImpl->createDocument(0, str, 0);
-    fROOT = fDocument->getDocumentElement();
-
-    AddProperty("control_parity", r.GetControlParity());
-    AddProperty("pll_reset",      r.GetPLLReset());
-    AddProperty("dll_reset",      r.GetDLLReset());
-    AddProperty("enable_channel", r.GetEnabledChannels());
-    AddProperty("global_reset",   r.GetGlobalReset());
-    AddProperty("enable_pattern", static_cast<unsigned int>(r.GetEnablePattern()));
+    
+    PopulateControlRegister(r);
 
     return XMLString();
   }
@@ -78,101 +72,154 @@ namespace PPSTimingMB
   {
     XMLCh str[100];
 
-    XMLString::transcode("TDCSetup", str, 99);
+    XMLString::transcode("TDCRegister", str, 99);
     fDocument = fImpl->createDocument(0, str, 0);
-    fROOT = fDocument->getDocumentElement();
 
-    AddProperty("setup_parity",         r.GetSetupParity());
-    AddProperty("enable_ttl_hit",       r.GetEnableTTLHit());
-    AddProperty("enable_ttl_clock",     r.GetEnableTTLClock());
-    AddProperty("enable_ttl_reset",     r.GetEnableTTLReset());
-    AddProperty("enable_ttl_control",   r.GetEnableTTLControl());
-    AddProperty("enable_ttl_serial",    r.GetEnableTTLSerial());
-    AddProperty("enable_pair",          r.GetEdgesPairing());
-    AddProperty("enable_matching",      r.GetTriggerMatchingMode());
-    AddProperty("roll_over",            r.GetRollOver());
-    AddProperty("pll_control",          r.GetPLLControlWord());
-    AddProperty("dll_mode",             static_cast<unsigned int>(r.GetDLLMode()));
-    AddProperty("mode_rc",              r.GetModeRC());
-    AddProperty("mode_rc_compression",  r.GetModeRCCompression());
-    AddProperty("enable_leading",       r.GetLeadingMode());
-    AddProperty("enable_trailing",      r.GetTrailingMode());
-    AddProperty("rc_adjust",            r.GetRCAdjustmentWord());
-    AddProperty("coarse_count_offset",  r.GetCoarseCountOffset());
-    AddProperty("trigger_count_offset", r.GetTriggerCountOffset());
-    AddProperty("enable_relative",      r.GetEnableRelative());
-    AddProperty("match_window",         r.GetMatchWindow());
-    AddProperty("search_window",        r.GetSearchWindow());
-    AddProperty("reject_count_offset",  r.GetRejectCountOffset());
-    AddProperty("tdc_id",               r.GetTDCId());
+    PopulateSetupRegister(r);
 
     return XMLString();
+  }
+
+  std::string
+  XMLHandler::WriteRegister(const TDCControl& c, const TDCSetup& s)
+  {
+    XMLCh str[100];
+
+    XMLString::transcode("TDCRegister", str, 99);
+    fDocument = fImpl->createDocument(0, str, 0);
+
+    PopulateControlRegister(c);
+    PopulateSetupRegister(s);
+    
+    return XMLString();
+  }
+
+  void
+  XMLHandler::PopulateControlRegister(const TDCControl& r)
+  {
+    XMLCh str[100];
+
+    XMLString::transcode("TDCControl", str, 99);
+    DOMElement* elem = fDocument->createElement(str);
+    fROOT = fDocument->getDocumentElement();
+
+    AddProperty(elem, "control_parity", r.GetControlParity());
+    AddProperty(elem, "pll_reset",      r.GetPLLReset());
+    AddProperty(elem, "dll_reset",      r.GetDLLReset());
+    AddProperty(elem, "enable_channel", r.GetEnabledChannels());
+    AddProperty(elem, "global_reset",   r.GetGlobalReset());
+    AddProperty(elem, "enable_pattern", static_cast<unsigned int>(r.GetEnablePattern()));
+
+    fROOT->appendChild(elem);
+  }
+
+  void
+  XMLHandler::PopulateSetupRegister(const TDCSetup& r)
+  {
+    XMLCh str[100];
+
+    XMLString::transcode("TDCSetup", str, 99);
+    DOMElement* elem = fDocument->createElement(str);
+    fROOT = fDocument->getDocumentElement();
+
+    AddProperty(elem, "setup_parity",         r.GetSetupParity());
+    AddProperty(elem, "enable_ttl_hit",       r.GetEnableTTLHit());
+    AddProperty(elem, "enable_ttl_clock",     r.GetEnableTTLClock());
+    AddProperty(elem, "enable_ttl_reset",     r.GetEnableTTLReset());
+    AddProperty(elem, "enable_ttl_control",   r.GetEnableTTLControl());
+    AddProperty(elem, "enable_ttl_serial",    r.GetEnableTTLSerial());
+    AddProperty(elem, "enable_pair",          r.GetEdgesPairing());
+    AddProperty(elem, "enable_matching",      r.GetTriggerMatchingMode());
+    AddProperty(elem, "roll_over",            r.GetRollOver());
+    AddProperty(elem, "pll_control",          r.GetPLLControlWord());
+    AddProperty(elem, "dll_mode",             static_cast<unsigned int>(r.GetDLLMode()));
+    AddProperty(elem, "mode_rc",              r.GetModeRC());
+    AddProperty(elem, "mode_rc_compression",  r.GetModeRCCompression());
+    AddProperty(elem, "enable_leading",       r.GetLeadingMode());
+    AddProperty(elem, "enable_trailing",      r.GetTrailingMode());
+    AddProperty(elem, "rc_adjust",            r.GetRCAdjustmentWord());
+    AddProperty(elem, "coarse_count_offset",  r.GetCoarseCountOffset());
+    AddProperty(elem, "trigger_count_offset", r.GetTriggerCountOffset());
+    AddProperty(elem, "enable_relative",      r.GetEnableRelative());
+    AddProperty(elem, "match_window",         r.GetMatchWindow());
+    AddProperty(elem, "search_window",        r.GetSearchWindow());
+    AddProperty(elem, "reject_count_offset",  r.GetRejectCountOffset());
+    AddProperty(elem, "tdc_id",               r.GetTDCId());
+
+    fROOT->appendChild(elem);
   }
 
   void
   XMLHandler::ReadRegister(std::string s, TDCControl* c)
   {
-    PropertiesMap map = ParseRegister(s);
-    if (map.GetProperty("register_name")!="TDCControl") {
-      std::cerr << "WARNING: trying to read a register of type " << map.GetProperty("register_name") << " in a TDCControl object" << std::endl;
-      return;
-    }
+    std::vector<PropertiesMap> maps = ParseRegister(s);
+    for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
+      if (map->GetProperty("register_name")!="TDCControl") {
+        //std::cerr << "WARNING: trying to read a register of type " << map->GetProperty("register_name") << " in a TDCControl object" << std::endl;
+        continue;
+      }
 
-    if (map.HasProperty("control_parity")) c->SetControlParity(map.GetUIntProperty("control_parity"));
-    if (map.HasProperty("pll_reset"))      c->SetPLLReset(map.GetUIntProperty("pll_reset"));
-    if (map.HasProperty("dll_reset"))      c->SetDLLReset(map.GetUIntProperty("dll_reset"));
-    if (map.HasProperty("enable_channel")) c->SetEnabledChannels(map.GetUIntProperty("enable_channel"));
-    if (map.HasProperty("global_reset"))   c->SetGlobalReset(map.GetUIntProperty("global_reset"));
-    if (map.HasProperty("enable_pattern")) c->SetEnablePattern(static_cast<TDCControl::EnablePattern>(map.GetUIntProperty("enable_pattern")));
+      if (map->HasProperty("control_parity")) c->SetControlParity(map->GetUIntProperty("control_parity"));
+      if (map->HasProperty("pll_reset"))      c->SetPLLReset(map->GetUIntProperty("pll_reset"));
+      if (map->HasProperty("dll_reset"))      c->SetDLLReset(map->GetUIntProperty("dll_reset"));
+      if (map->HasProperty("enable_channel")) c->SetEnabledChannels(map->GetUIntProperty("enable_channel"));
+      if (map->HasProperty("global_reset"))   c->SetGlobalReset(map->GetUIntProperty("global_reset"));
+      if (map->HasProperty("enable_pattern")) c->SetEnablePattern(static_cast<TDCControl::EnablePattern>(map->GetUIntProperty("enable_pattern")));
+    }
   }
 
   void
   XMLHandler::ReadRegister(std::string s, TDCSetup* r)
   {
-    PropertiesMap map = ParseRegister(s);
-    if (map.GetProperty("register_name")!="TDCSetup") {
-      std::cerr << "WARNING: trying to read a register of type " << map.GetProperty("register_name") << " in a TDCSetup object" << std::endl;
-      return;
-    }
+    std::vector<PropertiesMap> maps = ParseRegister(s);
+    for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
+      if (map->GetProperty("register_name")!="TDCSetup") {
+        //std::cerr << "WARNING: trying to read a register of type " << map->GetProperty("register_name") << " in a TDCSetup object" << std::endl;
+        continue;
+      }
 
-    if (map.HasProperty("setup_parity"))         r->SetSetupParity(map.GetUIntProperty("setup_parity"));
-    if (map.HasProperty("enable_ttl_hit"))       r->SetEnableTTLHit(map.GetUIntProperty("enable_ttl_hit"));
-    if (map.HasProperty("enable_ttl_clock"))     r->SetEnableTTLClock(map.GetUIntProperty("enable_ttl_clock"));
-    if (map.HasProperty("enable_ttl_reset"))     r->SetEnableTTLReset(map.GetUIntProperty("enable_ttl_reset"));
-    if (map.HasProperty("enable_ttl_control"))   r->SetEnableTTLControl(map.GetUIntProperty("enable_ttl_control"));
-    if (map.HasProperty("enable_ttl_serial"))    r->SetEnableTTLSerial(map.GetUIntProperty("enable_ttl_serial"));
-    if (map.HasProperty("enable_pair"))          r->SetEdgesPairing(map.GetUIntProperty("enable_pair"));
-    if (map.HasProperty("enable_matching"))      r->SetTriggerMatchingMode(map.GetUIntProperty("enable_matching"));
-    if (map.HasProperty("roll_over"))            r->SetRollOver(map.GetUIntProperty("roll_over"));
-    if (map.HasProperty("pll_control"))          r->SetPLLControlWord(map.GetUIntProperty("pll_control"));
-    if (map.HasProperty("dll_mode"))             r->SetDLLMode(static_cast<TDCSetup::DLLSpeedMode>(map.GetUIntProperty("dll_mode")));
-    if (map.HasProperty("mode_rc"))              r->SetModeRC(map.GetUIntProperty("mode_rc"));
-    if (map.HasProperty("mode_rc_compression"))  r->SetModeRCCompression(map.GetUIntProperty("mode_rc_compression"));
-    if (map.HasProperty("enable_leading"))       r->SetLeadingMode(map.GetUIntProperty("enable_leading"));
-    if (map.HasProperty("enable_trailing"))      r->SetTrailingMode(map.GetUIntProperty("enable_trailing"));
-    if (map.HasProperty("rc_adjust"))            r->SetRCAdjustmentWord(map.GetUIntProperty("rc_adjust"));
-    if (map.HasProperty("coarse_count_offset"))  r->SetCoarseCountOffset(map.GetUIntProperty("coarse_count_offset"));
-    if (map.HasProperty("trigger_count_offset")) r->SetTriggerCountOffset(map.GetUIntProperty("trigger_count_offset"));
-    if (map.HasProperty("enable_relative"))      r->SetEnableRelative(map.GetUIntProperty("enable_relative"));
-    if (map.HasProperty("match_window"))         r->SetMatchWindow(map.GetUIntProperty("match_window"));
-    if (map.HasProperty("search_window"))        r->SetSearchWindow(map.GetUIntProperty("search_window"));
-    if (map.HasProperty("reject_count_offset"))  r->SetRejectCountOffset(map.GetUIntProperty("reject_count_offset"));
-    if (map.HasProperty("tdc_id"))               r->SetTDCId(map.GetUIntProperty("tdc_id"));
+      if (map->HasProperty("setup_parity"))         r->SetSetupParity(map->GetUIntProperty("setup_parity"));
+      if (map->HasProperty("enable_ttl_hit"))       r->SetEnableTTLHit(map->GetUIntProperty("enable_ttl_hit"));
+      if (map->HasProperty("enable_ttl_clock"))     r->SetEnableTTLClock(map->GetUIntProperty("enable_ttl_clock"));
+      if (map->HasProperty("enable_ttl_reset"))     r->SetEnableTTLReset(map->GetUIntProperty("enable_ttl_reset"));
+      if (map->HasProperty("enable_ttl_control"))   r->SetEnableTTLControl(map->GetUIntProperty("enable_ttl_control"));
+      if (map->HasProperty("enable_ttl_serial"))    r->SetEnableTTLSerial(map->GetUIntProperty("enable_ttl_serial"));
+      if (map->HasProperty("enable_pair"))          r->SetEdgesPairing(map->GetUIntProperty("enable_pair"));
+      if (map->HasProperty("enable_matching"))      r->SetTriggerMatchingMode(map->GetUIntProperty("enable_matching"));
+      if (map->HasProperty("roll_over"))            r->SetRollOver(map->GetUIntProperty("roll_over"));
+      if (map->HasProperty("pll_control"))          r->SetPLLControlWord(map->GetUIntProperty("pll_control"));
+      if (map->HasProperty("dll_mode"))             r->SetDLLMode(static_cast<TDCSetup::DLLSpeedMode>(map->GetUIntProperty("dll_mode")));
+      if (map->HasProperty("mode_rc"))              r->SetModeRC(map->GetUIntProperty("mode_rc"));
+      if (map->HasProperty("mode_rc_compression"))  r->SetModeRCCompression(map->GetUIntProperty("mode_rc_compression"));
+      if (map->HasProperty("enable_leading"))       r->SetLeadingMode(map->GetUIntProperty("enable_leading"));
+      if (map->HasProperty("enable_trailing"))      r->SetTrailingMode(map->GetUIntProperty("enable_trailing"));
+      if (map->HasProperty("rc_adjust"))            r->SetRCAdjustmentWord(map->GetUIntProperty("rc_adjust"));
+      if (map->HasProperty("coarse_count_offset"))  r->SetCoarseCountOffset(map->GetUIntProperty("coarse_count_offset"));
+      if (map->HasProperty("trigger_count_offset")) r->SetTriggerCountOffset(map->GetUIntProperty("trigger_count_offset"));
+      if (map->HasProperty("enable_relative"))      r->SetEnableRelative(map->GetUIntProperty("enable_relative"));
+      if (map->HasProperty("match_window"))         r->SetMatchWindow(map->GetUIntProperty("match_window"));
+      if (map->HasProperty("search_window"))        r->SetSearchWindow(map->GetUIntProperty("search_window"));
+      if (map->HasProperty("reject_count_offset"))  r->SetRejectCountOffset(map->GetUIntProperty("reject_count_offset"));
+      if (map->HasProperty("tdc_id"))               r->SetTDCId(map->GetUIntProperty("tdc_id"));
+    }
   }
 
   void
-  XMLHandler::AddProperty(const char* name, const char* value)
+  XMLHandler::AddProperty(DOMElement* elem, const char* name, const char* value)
   {
-    if (!fDocument) return;
+    if (!elem) return;
     XMLCh str[100];
 
     XMLString::transcode(name, str, 99);
-    DOMElement* first = fDocument->createElement(str);
+    /*DOMAttr* att = fDocument->createAttribute(str);
+    elem->setAttributeNode(att);*/
+    DOMNode* child = fDocument->createElement(str);
+    elem->appendChild(child);
 
     XMLString::transcode(value, str, 99);
     DOMText* textNode = fDocument->createTextNode(str);
-    first->appendChild(textNode);
-    fROOT->appendChild(first);
+    child->appendChild(textNode);
+    //fROOT->appendChild(first);
   }
 
   std::string
@@ -198,36 +245,45 @@ namespace PPSTimingMB
     return os.str();
   }
 
-  XMLHandler::PropertiesMap
+  std::vector<XMLHandler::PropertiesMap>
   XMLHandler::ParseRegister(std::string reg)
   {
     XercesDOMParser* parser = new XercesDOMParser;
-    /*parser->setValidationScheme(XercesDOMParser::Val_Never);
+    parser->setValidationScheme(XercesDOMParser::Val_Never);
     parser->setDoNamespaces(false);
     parser->setDoSchema(false);
-    parser->setLoadExternalDTD(false);*/
+    parser->setLoadExternalDTD(false);
 
-    PropertiesMap out;
+    std::vector<PropertiesMap> out;
 
     try {
       MemBufInputSource reg_buf((const XMLByte*)reg.c_str(), reg.size(), "reg (in memory)", false);
       parser->parse(reg_buf);
       DOMDocument* document = parser->getDocument();
-      DOMElement* root = document->getDocumentElement();
+      DOMElement* root = document->getDocumentElement(); // TDCRegister root element
       if (!root) return out;
-      char* key = XMLString::transcode(root->getNodeName()); out.AddProperty("register_name", key); XMLString::release(&key);
-      DOMNodeList* children = root->getChildNodes();
-      if (!children) return out;
-      const XMLSize_t nodeCount = children->getLength();
-      for (unsigned int i=0; i<nodeCount; i++) {
-        DOMNode* currentNode = children->item(i);
-        if (!currentNode->getNodeType() or currentNode->getNodeType()!=DOMNode::ELEMENT_NODE) continue;
-        char* key = XMLString::transcode(currentNode->getNodeName());
-        DOMText* prop = dynamic_cast<DOMText*>(currentNode->getFirstChild());
-        char* value = XMLString::transcode(prop->getWholeText());
-        //std::cout << "----->" << key << " = " << value << std::endl;
-        out.AddProperty(key, value);
-        XMLString::release(&key); XMLString::release(&value);
+
+      DOMNodeList* registers = root->getChildNodes();
+      for (unsigned int i=0; i<registers->getLength(); i++) {
+        if (registers->item(i)->getNodeType()!=DOMNode::ELEMENT_NODE) continue;
+        PropertiesMap map;
+
+        char* key = XMLString::transcode(registers->item(i)->getNodeName()); map.AddProperty("register_name", key); XMLString::release(&key);
+        DOMNodeList* children = registers->item(i)->getChildNodes();
+        if (!children) return out;
+        const XMLSize_t nodeCount = children->getLength();
+        for (unsigned int i=0; i<nodeCount; i++) {
+          DOMNode* currentNode = children->item(i);
+          if (!currentNode->getNodeType() or currentNode->getNodeType()!=DOMNode::ELEMENT_NODE) continue;
+          char* key = XMLString::transcode(currentNode->getNodeName());
+          DOMText* prop = dynamic_cast<DOMText*>(currentNode->getFirstChild());
+          char* value = XMLString::transcode(prop->getWholeText());
+          //std::cout << "----->" << key << " = " << value << std::endl;
+          map.AddProperty(key, value);
+          XMLString::release(&key); XMLString::release(&value);
+        }
+
+        out.push_back(map);
       }
       document->release();
     } catch (XMLException& e) {

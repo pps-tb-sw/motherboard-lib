@@ -55,21 +55,26 @@ namespace PPSTimingMB
     static std::string WriteRegister(const TDCSetup& r);*/
     std::string WriteRegister(const TDCControl& r);
     std::string WriteRegister(const TDCSetup& r);
+    std::string WriteRegister(const TDCControl& c, const TDCSetup& s);
     void ReadRegister(std::string, TDCControl* c);
     void ReadRegister(std::string, TDCSetup* s);
 
    private:
     void Initialize();
     void Terminate();
-    void AddProperty(const char*, const char*);
-    void AddProperty(const char* name, unsigned int value) {
+
+    void PopulateControlRegister(const TDCControl& c);
+    void PopulateSetupRegister(const TDCSetup& s);
+
+    void AddProperty(DOMElement* elem, const char*, const char*);
+    void AddProperty(DOMElement* elem, const char* name, unsigned int value) {
       std::ostringstream os; os << value;
-      AddProperty(name, os.str().c_str());
+      AddProperty(elem, name, os.str().c_str());
     }
     std::string GetProperty(const char* name);
     unsigned int GetUIntProperty(const char* name);
     std::string XMLString();
-    PropertiesMap ParseRegister(std::string);
+    std::vector<PropertiesMap> ParseRegister(std::string);
     /*static DOMImplementation* fImpl;
     static DOMDocument* fDocument;*/
     DOMElement* fROOT;
