@@ -19,6 +19,7 @@ namespace PPSTimingMB
         SetConstantValues(); }
       inline TDCBoundaryScan(const TDCBoundaryScan& bs) :
         TDCRegister(TDC_BS_BITS_NUM, bs) { SetConstantValues(); }
+      inline TDCBoundaryScan(const std::vector<uint8_t>& words) : TDCRegister(TDC_BS_BITS_NUM, words) {;}
 
       inline bool IsTokenOut() const { return GetBits(kTokenOut, 1); }
       inline bool IsStrobeOut() const { return GetBits(kStrobeOut, 1); }
