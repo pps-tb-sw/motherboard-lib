@@ -39,7 +39,7 @@ namespace PPSTimingMB
       case rEnableChannel: return GetEnabledChannels();
       case rDLLReset:      return GetDLLReset();
       case rPLLReset:      return GetPLLReset();
-      case rControlParity: return GetControlParity();
+      case rControlParity: return GetParity();
       default: return 0;
     }
   }

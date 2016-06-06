@@ -99,7 +99,7 @@ namespace PPSTimingMB
 
     SetEnableJTAGReadout(false);
 
-    SetSetupParity(true);
+    ComputeParity();
   }
 
   void
@@ -229,7 +229,7 @@ namespace PPSTimingMB
       case rEnableTTLReset:                        return GetEnableTTLReset();
       case rEnableTTLClock:                        return GetEnableTTLClock();
       case rEnableTTLHit:                          return GetEnableTTLHit();
-      case rSetupParity:                           return GetSetupParity();
+      case rSetupParity:                           return GetParity();
       default: return 0;
     }
   }

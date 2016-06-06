@@ -118,6 +118,13 @@ namespace PPSTimingMB
         for (uint8_t i=0; i<fNumWords; i++) { fWord[i] = 0; }
       }
 
+      inline bool ComputeParityBit(unsigned short begin=0, unsigned short end=-1) const {
+        if (end<0) end = fWordSize;
+        bool parity = false;
+        for (uint8_t i=begin; i<end; i++) { parity ^= GetBits(i, 1); }
+        return parity;
+      }
+
       /// Pointer to this register's word
       word_t* fWord;
       /// Number of words to fit the \a fWordSize bits of this register to this object

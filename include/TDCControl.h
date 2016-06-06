@@ -70,8 +70,9 @@ namespace PPSTimingMB
         return static_cast<uint32_t>(word1|(word2<<16));
       }
 
-      void SetControlParity(const bool cp=true) { SetBits(kControlParity, cp, 1); }
-      inline bool GetControlParity() const { return GetBits(kControlParity, 1); }
+      void SetParity(const bool cp=true) { SetBits(kControlParity, cp, 1); }
+      inline bool GetParity() const { return GetBits(kControlParity, 1); }
+      void ComputeParity() { SetParity(TDCRegister::ComputeParityBit(0, TDC_CONTROL_BITS_NUM-1)); }
 
       /// Printout all useful values of this control register into an output stream
       void Dump(int verb=1, std::ostream& os=std::cout) const;
