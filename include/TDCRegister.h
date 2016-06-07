@@ -100,7 +100,7 @@ namespace PPSTimingMB
       inline bool ComputeParityBit(unsigned short begin=0, short end=-1) const {
         if (end<0) end = fWordSize;
         unsigned short parity = 0;
-        for (uint8_t i=begin; i<end; i++) { parity += GetBits(i, 1); }
+        for (unsigned short i=begin; i<end; i++) { parity += GetBits(i, 1); }
         return (parity%2);
       }
     protected:

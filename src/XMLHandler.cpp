@@ -164,7 +164,7 @@ namespace PPSTimingMB
       if (map->HasProperty("enable_pattern")) c->SetEnablePattern(static_cast<TDCControl::EnablePattern>(map->GetUIntProperty("enable_pattern")));
     }
 
-    c->ComputeParity();
+    //c->ComputeParity();
   }
 
   void
@@ -201,7 +201,7 @@ namespace PPSTimingMB
       if (map->HasProperty("tdc_id"))               r->SetTDCId(map->GetUIntProperty("tdc_id"));
     }
 
-    r->ComputeParity();
+    //r->ComputeParity();
   }
 
   void

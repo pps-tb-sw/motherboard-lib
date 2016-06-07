@@ -28,6 +28,7 @@ namespace PPSTimingMB
   TDCControl::SetConstantValues()
   {
     EnableAllChannels();
+    ComputeParity();
   }
 
   uint32_t
