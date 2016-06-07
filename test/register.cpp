@@ -7,6 +7,15 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+  vector<unsigned char> words;
+  //words.push_back(0x55); // 01010101
+  words.push_back(0x57); // 01010111
+  PPSTimingMB::TDCRegister r(8, words);
+  r.DumpRegister(3);
+  cout << "parity=" << r.ComputeParityBit() << endl;
+
+  return 0;
+
   PPSTimingMB::TDCSetup s;
   s.Dump(2);
 
@@ -34,6 +43,7 @@ int main(int argc, char* argv[])
 
   PPSTimingMB::TDCInternalCoreTest ict;
   ict.Dump();
+
 
   return 0;
 }
