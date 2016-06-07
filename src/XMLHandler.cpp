@@ -103,7 +103,6 @@ namespace PPSTimingMB
     DOMElement* elem = fDocument->createElement(str);
     fROOT = fDocument->getDocumentElement();
 
-    AddProperty(elem, "control_parity", r.GetControlParity());
     AddProperty(elem, "pll_reset",      r.GetPLLReset());
     AddProperty(elem, "dll_reset",      r.GetDLLReset());
     AddProperty(elem, "enable_channel", r.GetEnabledChannels());
@@ -122,7 +121,6 @@ namespace PPSTimingMB
     DOMElement* elem = fDocument->createElement(str);
     fROOT = fDocument->getDocumentElement();
 
-    AddProperty(elem, "setup_parity",         r.GetSetupParity());
     AddProperty(elem, "enable_ttl_hit",       r.GetEnableTTLHit());
     AddProperty(elem, "enable_ttl_clock",     r.GetEnableTTLClock());
     AddProperty(elem, "enable_ttl_reset",     r.GetEnableTTLReset());
@@ -159,13 +157,14 @@ namespace PPSTimingMB
         continue;
       }
 
-      if (map->HasProperty("control_parity")) c->SetControlParity(map->GetUIntProperty("control_parity"));
       if (map->HasProperty("pll_reset"))      c->SetPLLReset(map->GetUIntProperty("pll_reset"));
       if (map->HasProperty("dll_reset"))      c->SetDLLReset(map->GetUIntProperty("dll_reset"));
       if (map->HasProperty("enable_channel")) c->SetEnabledChannels(map->GetUIntProperty("enable_channel"));
       if (map->HasProperty("global_reset"))   c->SetGlobalReset(map->GetUIntProperty("global_reset"));
       if (map->HasProperty("enable_pattern")) c->SetEnablePattern(static_cast<TDCControl::EnablePattern>(map->GetUIntProperty("enable_pattern")));
     }
+
+    c->ComputeParity();
   }
 
   void
@@ -178,7 +177,6 @@ namespace PPSTimingMB
         continue;
       }
 
-      if (map->HasProperty("setup_parity"))         r->SetSetupParity(map->GetUIntProperty("setup_parity"));
       if (map->HasProperty("enable_ttl_hit"))       r->SetEnableTTLHit(map->GetUIntProperty("enable_ttl_hit"));
       if (map->HasProperty("enable_ttl_clock"))     r->SetEnableTTLClock(map->GetUIntProperty("enable_ttl_clock"));
       if (map->HasProperty("enable_ttl_reset"))     r->SetEnableTTLReset(map->GetUIntProperty("enable_ttl_reset"));
@@ -202,6 +200,8 @@ namespace PPSTimingMB
       if (map->HasProperty("reject_count_offset"))  r->SetRejectCountOffset(map->GetUIntProperty("reject_count_offset"));
       if (map->HasProperty("tdc_id"))               r->SetTDCId(map->GetUIntProperty("tdc_id"));
     }
+
+    r->ComputeParity();
   }
 
   void
