@@ -103,11 +103,13 @@ namespace PPSTimingMB
     DOMElement* elem = fDocument->createElement(str);
     fROOT = fDocument->getDocumentElement();
 
-    AddProperty(elem, "pll_reset",      r.GetPLLReset());
-    AddProperty(elem, "dll_reset",      r.GetDLLReset());
-    AddProperty(elem, "enable_channel", r.GetEnabledChannels());
-    AddProperty(elem, "global_reset",   r.GetGlobalReset());
-    AddProperty(elem, "enable_pattern", static_cast<unsigned int>(r.GetEnablePattern()));
+    AddProperty(elem, "pll_reset",             r.GetPLLReset());
+    AddProperty(elem, "dll_reset",             r.GetDLLReset());
+    /*AddProperty(elem, "enable_channel", r.GetEnabledChannels());*/
+    AddProperty(elem, "enable_channel_group0", r.GetEnabledChannelsGroup0());
+    AddProperty(elem, "enable_channel_group1", r.GetEnabledChannelsGroup1());
+    AddProperty(elem, "global_reset",          r.GetGlobalReset());
+    AddProperty(elem, "enable_pattern",        static_cast<unsigned int>(r.GetEnablePattern()));
 
     fROOT->appendChild(elem);
   }
@@ -157,11 +159,13 @@ namespace PPSTimingMB
         continue;
       }
 
-      if (map->HasProperty("pll_reset"))      c->SetPLLReset(map->GetUIntProperty("pll_reset"));
-      if (map->HasProperty("dll_reset"))      c->SetDLLReset(map->GetUIntProperty("dll_reset"));
-      if (map->HasProperty("enable_channel")) c->SetEnabledChannels(map->GetUIntProperty("enable_channel"));
-      if (map->HasProperty("global_reset"))   c->SetGlobalReset(map->GetUIntProperty("global_reset"));
-      if (map->HasProperty("enable_pattern")) c->SetEnablePattern(static_cast<TDCControl::EnablePattern>(map->GetUIntProperty("enable_pattern")));
+      if (map->HasProperty("pll_reset"))             c->SetPLLReset(map->GetUIntProperty("pll_reset"));
+      if (map->HasProperty("dll_reset"))             c->SetDLLReset(map->GetUIntProperty("dll_reset"));
+      if (map->HasProperty("enable_channel"))        c->SetEnabledChannels(map->GetUIntProperty("enable_channel"));
+      if (map->HasProperty("enable_channel_group0")) c->SetEnabledChannelsGroup0(map->GetUIntProperty("enable_channel_group0"));
+      if (map->HasProperty("enable_channel_group1")) c->SetEnabledChannelsGroup1(map->GetUIntProperty("enable_channel_group1"));
+      if (map->HasProperty("global_reset"))          c->SetGlobalReset(map->GetUIntProperty("global_reset"));
+      if (map->HasProperty("enable_pattern"))        c->SetEnablePattern(static_cast<TDCControl::EnablePattern>(map->GetUIntProperty("enable_pattern")));
     }
 
     c->ComputeParity();

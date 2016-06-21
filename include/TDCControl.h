@@ -70,9 +70,10 @@ namespace PPSTimingMB
         SetEnabledChannels(ch&0xffff, (ch>>16)&0xffff);
       }
       inline void SetEnabledChannels(uint16_t group0, uint16_t group1) {
-        SetBits(kEnableChannel, group0&0xffff, 16);
-        SetBits(kEnableChannel+16, group1&0xffff, 16);
+        SetEnabledChannelsGroup0(group0); SetEnabledChannelsGroup1(group1);
       }
+      inline void SetEnabledChannelsGroup0(uint16_t poi) { SetBits(kEnableChannel, poi&0xffff, 16); }
+      inline void SetEnabledChannelsGroup1(uint16_t poi) { SetBits(kEnableChannel+16, poi&0xffff, 16); }
       inline uint16_t GetEnabledChannelsGroup0() const {
         return GetBits(kEnableChannel, 16);
       }
