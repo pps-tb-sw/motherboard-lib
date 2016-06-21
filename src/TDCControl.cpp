@@ -36,12 +36,13 @@ namespace PPSTimingMB
   TDCControl::GetValue(const TDCControlRegister& reg)
   {
     switch (reg) {
-      case rEnablePattern: return GetEnablePattern();
-      case rGlobalReset:   return GetGlobalReset();
-      case rEnableChannel: return GetEnabledChannels();
-      case rDLLReset:      return GetDLLReset();
-      case rPLLReset:      return GetPLLReset();
-      case rControlParity: return GetParity();
+      case rEnablePattern:  return GetEnablePattern();
+      case rGlobalReset:    return GetGlobalReset();
+      case rEnableChannel0: return GetEnabledChannelsGroup0();
+      case rEnableChannel1: return GetEnabledChannelsGroup1();
+      case rDLLReset:       return GetDLLReset();
+      case rPLLReset:       return GetPLLReset();
+      case rControlParity:  return GetParity();
       default: return 0;
     }
   }
@@ -49,12 +50,13 @@ namespace PPSTimingMB
   std::ostream&
   operator<<(std::ostream& os, const TDCControlRegister& reg) {
     switch (reg) {
-      case rEnablePattern: os << "enable_pattern"; break;
-      case rGlobalReset:   os << "global_reset"; break;
-      case rEnableChannel: os << "enable_channel"; break;
-      case rDLLReset:      os << "dll_reset"; break;
-      case rPLLReset:      os << "pll_reset"; break;
-      case rControlParity: os << "control_parity"; break;
+      case rEnablePattern:  os << "enable_pattern"; break;
+      case rGlobalReset:    os << "global_reset"; break;
+      case rEnableChannel0: os << "enable_channel_group0"; break;
+      case rEnableChannel1: os << "enable_channel_group1"; break;
+      case rDLLReset:       os << "dll_reset"; break;
+      case rPLLReset:       os << "pll_reset"; break;
+      case rControlParity:  os << "control_parity"; break;
       default: break;
     }
     return os;

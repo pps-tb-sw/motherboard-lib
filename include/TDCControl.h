@@ -6,7 +6,12 @@
 
 namespace PPSTimingMB
 {
-  typedef enum TDCControlRegister { rEnablePattern=0, rGlobalReset, rEnableChannel, rDLLReset, rPLLReset, rControlParity, rNumControlRegisters } TDCControlRegister;
+  typedef enum TDCControlRegister {
+    rEnablePattern=0, rGlobalReset,
+    rEnableChannel0, rEnableChannel1,
+    rDLLReset, rPLLReset, rControlParity,
+    rNumControlRegisters
+  } TDCControlRegister;
   std::ostream& operator<<(std::ostream& out, const TDCControlRegister& sp);
   inline unsigned short GetNumTDCControlRegisters() { return rNumControlRegisters; }
   /**
