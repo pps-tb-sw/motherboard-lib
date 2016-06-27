@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <TDCRegister>
-  <TDCControl>
+  <TDCControl mfec="1" ccu="1" i2c="1">
+    <control_parity>0</control_parity>
+    <pll_reset>1</pll_reset>
+    <dll_reset>0</dll_reset>
+    <enable_channel>4294967294</enable_channel>
+    <global_reset>0</global_reset>
+    <enable_pattern>0</enable_pattern>
+  </TDCControl>
+  <TDCControl mfec="1" ccu="1" i2c="2">
+    <control_parity>0</control_parity>
+    <pll_reset>1</pll_reset>
+    <dll_reset>0</dll_reset>
+    <enable_channel>4294967294</enable_channel>
+    <global_reset>0</global_reset>
+    <enable_pattern>0</enable_pattern>
+  </TDCControl>
+  <TDCControl mfec="1" ccu="2" i2c="2">
     <control_parity>0</control_parity>
     <pll_reset>1</pll_reset>
     <dll_reset>0</dll_reset>
