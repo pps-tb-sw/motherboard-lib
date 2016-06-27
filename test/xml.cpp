@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 
   // writeout part
   ofstream xml_out("test_output.xml");
-  xml_out << h.WriteRegister(c, s);
+  xml_out << h.WriteRegister(c, s, 1, 1, 2);
   xml_out.close();
 
   string input_file = "test_input.xml";
@@ -26,9 +26,9 @@ int main(int argc, char* argv[])
   ostringstream os; ifstream xml_in(input_file.c_str()); os << xml_in.rdbuf(); xml_in.close();
 
   cout << "Reading setup register..." << endl;
-  h.ReadRegister(os.str(), &s);
+  h.ReadRegister(os.str(), &s, 1, 1, 1);
   cout << "Reading control register..." << endl;
-  h.ReadRegister(os.str(), &c);
+  h.ReadRegister(os.str(), &c, 1, 1, 1);
 
   s.Dump();
 

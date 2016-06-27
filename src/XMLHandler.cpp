@@ -55,53 +55,60 @@ namespace PPSTimingMB
   }
 
   std::string
-  XMLHandler::WriteRegister(const TDCControl& r)
+  XMLHandler::WriteRegister(const TDCControl& r, unsigned int mfec, unsigned int ccu, unsigned int i2c)
   {
     XMLCh str[100];
 
     XMLString::transcode("TDCRegister", str, 99);
     fDocument = fImpl->createDocument(0, str, 0);
     
-    PopulateControlRegister(r);
+    PopulateControlRegister(r, mfec, ccu, i2c);
 
     return XMLString();
   }
 
   std::string
-  XMLHandler::WriteRegister(const TDCSetup& r)
+  XMLHandler::WriteRegister(const TDCSetup& r, unsigned int mfec, unsigned int ccu, unsigned int i2c)
   {
     XMLCh str[100];
 
     XMLString::transcode("TDCRegister", str, 99);
     fDocument = fImpl->createDocument(0, str, 0);
 
-    PopulateSetupRegister(r);
+    PopulateSetupRegister(r, mfec, ccu, i2c);
 
     return XMLString();
   }
 
   std::string
-  XMLHandler::WriteRegister(const TDCControl& c, const TDCSetup& s)
+  XMLHandler::WriteRegister(const TDCControl& c, const TDCSetup& s, unsigned int mfec, unsigned int ccu, unsigned int i2c)
   {
     XMLCh str[100];
 
     XMLString::transcode("TDCRegister", str, 99);
     fDocument = fImpl->createDocument(0, str, 0);
 
-    PopulateControlRegister(c);
-    PopulateSetupRegister(s);
+    PopulateControlRegister(c, mfec, ccu, i2c);
+    PopulateSetupRegister(s, mfec, ccu, i2c);
     
     return XMLString();
   }
 
   void
-  XMLHandler::PopulateControlRegister(const TDCControl& r)
+  XMLHandler::PopulateControlRegister(const TDCControl& r, unsigned int mfec, unsigned int ccu, unsigned int i2c)
   {
     XMLCh str[100];
 
     XMLString::transcode("TDCControl", str, 99);
     DOMElement* elem = fDocument->createElement(str);
     fROOT = fDocument->getDocumentElement();
+
+    {
+      XMLCh key[100], value[100];
+      XMLString::transcode("mfec", key, 99); XMLString::transcode(std::to_string(mfec).c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("ccu", key, 99); XMLString::transcode(std::to_string(ccu).c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("i2c", key, 99); XMLString::transcode(std::to_string(i2c).c_str(), value, 99); elem->setAttribute(key, value);
+    }
 
     AddProperty(elem, "pll_reset",             r.GetPLLReset());
     AddProperty(elem, "dll_reset",             r.GetDLLReset());
@@ -115,13 +122,20 @@ namespace PPSTimingMB
   }
 
   void
-  XMLHandler::PopulateSetupRegister(const TDCSetup& r)
+  XMLHandler::PopulateSetupRegister(const TDCSetup& r, unsigned int mfec, unsigned int ccu, unsigned int i2c)
   {
     XMLCh str[100];
 
     XMLString::transcode("TDCSetup", str, 99);
     DOMElement* elem = fDocument->createElement(str);
     fROOT = fDocument->getDocumentElement();
+
+    {
+      XMLCh key[100], value[100];
+      XMLString::transcode("mfec", key, 99); XMLString::transcode(std::to_string(mfec).c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("ccu", key, 99); XMLString::transcode(std::to_string(ccu).c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("i2c", key, 99); XMLString::transcode(std::to_string(i2c).c_str(), value, 99); elem->setAttribute(key, value);
+    }
 
     AddProperty(elem, "enable_ttl_hit",       r.GetEnableTTLHit());
     AddProperty(elem, "enable_ttl_clock",     r.GetEnableTTLClock());
@@ -150,14 +164,11 @@ namespace PPSTimingMB
   }
 
   void
-  XMLHandler::ReadRegister(std::string s, TDCControl* c)
+  XMLHandler::ReadRegister(std::string s, TDCControl* c, unsigned int mfec, unsigned int ccu, unsigned int i2c)
   {
-    std::vector<PropertiesMap> maps = ParseRegister(s);
+    std::vector<PropertiesMap> maps = ParseRegister(s, mfec, ccu, i2c);
     for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
-      if (map->GetProperty("register_name")!="TDCControl") {
-        //std::cerr << "WARNING: trying to read a register of type " << map->GetProperty("register_name") << " in a TDCControl object" << std::endl;
-        continue;
-      }
+      if (map->GetProperty("register_name")!="TDCControl") { continue; }
 
       if (map->HasProperty("pll_reset"))             c->SetPLLReset(map->GetUIntProperty("pll_reset"));
       if (map->HasProperty("dll_reset"))             c->SetDLLReset(map->GetUIntProperty("dll_reset"));
@@ -172,14 +183,11 @@ namespace PPSTimingMB
   }
 
   void
-  XMLHandler::ReadRegister(std::string s, TDCSetup* r)
+  XMLHandler::ReadRegister(std::string s, TDCSetup* r, unsigned int mfec, unsigned int ccu, unsigned int i2c)
   {
-    std::vector<PropertiesMap> maps = ParseRegister(s);
+    std::vector<PropertiesMap> maps = ParseRegister(s, mfec, ccu, i2c);
     for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
-      if (map->GetProperty("register_name")!="TDCSetup") {
-        //std::cerr << "WARNING: trying to read a register of type " << map->GetProperty("register_name") << " in a TDCSetup object" << std::endl;
-        continue;
-      }
+      if (map->GetProperty("register_name")!="TDCSetup") { continue; }
 
       if (map->HasProperty("enable_ttl_hit"))       r->SetEnableTTLHit(map->GetUIntProperty("enable_ttl_hit"));
       if (map->HasProperty("enable_ttl_clock"))     r->SetEnableTTLClock(map->GetUIntProperty("enable_ttl_clock"));
@@ -250,7 +258,7 @@ namespace PPSTimingMB
   }
 
   std::vector<XMLHandler::PropertiesMap>
-  XMLHandler::ParseRegister(std::string reg)
+  XMLHandler::ParseRegister(std::string reg, unsigned int mfec, unsigned int ccu, unsigned int i2c)
   {
     XercesDOMParser* parser = new XercesDOMParser;
     parser->setValidationScheme(XercesDOMParser::Val_Never);
@@ -270,14 +278,28 @@ namespace PPSTimingMB
       DOMNodeList* registers = root->getChildNodes();
       for (unsigned int i=0; i<registers->getLength(); i++) {
         if (registers->item(i)->getNodeType()!=DOMNode::ELEMENT_NODE) continue;
+
+        DOMNamedNodeMap* attr = registers->item(i)->getAttributes();
+        bool found_mfec = false, found_ccu = false, found_i2c = false;
+        for (unsigned int j=0; j<attr->getLength(); j++) {
+          char* key = XMLString::transcode(attr->item(j)->getNodeName()), *value = XMLString::transcode(attr->item(j)->getNodeValue());
+          if ((strcmp(key, "mfec")==0) and static_cast<unsigned int>(atoi(value))==mfec) found_mfec = true;
+          if ((strcmp(key, "ccu")==0) and static_cast<unsigned int>(atoi(value))==ccu) found_ccu = true;
+          if ((strcmp(key, "i2c")==0) and static_cast<unsigned int>(atoi(value))==i2c) found_i2c = true;
+        }
+        if (!found_mfec or !found_ccu or !found_i2c) continue;
+
         PropertiesMap map;
 
         char* key = XMLString::transcode(registers->item(i)->getNodeName()); map.AddProperty("register_name", key); XMLString::release(&key);
         DOMNodeList* children = registers->item(i)->getChildNodes();
+
+        //std::cout << "Found a " << map.GetProperty("register_name") << " for mfec=" << mfec << ", ccu=" << ccu << ", i2c=" << i2c << std::endl;
+
         if (!children) return out;
         const XMLSize_t nodeCount = children->getLength();
-        for (unsigned int i=0; i<nodeCount; i++) {
-          DOMNode* currentNode = children->item(i);
+        for (unsigned int j=0; j<nodeCount; j++) {
+          DOMNode* currentNode = children->item(j);
           if (!currentNode->getNodeType() or currentNode->getNodeType()!=DOMNode::ELEMENT_NODE) continue;
           char* key = XMLString::transcode(currentNode->getNodeName());
           DOMText* prop = dynamic_cast<DOMText*>(currentNode->getFirstChild());

@@ -53,18 +53,18 @@ namespace PPSTimingMB
 
     /*static std::string WriteRegister(const TDCControl& r);
     static std::string WriteRegister(const TDCSetup& r);*/
-    std::string WriteRegister(const TDCControl& r);
-    std::string WriteRegister(const TDCSetup& r);
-    std::string WriteRegister(const TDCControl& c, const TDCSetup& s);
-    void ReadRegister(std::string, TDCControl* c);
-    void ReadRegister(std::string, TDCSetup* s);
+    std::string WriteRegister(const TDCControl& r, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    std::string WriteRegister(const TDCSetup& r, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    std::string WriteRegister(const TDCControl& c, const TDCSetup& s, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    void ReadRegister(std::string, TDCControl* c, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    void ReadRegister(std::string, TDCSetup* s, unsigned int mfec, unsigned int ccu, unsigned int i2c);
 
    private:
     void Initialize();
     void Terminate();
 
-    void PopulateControlRegister(const TDCControl& c);
-    void PopulateSetupRegister(const TDCSetup& s);
+    void PopulateControlRegister(const TDCControl& c, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    void PopulateSetupRegister(const TDCSetup& s, unsigned int mfec, unsigned int ccu, unsigned int i2c);
 
     void AddProperty(DOMElement* elem, const char*, const char*);
     void AddProperty(DOMElement* elem, const char* name, unsigned int value) {
@@ -74,7 +74,7 @@ namespace PPSTimingMB
     std::string GetProperty(const char* name);
     unsigned int GetUIntProperty(const char* name);
     std::string XMLString();
-    std::vector<PropertiesMap> ParseRegister(std::string);
+    std::vector<PropertiesMap> ParseRegister(std::string, unsigned int mfec, unsigned int ccu, unsigned int i2c);
     /*static DOMImplementation* fImpl;
     static DOMDocument* fDocument;*/
     DOMElement* fROOT;
