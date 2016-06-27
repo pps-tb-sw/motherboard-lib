@@ -105,9 +105,9 @@ namespace PPSTimingMB
 
     {
       XMLCh key[100], value[100];
-      XMLString::transcode("mfec", key, 99); XMLString::transcode(std::to_string((int)mfec).c_str(), value, 99); elem->setAttribute(key, value);
-      XMLString::transcode("ccu", key, 99); XMLString::transcode(std::to_string((int)ccu).c_str(), value, 99); elem->setAttribute(key, value);
-      XMLString::transcode("i2c", key, 99); XMLString::transcode(std::to_string((int)i2c).c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("mfec", key, 99); XMLString::transcode(std::to_string((long)mfec).c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("ccu", key, 99); XMLString::transcode(std::to_string((long)ccu).c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("i2c", key, 99); XMLString::transcode(std::to_string((long)i2c).c_str(), value, 99); elem->setAttribute(key, value);
     }
 
     AddProperty(elem, "pll_reset",             r.GetPLLReset());
@@ -132,9 +132,9 @@ namespace PPSTimingMB
 
     {
       XMLCh key[100], value[100];
-      XMLString::transcode("mfec", key, 99); XMLString::transcode(std::to_string((int)mfec).c_str(), value, 99); elem->setAttribute(key, value);
-      XMLString::transcode("ccu", key, 99); XMLString::transcode(std::to_string((int)ccu).c_str(), value, 99); elem->setAttribute(key, value);
-      XMLString::transcode("i2c", key, 99); XMLString::transcode(std::to_string((int)i2c).c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("mfec", key, 99); XMLString::transcode(std::to_string((long)mfec).c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("ccu", key, 99); XMLString::transcode(std::to_string((long)ccu).c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("i2c", key, 99); XMLString::transcode(std::to_string((long)i2c).c_str(), value, 99); elem->setAttribute(key, value);
     }
 
     AddProperty(elem, "enable_ttl_hit",       r.GetEnableTTLHit());
