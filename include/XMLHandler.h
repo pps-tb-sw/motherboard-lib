@@ -56,8 +56,8 @@ namespace PPSTimingMB
     std::string WriteRegister(const TDCControl& r, unsigned int mfec, unsigned int ccu, unsigned int i2c);
     std::string WriteRegister(const TDCSetup& r, unsigned int mfec, unsigned int ccu, unsigned int i2c);
     std::string WriteRegister(const TDCControl& c, const TDCSetup& s, unsigned int mfec, unsigned int ccu, unsigned int i2c);
-    void ReadRegister(std::string, TDCControl* c, unsigned int mfec, unsigned int ccu, unsigned int i2c);
-    void ReadRegister(std::string, TDCSetup* s, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    bool ReadRegister(std::string, TDCControl* c, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    bool ReadRegister(std::string, TDCSetup* s, unsigned int mfec, unsigned int ccu, unsigned int i2c);
 
    private:
     void Initialize();

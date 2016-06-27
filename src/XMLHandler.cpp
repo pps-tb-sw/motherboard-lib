@@ -163,10 +163,17 @@ namespace PPSTimingMB
     fROOT->appendChild(elem);
   }
 
-  void
+  bool
   XMLHandler::ReadRegister(std::string s, TDCControl* c, unsigned int mfec, unsigned int ccu, unsigned int i2c)
   {
     std::vector<PropertiesMap> maps = ParseRegister(s, mfec, ccu, i2c);
+    if (!maps.size()) {
+      std::cerr << "FAILED to retrieve a TDCControl register with" << "\n\t"
+                << "MFEC=" << mfec << "\n\t"
+                << "CCU =" << ccu << "\n\t"
+                << "I2C =" << i2c << std::endl;
+      return false;
+    }
     for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
       if (map->GetProperty("register_name")!="TDCControl") { continue; }
 
@@ -180,12 +187,20 @@ namespace PPSTimingMB
     }
 
     c->ComputeParity();
+    return true;
   }
 
-  void
+  bool
   XMLHandler::ReadRegister(std::string s, TDCSetup* r, unsigned int mfec, unsigned int ccu, unsigned int i2c)
   {
     std::vector<PropertiesMap> maps = ParseRegister(s, mfec, ccu, i2c);
+    if (!maps.size()) {
+      std::cerr << "FAILED to retrieve a TDCSetup register with" << "\n\t"
+                << "MFEC=" << mfec << "\n\t"
+                << "CCU =" << ccu << "\n\t"
+                << "I2C =" << i2c << std::endl;
+      return false;
+    }
     for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
       if (map->GetProperty("register_name")!="TDCSetup") { continue; }
 
@@ -214,6 +229,7 @@ namespace PPSTimingMB
     }
 
     r->ComputeParity();
+    return true;
   }
 
   void
