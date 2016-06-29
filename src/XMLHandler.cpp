@@ -105,9 +105,13 @@ namespace PPSTimingMB
 
     {
       XMLCh key[100], value[100];
-      XMLString::transcode("mfec", key, 99); XMLString::transcode(std::to_string((long long unsigned int)mfec).c_str(), value, 99); elem->setAttribute(key, value);
-      XMLString::transcode("ccu", key, 99); XMLString::transcode(std::to_string((long long unsigned int)ccu).c_str(), value, 99); elem->setAttribute(key, value);
-      XMLString::transcode("i2c", key, 99); XMLString::transcode(std::to_string((long long unsigned int)i2c).c_str(), value, 99); elem->setAttribute(key, value);
+      std::stringstream mfec_addr, ccu_addr, i2c_addr;
+      mfec_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << mfec;
+      ccu_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << ccu;
+      i2c_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << i2c;
+      XMLString::transcode("mfec", key, 99); XMLString::transcode(mfec_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("ccu", key, 99); XMLString::transcode(ccu_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("i2c", key, 99); XMLString::transcode(i2c_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
     }
 
     AddProperty(elem, "pll_reset",             r.GetPLLReset());
@@ -132,9 +136,13 @@ namespace PPSTimingMB
 
     {
       XMLCh key[100], value[100];
-      XMLString::transcode("mfec", key, 99); XMLString::transcode(std::to_string((long long unsigned int)mfec).c_str(), value, 99); elem->setAttribute(key, value);
-      XMLString::transcode("ccu", key, 99); XMLString::transcode(std::to_string((long long unsigned int)ccu).c_str(), value, 99); elem->setAttribute(key, value);
-      XMLString::transcode("i2c", key, 99); XMLString::transcode(std::to_string((long long unsigned int)i2c).c_str(), value, 99); elem->setAttribute(key, value);
+      std::stringstream mfec_addr, ccu_addr, i2c_addr;
+      mfec_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << mfec;
+      ccu_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << ccu;
+      i2c_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << i2c;
+      XMLString::transcode("mfec", key, 99); XMLString::transcode(mfec_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("ccu", key, 99); XMLString::transcode(ccu_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
+      XMLString::transcode("i2c", key, 99); XMLString::transcode(i2c_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
     }
 
     AddProperty(elem, "enable_ttl_hit",       r.GetEnableTTLHit());
@@ -299,9 +307,18 @@ namespace PPSTimingMB
         bool found_mfec = false, found_ccu = false, found_i2c = false;
         for (unsigned int j=0; j<attr->getLength(); j++) {
           char* key = XMLString::transcode(attr->item(j)->getNodeName()), *value = XMLString::transcode(attr->item(j)->getNodeValue());
-          if ((strcmp(key, "mfec")==0) and static_cast<unsigned int>(atoi(value))==mfec) found_mfec = true;
-          if ((strcmp(key, "ccu")==0) and static_cast<unsigned int>(atoi(value))==ccu) found_ccu = true;
-          if ((strcmp(key, "i2c")==0) and static_cast<unsigned int>(atoi(value))==i2c) found_i2c = true;
+          if ((strcmp(key, "mfec")==0)) {
+            unsigned int mfec_addr = (strcspn(value, "0x")==0) ? static_cast<unsigned long>(strtol(value, NULL, 0)) : static_cast<unsigned int>(atoi(value));
+            if (mfec_addr==mfec) found_mfec = true;
+          }
+          if ((strcmp(key, "ccu")==0)) {
+            unsigned int ccu_addr = (strcspn(value, "0x")==0) ? static_cast<unsigned long>(strtol(value, NULL, 0)) : static_cast<unsigned int>(atoi(value));
+            if (ccu_addr==ccu) found_ccu = true;
+          }
+          if ((strcmp(key, "i2c")==0)) {
+            unsigned int i2c_addr = (strcspn(value, "0x")==0) ? static_cast<unsigned long>(strtol(value, NULL, 0)) : static_cast<unsigned int>(atoi(value));
+            if (i2c_addr==i2c) found_i2c = true;
+          }
         }
         if (!found_mfec or !found_ccu or !found_i2c) continue;
 

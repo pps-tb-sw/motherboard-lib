@@ -16,7 +16,7 @@
     <global_reset>0</global_reset>
     <enable_pattern>0</enable_pattern>
   </TDCControl>
-  <TDCControl mfec="1" ccu="2" i2c="2">
+  <TDCControl mfec="0x3" ccu="0x1" i2c="0x1">
     <control_parity>0</control_parity>
     <pll_reset>1</pll_reset>
     <dll_reset>0</dll_reset>
@@ -24,7 +24,7 @@
     <global_reset>0</global_reset>
     <enable_pattern>0</enable_pattern>
   </TDCControl>
-  <TDCSetup>
+  <TDCSetup mfec="0x3" ccu="0x1" i2c="0x17">
     <setup_parity>1</setup_parity>
     <enable_ttl_hit>0</enable_ttl_hit>
     <enable_ttl_clock>0</enable_ttl_clock>
