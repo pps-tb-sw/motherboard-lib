@@ -81,6 +81,19 @@ namespace PPSTimingMB
   }
 
   std::string
+  XMLHandler::WriteRegister(const NINOThresholds& n, unsigned int mfec, unsigned int ccu, unsigned int i2c)
+  {
+    XMLCh str[100];
+
+    XMLString::transcode("TDCRegister", str, 99);
+    fDocument = fImpl->createDocument(0, str, 0);
+
+    PopulateNINOThresholds(n, mfec, ccu, i2c);
+
+    return XMLString();
+  }
+
+  std::string
   XMLHandler::WriteRegister(const TDCControl& c, const TDCSetup& s, unsigned int mfec, unsigned int ccu, unsigned int i2c)
   {
     XMLCh str[100];
@@ -94,6 +107,21 @@ namespace PPSTimingMB
     return XMLString();
   }
 
+  std::string
+  XMLHandler::WriteRegister(const TDCControl& c, const TDCSetup& s, const NINOThresholds& n, unsigned int mfec, unsigned int ccu, unsigned int i2c)
+  {
+    XMLCh str[100];
+
+    XMLString::transcode("TDCRegister", str, 99);
+    fDocument = fImpl->createDocument(0, str, 0);
+
+    PopulateControlRegister(c, mfec, ccu, i2c);
+    PopulateSetupRegister(s, mfec, ccu, i2c);
+    PopulateNINOThresholds(n, mfec, ccu, i2c);
+    
+    return XMLString();
+  }
+
   void
   XMLHandler::PopulateControlRegister(const TDCControl& r, unsigned int mfec, unsigned int ccu, unsigned int i2c)
   {
@@ -103,16 +131,7 @@ namespace PPSTimingMB
     DOMElement* elem = fDocument->createElement(str);
     fROOT = fDocument->getDocumentElement();
 
-    {
-      XMLCh key[100], value[100];
-      std::stringstream mfec_addr, ccu_addr, i2c_addr;
-      mfec_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << mfec;
-      ccu_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << ccu;
-      i2c_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << i2c;
-      XMLString::transcode("mfec", key, 99); XMLString::transcode(mfec_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
-      XMLString::transcode("ccu", key, 99); XMLString::transcode(ccu_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
-      XMLString::transcode("i2c", key, 99); XMLString::transcode(i2c_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
-    }
+    SetAddressAttributes(elem, mfec, ccu, i2c);
 
     AddProperty(elem, "pll_reset",             r.GetPLLReset());
     AddProperty(elem, "dll_reset",             r.GetDLLReset());
@@ -126,6 +145,25 @@ namespace PPSTimingMB
   }
 
   void
+  XMLHandler::PopulateNINOThresholds(const NINOThresholds& r, unsigned int mfec, unsigned int ccu, unsigned int i2c)
+  {
+    XMLCh str[100];
+
+    XMLString::transcode("NINOThresholds", str, 99);
+    DOMElement* elem = fDocument->createElement(str);
+    fROOT = fDocument->getDocumentElement();
+
+    SetAddressAttributes(elem, mfec, ccu, i2c);
+
+    AddProperty(elem, "group0", r.group0);
+    AddProperty(elem, "group1", r.group1);
+    AddProperty(elem, "group2", r.group2);
+    AddProperty(elem, "group3", r.group3);
+
+    fROOT->appendChild(elem);
+  }
+
+  void
   XMLHandler::PopulateSetupRegister(const TDCSetup& r, unsigned int mfec, unsigned int ccu, unsigned int i2c)
   {
     XMLCh str[100];
@@ -134,16 +172,7 @@ namespace PPSTimingMB
     DOMElement* elem = fDocument->createElement(str);
     fROOT = fDocument->getDocumentElement();
 
-    {
-      XMLCh key[100], value[100];
-      std::stringstream mfec_addr, ccu_addr, i2c_addr;
-      mfec_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << mfec;
-      ccu_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << ccu;
-      i2c_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << i2c;
-      XMLString::transcode("mfec", key, 99); XMLString::transcode(mfec_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
-      XMLString::transcode("ccu", key, 99); XMLString::transcode(ccu_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
-      XMLString::transcode("i2c", key, 99); XMLString::transcode(i2c_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
-    }
+    SetAddressAttributes(elem, mfec, ccu, i2c);
 
     AddProperty(elem, "enable_ttl_hit",       r.GetEnableTTLHit());
     AddProperty(elem, "enable_ttl_clock",     r.GetEnableTTLClock());
@@ -372,5 +401,18 @@ namespace PPSTimingMB
     std::string prop = GetProperty(name);
     if (prop=="") return 0;
     return atoi(prop.c_str());
+  }
+
+  void
+  XMLHandler::SetAddressAttributes(DOMElement* elem, unsigned int mfec, unsigned int ccu, unsigned int i2c)
+  {
+    XMLCh key[100], value[100];
+    std::stringstream mfec_addr, ccu_addr, i2c_addr;
+    mfec_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << mfec;
+    ccu_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << ccu;
+    i2c_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << i2c;
+    XMLString::transcode("mfec", key, 99); XMLString::transcode(mfec_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
+    XMLString::transcode("ccu", key, 99); XMLString::transcode(ccu_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
+    XMLString::transcode("i2c", key, 99); XMLString::transcode(i2c_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
   }
 }

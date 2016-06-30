@@ -15,6 +15,7 @@
 
 #include "TDCControl.h"
 #include "TDCSetup.h"
+#include "NINOThresholds.h"
 
 XERCES_CPP_NAMESPACE_USE
 
@@ -55,9 +56,12 @@ namespace PPSTimingMB
     static std::string WriteRegister(const TDCSetup& r);*/
     std::string WriteRegister(const TDCControl& r, unsigned int mfec, unsigned int ccu, unsigned int i2c);
     std::string WriteRegister(const TDCSetup& r, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    std::string WriteRegister(const NINOThresholds& n, unsigned int mfec, unsigned int ccu, unsigned int i2c);
     std::string WriteRegister(const TDCControl& c, const TDCSetup& s, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    std::string WriteRegister(const TDCControl& c, const TDCSetup& s, const NINOThresholds& n, unsigned int mfec, unsigned int ccu, unsigned int i2c);
     bool ReadRegister(std::string, TDCControl* c, unsigned int mfec, unsigned int ccu, unsigned int i2c);
     bool ReadRegister(std::string, TDCSetup* s, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    bool ReadRegister(std::string, NINOThresholds* n, unsigned int mfec, unsigned int ccu, unsigned int i2c);
 
    private:
     void Initialize();
@@ -65,12 +69,14 @@ namespace PPSTimingMB
 
     void PopulateControlRegister(const TDCControl& c, unsigned int mfec, unsigned int ccu, unsigned int i2c);
     void PopulateSetupRegister(const TDCSetup& s, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    void PopulateNINOThresholds(const NINOThresholds& n, unsigned int mfec, unsigned int ccu, unsigned int i2c);
 
     void AddProperty(DOMElement* elem, const char*, const char*);
     void AddProperty(DOMElement* elem, const char* name, unsigned int value) {
       std::ostringstream os; os << value;
       AddProperty(elem, name, os.str().c_str());
     }
+    void SetAddressAttributes(DOMElement* elem, unsigned int mfec, unsigned int ccu, unsigned int i2c);
     std::string GetProperty(const char* name);
     unsigned int GetUIntProperty(const char* name);
     std::string XMLString();
