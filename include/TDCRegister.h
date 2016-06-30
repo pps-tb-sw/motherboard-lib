@@ -95,8 +95,10 @@ namespace PPSTimingMB
       void DumpRegister(unsigned short verb=1, std::ostream& os=std::cout, const bit max_bits=-1) const;
       /// Ensure that the critical constant values are properly set in the register word
       inline void SetConstantValues() {;}
+      /// Return a given value as a 32-bit word
       template<class T> inline uint32_t GetValue(const T&) { return 0; }
 
+      /// Compute the parity bit of the full register word
       inline bool ComputeParityBit(unsigned short begin=0, short end=-1) const {
         if (end<0) end = fWordSize;
         unsigned short parity = 0;
