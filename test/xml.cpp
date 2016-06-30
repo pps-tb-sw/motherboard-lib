@@ -29,10 +29,16 @@ int main(int argc, char* argv[])
   ostringstream os; ifstream xml_in(input_file.c_str()); os << xml_in.rdbuf(); xml_in.close();
 
   cout << "Reading setup register..." << endl;
-  h.ReadRegister(os.str(), &s, 3, 1, 1);
+  h.ReadRegister(os.str(), &s, PPSTimingMB::BoardAddress(3, 1, 1));
   cout << "Reading control register..." << endl;
   h.ReadRegister(os.str(), &c, 1, 1, 1);
+  cout << "Reading NINO thresholds..." << endl;
 
+  cout << "--> before:" << endl;
+  n.Dump();
+  h.ReadRegister(os.str(), &n, 1, 2, 1);
+  cout << "--> after:" << endl;
+  n.Dump();
 
   s.Dump();
 

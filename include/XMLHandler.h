@@ -16,6 +16,7 @@
 #include "TDCControl.h"
 #include "TDCSetup.h"
 #include "NINOThresholds.h"
+#include "BoardAddress.h"
 
 XERCES_CPP_NAMESPACE_USE
 
@@ -52,35 +53,47 @@ namespace PPSTimingMB
       std::map<std::string,std::string> fMap;
     };
 
-    /*static std::string WriteRegister(const TDCControl& r);
-    static std::string WriteRegister(const TDCSetup& r);*/
-    std::string WriteRegister(const TDCControl& r, unsigned int mfec, unsigned int ccu, unsigned int i2c);
-    std::string WriteRegister(const TDCSetup& r, unsigned int mfec, unsigned int ccu, unsigned int i2c);
-    std::string WriteRegister(const NINOThresholds& n, unsigned int mfec, unsigned int ccu, unsigned int i2c);
-    std::string WriteRegister(const TDCControl& c, const TDCSetup& s, unsigned int mfec, unsigned int ccu, unsigned int i2c);
-    std::string WriteRegister(const TDCControl& c, const TDCSetup& s, const NINOThresholds& n, unsigned int mfec, unsigned int ccu, unsigned int i2c);
-    bool ReadRegister(std::string, TDCControl* c, unsigned int mfec, unsigned int ccu, unsigned int i2c);
-    bool ReadRegister(std::string, TDCSetup* s, unsigned int mfec, unsigned int ccu, unsigned int i2c);
-    bool ReadRegister(std::string, NINOThresholds* n, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    inline std::string WriteRegister(const TDCControl& r, unsigned int mfec, unsigned int ccu, unsigned int i2c) { return WriteRegister(r, BoardAddress(mfec, ccu, i2c)); }
+    std::string WriteRegister(const TDCControl& r, const BoardAddress& addr);
+    inline bool ReadRegister(std::string str, TDCControl* c, unsigned int mfec, unsigned int ccu, unsigned int i2c) { return ReadRegister(str, c, BoardAddress(mfec, ccu, i2c)); }
+    bool ReadRegister(std::string, TDCControl* c, const BoardAddress& addr);
+
+    inline std::string WriteRegister(const TDCSetup& r, unsigned int mfec, unsigned int ccu, unsigned int i2c) { return WriteRegister(r, BoardAddress(mfec, ccu, i2c)); }
+    std::string WriteRegister(const TDCSetup& r, const BoardAddress& addr);
+    inline bool ReadRegister(std::string str, TDCSetup* s, unsigned int mfec, unsigned int ccu, unsigned int i2c) { return ReadRegister(str, s, BoardAddress(mfec, ccu, i2c)); }
+    bool ReadRegister(std::string, TDCSetup* s, const BoardAddress& addr);
+
+    inline std::string WriteRegister(const NINOThresholds& n, unsigned int mfec, unsigned int ccu, unsigned int i2c) { return WriteRegister(n, BoardAddress(mfec, ccu, i2c)); }
+    std::string WriteRegister(const NINOThresholds& n, const BoardAddress& addr);
+    inline bool ReadRegister(std::string str, NINOThresholds* n, unsigned int mfec, unsigned int ccu, unsigned int i2c) { return ReadRegister(str, n, BoardAddress(mfec, ccu, i2c)); }
+    bool ReadRegister(std::string, NINOThresholds* n, const BoardAddress& addr);
+
+    inline std::string WriteRegister(const TDCControl& c, const TDCSetup& s, unsigned int mfec, unsigned int ccu, unsigned int i2c) { return WriteRegister(c, s, BoardAddress(mfec, ccu, i2c)); }
+    std::string WriteRegister(const TDCControl& c, const TDCSetup& s, const BoardAddress& addr);
+
+    inline std::string WriteRegister(const TDCControl& c, const TDCSetup& s, const NINOThresholds& n, unsigned int mfec, unsigned int ccu, unsigned int i2c) {
+      return WriteRegister(c, s, n, BoardAddress(mfec, ccu, i2c));
+    }
+    std::string WriteRegister(const TDCControl& c, const TDCSetup& s, const NINOThresholds& n, const BoardAddress& addr);
 
    private:
     void Initialize();
     void Terminate();
 
-    void PopulateControlRegister(const TDCControl& c, unsigned int mfec, unsigned int ccu, unsigned int i2c);
-    void PopulateSetupRegister(const TDCSetup& s, unsigned int mfec, unsigned int ccu, unsigned int i2c);
-    void PopulateNINOThresholds(const NINOThresholds& n, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    void PopulateControlRegister(const TDCControl& c, const BoardAddress&);
+    void PopulateSetupRegister(const TDCSetup& s, const BoardAddress&);
+    void PopulateNINOThresholds(const NINOThresholds& n, const BoardAddress&);
 
     void AddProperty(DOMElement* elem, const char*, const char*);
     void AddProperty(DOMElement* elem, const char* name, unsigned int value) {
       std::ostringstream os; os << value;
       AddProperty(elem, name, os.str().c_str());
     }
-    void SetAddressAttributes(DOMElement* elem, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    void SetAddressAttributes(DOMElement* elem, const BoardAddress&);
     std::string GetProperty(const char* name);
     unsigned int GetUIntProperty(const char* name);
     std::string XMLString();
-    std::vector<PropertiesMap> ParseRegister(std::string, unsigned int mfec, unsigned int ccu, unsigned int i2c);
+    std::vector<PropertiesMap> ParseRegister(std::string, const BoardAddress&);
     /*static DOMImplementation* fImpl;
     static DOMDocument* fDocument;*/
     DOMElement* fROOT;
