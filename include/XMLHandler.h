@@ -74,13 +74,9 @@ namespace PPSTimingMB
     bool ReadRegister(std::string, TDCSetup* s, const BoardAddress& addr);
 
     /// Extract a XML output of a NINO thresholds register
-    inline std::string WriteRegister(const NINOThresholds& n, unsigned int mfec, unsigned int ccu) { return WriteRegister(n, BoardAddress(mfec, ccu, 0)); }
-    /// Extract a XML output of a NINO thresholds register
-    std::string WriteRegister(const NINOThresholds& n, const BoardAddress& addr);
+    std::string WriteRegister(const NINOThresholds& n);
     /// Parse a NINO thresholds register out of a XML configuration file
-    inline bool ReadRegister(std::string str, NINOThresholds* n, unsigned int mfec, unsigned int ccu, unsigned int i2c) { return ReadRegister(str, n, BoardAddress(mfec, ccu, i2c)); }
-    /// Parse a NINO thresholds register out of a XML configuration file
-    bool ReadRegister(std::string, NINOThresholds* n, const BoardAddress& addr);
+    bool ReadRegister(std::string, NINOThresholds* n);
 
     /// Extract a XML output of a TDCControl and a TDCSetup register
     inline std::string WriteRegister(const TDCControl& c, const TDCSetup& s, unsigned int mfec, unsigned int ccu, unsigned int i2c) { return WriteRegister(c, s, BoardAddress(mfec, ccu, i2c)); }

@@ -40,9 +40,12 @@ int main(int argc, char* argv[])
 
   cout << "--> before:" << endl;
   n.Dump();
-  h.ReadRegister(os.str(), &n, 1, 2, 1);
+  h.ReadRegister(os.str(), &n);
   cout << "--> after:" << endl;
   n.Dump();
+
+  const PPSTimingMB::BoardAddress address_to_retrieve(1, 3, 3);
+  cout << "NINO threshold for address " << address_to_retrieve.mfec << ":" << address_to_retrieve.ccu << ":" << address_to_retrieve.i2c << ": " << n.GetValue(address_to_retrieve) << endl;
 
   s.Dump();
 

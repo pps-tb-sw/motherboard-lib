@@ -81,7 +81,7 @@ namespace PPSTimingMB
   }
 
   std::string
-  XMLHandler::WriteRegister(const NINOThresholds& n, const BoardAddress&)
+  XMLHandler::WriteRegister(const NINOThresholds& n)
   {
     XMLCh str[100];
 
@@ -154,7 +154,7 @@ namespace PPSTimingMB
     fROOT = fDocument->getDocumentElement();
 
     unsigned int i = 0;
-    for (NINOThresholds::Register::const_iterator it=r.thresholds.begin(); it!=r.thresholds.end(); it++, i++) {
+    for (NINOThresholds::Register::const_iterator it=r.GetValues().begin(); it!=r.GetValues().end(); it++, i++) {
       std::ostringstream os; os << "group" << std::dec << i;
       DOMElement* thr = (DOMElement*)AddProperty(elem, os.str().c_str(), it->second);
       SetAddressAttributes(thr, it->first);
@@ -266,20 +266,19 @@ namespace PPSTimingMB
   }
 
   bool
-  XMLHandler::ReadRegister(std::string s, NINOThresholds* n, const BoardAddress& addr)
+  XMLHandler::ReadRegister(std::string s, NINOThresholds* n)
   {
-    std::vector<PropertiesMap> maps = ParseRegister(s, addr);
+    std::vector<PropertiesMap> maps = ParseRegister(s, BoardAddress(0,0,0));
     if (!maps.size()) {
-      std::cerr << "FAILED to retrieve a NINO thresholds register with" << std::endl;
-      addr.Dump(std::cerr);
+      std::cerr << "FAILED to retrieve a NINO thresholds register" << std::endl;
       return false;
     }
     for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
       if (map->GetProperty("register_name")!="NINOThresholds") { continue; }
-      if (map->HasProperty("group0")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group0"); n->thresholds[prop.first] = prop.second; }
-      if (map->HasProperty("group1")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group1"); n->thresholds[prop.first] = prop.second; }
-      if (map->HasProperty("group2")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group2"); n->thresholds[prop.first] = prop.second; }
-      if (map->HasProperty("group3")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group3"); n->thresholds[prop.first] = prop.second; }
+      if (map->HasProperty("group0")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group0"); n->SetValue(prop.first, prop.second); }
+      if (map->HasProperty("group1")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group1"); n->SetValue(prop.first, prop.second); }
+      if (map->HasProperty("group2")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group2"); n->SetValue(prop.first, prop.second); }
+      if (map->HasProperty("group3")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group3"); n->SetValue(prop.first, prop.second); }
     }
 
     return true;
