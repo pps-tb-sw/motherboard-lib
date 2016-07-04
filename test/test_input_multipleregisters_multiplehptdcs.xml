@@ -49,10 +49,11 @@
     <reject_count_offset>0</reject_count_offset>
     <tdc_id>0</tdc_id>
   </TDCSetup>
-  <NINOThresholds ccu="0x0002" i2c="0x0001" mfec="0x0001">
-    <group0>10</group0>
-    <group1>20</group1>
-    <group2>30</group2>
-    <group3>40</group3>
+  
+  <NINOThresholds>
+    <group0 ccu="0x0003" i2c="0x0001" mfec="0x0001">10</group0>
+    <group1 ccu="0x0003" i2c="0x0002" mfec="0x0001">20</group1>
+    <group2 ccu="0x0003" i2c="0x0003" mfec="0x0001">30</group2>
+    <group3 ccu="0x0003" i2c="0x0004" mfec="0x0001">40</group3>
   </NINOThresholds>
 </TDCRegister>

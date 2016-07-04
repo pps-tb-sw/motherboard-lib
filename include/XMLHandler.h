@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <map>
+#include <regex>
 
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
@@ -49,6 +50,8 @@ namespace PPSTimingMB
       std::string GetProperty(const char* name);
       /// Retrieve the (unsigned integer) value associated with a key
       unsigned int GetUIntProperty(const char* name);
+      std::map<std::string,std::string> GetStructuredProperty(const char* name);
+      std::pair<BoardAddress, unsigned int> GetNINOThresholdValue(const char* name);
      private:
       std::map<std::string,std::string> fMap;
     };
@@ -72,7 +75,7 @@ namespace PPSTimingMB
     bool ReadRegister(std::string, TDCSetup* s, const BoardAddress& addr);
 
     /// Extract a XML output of a NINO thresholds register
-    inline std::string WriteRegister(const NINOThresholds& n, unsigned int mfec, unsigned int ccu, unsigned int i2c) { return WriteRegister(n, BoardAddress(mfec, ccu, i2c)); }
+    inline std::string WriteRegister(const NINOThresholds& n, unsigned int mfec, unsigned int ccu) { return WriteRegister(n, BoardAddress(mfec, ccu, 0)); }
     /// Extract a XML output of a NINO thresholds register
     std::string WriteRegister(const NINOThresholds& n, const BoardAddress& addr);
     /// Parse a NINO thresholds register out of a XML configuration file
@@ -98,20 +101,18 @@ namespace PPSTimingMB
 
     void PopulateControlRegister(const TDCControl& c, const BoardAddress&);
     void PopulateSetupRegister(const TDCSetup& s, const BoardAddress&);
-    void PopulateNINOThresholds(const NINOThresholds& n, const BoardAddress&);
+    void PopulateNINOThresholds(const NINOThresholds& n);
 
-    void AddProperty(DOMElement* elem, const char*, const char*);
-    void AddProperty(DOMElement* elem, const char* name, unsigned int value) {
+    DOMNode* AddProperty(DOMNode* elem, const char*, const char*);
+    DOMNode* AddProperty(DOMNode* elem, const char* name, unsigned int value) {
       std::ostringstream os; os << value;
-      AddProperty(elem, name, os.str().c_str());
+      return AddProperty(elem, name, os.str().c_str());
     }
     void SetAddressAttributes(DOMElement* elem, const BoardAddress&);
     std::string GetProperty(const char* name);
     unsigned int GetUIntProperty(const char* name);
     std::string XMLString();
     std::vector<PropertiesMap> ParseRegister(std::string, const BoardAddress&);
-    /*static DOMImplementation* fImpl;
-    static DOMDocument* fDocument;*/
     DOMElement* fROOT;
     DOMImplementation* fImpl;
     DOMDocument* fDocument;

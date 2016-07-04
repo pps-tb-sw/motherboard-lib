@@ -14,7 +14,11 @@ int main(int argc, char* argv[])
   PPSTimingMB::TDCControl c;
   PPSTimingMB::TDCSetup s;
   //s.Dump(3);
-  PPSTimingMB::NINOThresholds n(1, 2, 3, 4); // lol, just kidding
+  PPSTimingMB::NINOThresholds n;
+  n.SetValue(PPSTimingMB::BoardAddress(1, 3, 1), 1); // lol, just kidding
+  n.SetValue(PPSTimingMB::BoardAddress(1, 3, 2), 2); // lol, just kidding
+  n.SetValue(PPSTimingMB::BoardAddress(1, 3, 3), 3); // lol, just kidding
+  n.SetValue(PPSTimingMB::BoardAddress(1, 3, 4), 4); // lol, just kidding
   n.Dump();
   PPSTimingMB::XMLHandler h; 
  
