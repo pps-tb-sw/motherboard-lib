@@ -2,17 +2,18 @@
 
 namespace PPSTimingMB
 {
-  NINOThresholds::NINOThresholds(unsigned int g0, unsigned int g1, unsigned int g2, unsigned int g3) :
-      group0(g0), group1(g1), group2(g2), group3(g3)
-  {}
+  void
+  NINOThresholds::SetValue(const BoardAddress& addr, unsigned int value)
+  {
+    thresholds[addr] = value;
+  }
 
   void
-  NINOThresholds::Dump(std::ostream& out)
+  NINOThresholds::Dump(std::ostream& out) const
   {
-    out << "NINO Thresholds:" << std::endl
-        << " * group 0 (ch.  0- 7): " << group0 << std::endl
-        << " * group 1 (ch.  8-15): " << group1 << std::endl
-        << " * group 2 (ch. 16-23): " << group2 << std::endl
-        << " * group 3 (ch. 24-31): " << group3 << std::endl;
+    out << "NINO Thresholds:" << std::endl;
+    for (Register::const_iterator it=thresholds.begin(); it!=thresholds.end(); it++) {
+      out << " * I2C address: " << it->first.i2c << " --> value: " << it->second << std::endl;
+    }
   }
 }

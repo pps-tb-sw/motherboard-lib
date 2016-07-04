@@ -81,14 +81,14 @@ namespace PPSTimingMB
   }
 
   std::string
-  XMLHandler::WriteRegister(const NINOThresholds& n, const BoardAddress& addr)
+  XMLHandler::WriteRegister(const NINOThresholds& n, const BoardAddress&)
   {
     XMLCh str[100];
 
     XMLString::transcode("TDCRegister", str, 99);
     fDocument = fImpl->createDocument(0, str, 0);
 
-    PopulateNINOThresholds(n, addr);
+    PopulateNINOThresholds(n);
 
     return XMLString();
   }
@@ -117,7 +117,7 @@ namespace PPSTimingMB
 
     PopulateControlRegister(c, addr);
     PopulateSetupRegister(s, addr);
-    PopulateNINOThresholds(n, addr);
+    PopulateNINOThresholds(n);
     
     return XMLString();
   }
@@ -145,7 +145,7 @@ namespace PPSTimingMB
   }
 
   void
-  XMLHandler::PopulateNINOThresholds(const NINOThresholds& r, const BoardAddress& addr)
+  XMLHandler::PopulateNINOThresholds(const NINOThresholds& r)
   {
     XMLCh str[100];
 
@@ -153,12 +153,12 @@ namespace PPSTimingMB
     DOMElement* elem = fDocument->createElement(str);
     fROOT = fDocument->getDocumentElement();
 
-    SetAddressAttributes(elem, addr);
-
-    AddProperty(elem, "group0", r.group0);
-    AddProperty(elem, "group1", r.group1);
-    AddProperty(elem, "group2", r.group2);
-    AddProperty(elem, "group3", r.group3);
+    unsigned int i = 0;
+    for (NINOThresholds::Register::const_iterator it=r.thresholds.begin(); it!=r.thresholds.end(); it++, i++) {
+      std::ostringstream os; os << "group" << std::dec << i;
+      DOMElement* thr = (DOMElement*)AddProperty(elem, os.str().c_str(), it->second);
+      SetAddressAttributes(thr, it->first);
+    }
 
     fROOT->appendChild(elem);
   }
@@ -276,20 +276,19 @@ namespace PPSTimingMB
     }
     for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
       if (map->GetProperty("register_name")!="NINOThresholds") { continue; }
-
-      if (map->HasProperty("group0")) n->group0 = map->GetUIntProperty("group0");
-      if (map->HasProperty("group1")) n->group1 = map->GetUIntProperty("group1");
-      if (map->HasProperty("group2")) n->group2 = map->GetUIntProperty("group2");
-      if (map->HasProperty("group3")) n->group3 = map->GetUIntProperty("group3");
+      if (map->HasProperty("group0")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group0"); n->thresholds[prop.first] = prop.second; }
+      if (map->HasProperty("group1")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group1"); n->thresholds[prop.first] = prop.second; }
+      if (map->HasProperty("group2")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group2"); n->thresholds[prop.first] = prop.second; }
+      if (map->HasProperty("group3")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group3"); n->thresholds[prop.first] = prop.second; }
     }
 
     return true;
   }
 
-  void
-  XMLHandler::AddProperty(DOMElement* elem, const char* name, const char* value)
+  DOMNode*
+  XMLHandler::AddProperty(DOMNode* elem, const char* name, const char* value)
   {
-    if (!elem) return;
+    if (!elem) return nullptr;
     XMLCh str[100];
 
     XMLString::transcode(name, str, 99);
@@ -302,6 +301,21 @@ namespace PPSTimingMB
     DOMText* textNode = fDocument->createTextNode(str);
     child->appendChild(textNode);
     //fROOT->appendChild(first);
+    //
+    return child;
+  }
+
+  void
+  XMLHandler::SetAddressAttributes(DOMElement* elem, const BoardAddress& addr)
+  {
+    XMLCh key[100], value[100];
+    std::stringstream mfec_addr, ccu_addr, i2c_addr;
+    mfec_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << addr.mfec;
+    ccu_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << addr.ccu;
+    i2c_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << addr.i2c;
+    XMLString::transcode("mfec", key, 99); XMLString::transcode(mfec_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
+    XMLString::transcode("ccu", key, 99); XMLString::transcode(ccu_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
+    XMLString::transcode("i2c", key, 99); XMLString::transcode(i2c_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
   }
 
   std::string
@@ -366,14 +380,15 @@ namespace PPSTimingMB
             if (i2c_addr==addr.i2c) found_i2c = true;
           }
         }
-        if (!found_mfec or !found_ccu or !found_i2c) continue;
 
         PropertiesMap map;
 
         char* key = XMLString::transcode(registers->item(i)->getNodeName()); map.AddProperty("register_name", key); XMLString::release(&key);
         DOMNodeList* children = registers->item(i)->getChildNodes();
 
-        //std::cout << "Found a " << map.GetProperty("register_name") << " for mfec=" << mfec << ", ccu=" << ccu << ", i2c=" << i2c << std::endl;
+        if (map.GetProperty("register_name")!="NINOThresholds" and (!found_mfec or !found_ccu or !found_i2c)) continue;
+
+        //std::cout << "Found a " << map.GetProperty("register_name") << " for mfec=" << addr.mfec << ", ccu=" << addr.ccu << ", i2c=" << addr.i2c << std::endl;
 
         if (!children) return out;
         const XMLSize_t nodeCount = children->getLength();
@@ -383,8 +398,16 @@ namespace PPSTimingMB
           char* key = XMLString::transcode(currentNode->getNodeName());
           DOMText* prop = dynamic_cast<DOMText*>(currentNode->getFirstChild());
           char* value = XMLString::transcode(prop->getWholeText());
-          //std::cout << "----->" << key << " = " << value << std::endl;
-          map.AddProperty(key, value);
+          DOMNamedNodeMap* attr = currentNode->getAttributes();
+          //std::string str_val = value;// str_val.replace('\r', "");// str_val = std::regex_replace(str_val, std::regex("^ +| +$|( ) +"), "$1");
+          std::ostringstream os_val; os_val << value;
+          for (unsigned int k=0; k<attr->getLength(); k++) {
+            char* att_key = XMLString::transcode(attr->item(k)->getNodeName()), *att_value = XMLString::transcode(attr->item(k)->getNodeValue());
+            //std::cout << "attribute " << k << ":" << att_key << ":" << att_value << std::endl;
+            os_val << "\n" << att_key << ":" << att_value;
+          }
+          //std::cout << "----->" << key << " = " << os_val.str() << std::endl;
+          map.AddProperty(key, os_val.str().c_str());
           XMLString::release(&key); XMLString::release(&value);
         }
 
@@ -416,20 +439,41 @@ namespace PPSTimingMB
   XMLHandler::PropertiesMap::GetUIntProperty(const char* name)
   {
     std::string prop = GetProperty(name);
-    if (prop=="") return 0;
+    if (prop.empty()) return 0;
     return atoi(prop.c_str());
   }
 
-  void
-  XMLHandler::SetAddressAttributes(DOMElement* elem, const BoardAddress& addr)
+  std::map<std::string,std::string>
+  XMLHandler::PropertiesMap::GetStructuredProperty(const char* name)
   {
-    XMLCh key[100], value[100];
-    std::stringstream mfec_addr, ccu_addr, i2c_addr;
-    mfec_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << addr.mfec;
-    ccu_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << addr.ccu;
-    i2c_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << addr.i2c;
-    XMLString::transcode("mfec", key, 99); XMLString::transcode(mfec_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
-    XMLString::transcode("ccu", key, 99); XMLString::transcode(ccu_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
-    XMLString::transcode("i2c", key, 99); XMLString::transcode(i2c_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
+    std::map<std::string,std::string> out;
+    std::string prop = GetProperty(name);
+    if (prop.empty()) return out;
+    size_t pos;
+    std::stringstream ss(prop);
+    while (getline(ss, prop, '\n')) {
+      if (prop.empty()) continue;
+      if ((pos=prop.find(":"))!=std::string::npos) { out.insert(std::pair<std::string,std::string>(prop.substr(0, pos), prop.substr(pos+1, prop.size()))); }
+      else { out.insert(std::pair<std::string,std::string>("value", prop)); }
+    }
+    return out;
+  }
+
+  std::pair<BoardAddress, unsigned int>
+  XMLHandler::PropertiesMap::GetNINOThresholdValue(const char* name)
+  {
+    BoardAddress addr(0, 0, 0);
+    std::pair<BoardAddress, unsigned int> out(addr, 0);
+
+    std::map<std::string,std::string> prop = GetStructuredProperty(name);
+    //if (prop.size()!=4) return out;
+    const char* mfec_str = prop["mfec"].c_str(), *ccu_str = prop["ccu"].c_str(), *i2c_str = prop["i2c"].c_str(), *value_str = prop["value"].c_str();
+    unsigned int mfec_addr = (strcspn(mfec_str, "0x")==0) ? static_cast<unsigned long>(strtol(mfec_str, NULL, 0)) : static_cast<unsigned int>(atoi(mfec_str)),
+                 ccu_addr = (strcspn(ccu_str, "0x")==0) ? static_cast<unsigned long>(strtol(ccu_str, NULL, 0)) : static_cast<unsigned int>(atoi(ccu_str)),
+                 i2c_addr = (strcspn(i2c_str, "0x")==0) ? static_cast<unsigned long>(strtol(i2c_str, NULL, 0)) : static_cast<unsigned int>(atoi(i2c_str)),
+                 value = (strcspn(value_str, "0x")==0) ? static_cast<unsigned long>(strtol(value_str, NULL, 0)) : static_cast<unsigned int>(atoi(value_str));
+
+    addr = BoardAddress(mfec_addr, ccu_addr, i2c_addr);
+    return std::pair<BoardAddress, unsigned int>(addr, value);
   }
 }

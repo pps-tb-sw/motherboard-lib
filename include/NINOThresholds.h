@@ -1,7 +1,9 @@
 #ifndef NINOThresholds_h
 #define NINOThresholds_h
 
+#include "BoardAddress.h"
 #include <iostream>
+#include <map>
 
 namespace PPSTimingMB
 {
@@ -12,19 +14,17 @@ namespace PPSTimingMB
    */
   struct NINOThresholds
   {
+    typedef std::map<BoardAddress, unsigned int> Register;
+
     /// Construct the object out of the four threshold values
-    NINOThresholds(unsigned int,unsigned int,unsigned int,unsigned int);
+    inline NINOThresholds() {;}
+    //
+    void SetValue(const BoardAddress&, unsigned int);
     /// Dump the threshold for all 4 groups into the output stream
-    void Dump(std::ostream& os=std::cout);
+    void Dump(std::ostream& os=std::cout) const;
 
     /// NINO threshold for channels 0-7
-    unsigned int group0;
-    /// NINO threshold for channels 8-15
-    unsigned int group1;
-    /// NINO threshold for channels 16-23
-    unsigned int group2;
-    /// NINO threshold for channels 24-31
-    unsigned int group3;
+    Register thresholds;
   };
 }
 
