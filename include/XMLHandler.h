@@ -4,7 +4,6 @@
 #include <iostream>
 #include <sstream>
 #include <map>
-#include <regex>
 
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/PlatformUtils.hpp>

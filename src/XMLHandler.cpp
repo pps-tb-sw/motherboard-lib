@@ -288,7 +288,7 @@ namespace PPSTimingMB
   DOMNode*
   XMLHandler::AddProperty(DOMNode* elem, const char* name, const char* value)
   {
-    if (!elem) return nullptr;
+    if (!elem) return 0;
     XMLCh str[100];
 
     XMLString::transcode(name, str, 99);
@@ -399,14 +399,11 @@ namespace PPSTimingMB
           DOMText* prop = dynamic_cast<DOMText*>(currentNode->getFirstChild());
           char* value = XMLString::transcode(prop->getWholeText());
           DOMNamedNodeMap* attr = currentNode->getAttributes();
-          //std::string str_val = value;// str_val.replace('\r', "");// str_val = std::regex_replace(str_val, std::regex("^ +| +$|( ) +"), "$1");
           std::ostringstream os_val; os_val << value;
           for (unsigned int k=0; k<attr->getLength(); k++) {
             char* att_key = XMLString::transcode(attr->item(k)->getNodeName()), *att_value = XMLString::transcode(attr->item(k)->getNodeValue());
-            //std::cout << "attribute " << k << ":" << att_key << ":" << att_value << std::endl;
             os_val << "\n" << att_key << ":" << att_value;
           }
-          //std::cout << "----->" << key << " = " << os_val.str() << std::endl;
           map.AddProperty(key, os_val.str().c_str());
           XMLString::release(&key); XMLString::release(&value);
         }
