@@ -10,6 +10,8 @@ int main(int argc, char* argv[])
   PPSTimingMB::TDCSetup s;
   s.Dump(2);
 
+  return 0;
+
   PPSTimingMB::TDCControl c;
   /*c.SetEnablePattern(PPSTimingMB::TDCControl::OutputDisabled);
   c.DumpRegister(3);

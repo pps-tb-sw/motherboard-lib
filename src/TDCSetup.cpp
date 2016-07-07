@@ -22,7 +22,7 @@ namespace PPSTimingMB
 
     SetEnableLocalTrailer(true); // FIXME not yet discussed...
     SetEnableLocalHeader(true); // FIXME not yet discussed...
-    SetMaster(false);
+    SetMaster(true);
     SetEnableBytewise(false);
 
     SetBypassInputs(false); // bit 44
