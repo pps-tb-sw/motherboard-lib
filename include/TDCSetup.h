@@ -621,19 +621,6 @@ namespace PPSTimingMB
       /// Selection of clock source for DLL
       inline void SetDLLClockSource(const DLLClockSource dcs) { SetBits(kDLLClockSource, dcs, 3); }
       inline DLLClockSource GetDLLClockSource() const { return static_cast<DLLClockSource>(GetBits(kDLLClockSource, 3)); }
-      inline uint8_t GetSerialClockDelay() const { return GetBits(kSerialClockDelay, 4); }
-      inline uint8_t GetIOClockDelay() const { return GetBits(kIOClockDelay, 4); }
-      inline uint8_t GetCoreClockDelay() const { return GetBits(kCoreClockDelay, 4); }
-      inline uint8_t GetDLLClockDelay() const { return GetBits(kDLLClockDelay, 4); }
-
-      /// Printout all useful values of this setup register into an output stream
-      void Dump(int verb=1, std::ostream& os=std::cout) const;
-      std::string GetXML() const;
-      uint32_t GetValue(const TDCSetupRegister& v);
-
-    private:
-      //////////////////////// Private set'ers and get'ers ////////////////////////
-
       /**
        * \brief Delay of internal serial clock
        * \param[in] delay_clock Use of direct clock (0) or delayed clock (1)
@@ -643,6 +630,8 @@ namespace PPSTimingMB
         uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
         SetBits(kSerialClockDelay, word, 4);
       }
+      inline void SetSerialClockDelayWord(const uint8_t word) { SetBits(kSerialClockDelay, word, 4); }
+      inline uint8_t GetSerialClockDelay() const { return GetBits(kSerialClockDelay, 4); }
       /**
        * \brief Delay of internal I/O clock
        * \param[in] delay_clock Use of direct clock (0) or delayed clock (1)
@@ -652,6 +641,8 @@ namespace PPSTimingMB
         uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
         SetBits(kIOClockDelay, word, 4);
       }
+      inline void SetIOClockDelayWord(const uint8_t word) { SetBits(kIOClockDelay, word, 4); }
+      inline uint8_t GetIOClockDelay() const { return GetBits(kIOClockDelay, 4); }
       /**
        * \brief Delay of internal core clock
        * \param[in] delay_clock Use of direct clock (0) or delayed clock (1)
@@ -661,6 +652,8 @@ namespace PPSTimingMB
         uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
         SetBits(kCoreClockDelay, word, 4);
       }
+      inline void SetCoreClockDelayWord(const uint8_t word) { SetBits(kCoreClockDelay, word, 4); }
+      inline uint8_t GetCoreClockDelay() const { return GetBits(kCoreClockDelay, 4); }
       /**
        * \brief Delay of internal DLL clock
        * \param[in] delay_clock Use of direct clock (0) or delayed clock (1)
@@ -670,6 +663,15 @@ namespace PPSTimingMB
         uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
         SetBits(kDLLClockDelay, word, 4);
       }
+      inline void SetDLLClockDelayWord(const uint8_t word) { SetBits(kDLLClockDelay, word, 4); }
+      inline uint8_t GetDLLClockDelay() const { return GetBits(kDLLClockDelay, 4); }
+
+      /// Printout all useful values of this setup register into an output stream
+      void Dump(int verb=1, std::ostream& os=std::cout) const;
+      std::string GetXML() const;
+      uint32_t GetValue(const TDCSetupRegister& v);
+
+    private:
 
       // List of LSBs for all sub-words in the full ~700-bits setup word
       static const bit kTestSelect = 0;
