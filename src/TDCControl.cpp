@@ -10,10 +10,10 @@ namespace PPSTimingMB
        << "===================" << std::endl;
     if (verb>1) DumpRegister(verb, os);
     os << " EnablePattern: " << GetEnablePattern() << std::endl
-       << " Enabled channels: " << std::endl/*;
+       << " Enabled channels: " << std::endl;
     uint32_t channels = GetEnabledChannels();
     os << "  0-15: " << (channels&0xffff) << std::endl
-       << " 16-31: " << (channels>>16) << std::endl*/
+       << " 16-31: " << (channels>>16) << std::endl
        << "  --> In: ";
     for (unsigned int i=0; i<TDC_NUM_CHANNELS; i++) { if (IsChannelEnabled(i)) os << " " << i; }
     os << std::endl << "  --> Out:";
@@ -21,25 +21,28 @@ namespace PPSTimingMB
     os << std::endl
        << " Global reset: " << GetGlobalReset() << std::endl
        << " DLL reset: " << GetDLLReset() << std::endl
-       << " PLL reset: " << GetPLLReset() << std::endl;
+       << " PLL reset: " << GetPLLReset() << std::endl
+       << " -- Parity: " << GetParity() << std::endl;
   }
 
   void
   TDCControl::SetConstantValues()
   {
     EnableAllChannels();
+    ComputeParity();
   }
 
   uint32_t
   TDCControl::GetValue(const TDCControlRegister& reg)
   {
     switch (reg) {
-      case rEnablePattern: return GetEnablePattern();
-      case rGlobalReset:   return GetGlobalReset();
-      case rEnableChannel: return GetEnabledChannels();
-      case rDLLReset:      return GetDLLReset();
-      case rPLLReset:      return GetPLLReset();
-      case rControlParity: return GetControlParity();
+      case rEnablePattern:  return GetEnablePattern();
+      case rGlobalReset:    return GetGlobalReset();
+      case rEnableChannel0: return GetEnabledChannelsGroup0();
+      case rEnableChannel1: return GetEnabledChannelsGroup1();
+      case rDLLReset:       return GetDLLReset();
+      case rPLLReset:       return GetPLLReset();
+      case rControlParity:  return GetParity();
       default: return 0;
     }
   }
@@ -47,12 +50,13 @@ namespace PPSTimingMB
   std::ostream&
   operator<<(std::ostream& os, const TDCControlRegister& reg) {
     switch (reg) {
-      case rEnablePattern: os << "enable_pattern"; break;
-      case rGlobalReset:   os << "global_reset"; break;
-      case rEnableChannel: os << "enable_channel"; break;
-      case rDLLReset:      os << "dll_reset"; break;
-      case rPLLReset:      os << "pll_reset"; break;
-      case rControlParity: os << "control_parity"; break;
+      case rEnablePattern:  os << "enable_pattern"; break;
+      case rGlobalReset:    os << "global_reset"; break;
+      case rEnableChannel0: os << "enable_channel_group0"; break;
+      case rEnableChannel1: os << "enable_channel_group1"; break;
+      case rDLLReset:       os << "dll_reset"; break;
+      case rPLLReset:       os << "pll_reset"; break;
+      case rControlParity:  os << "control_parity"; break;
       default: break;
     }
     return os;

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<TDCRegister>
+  <TDCControl mfec="1" ccu="1" i2c="1">
+    <control_parity>0</control_parity>
+    <pll_reset>1</pll_reset>
+    <dll_reset>0</dll_reset>
+    <enable_channel>4294967294</enable_channel>
+    <global_reset>0</global_reset>
+    <enable_pattern>0</enable_pattern>
+  </TDCControl>
+  <TDCControl mfec="1" ccu="1" i2c="2">
+    <control_parity>0</control_parity>
+    <pll_reset>1</pll_reset>
+    <dll_reset>0</dll_reset>
+    <enable_channel>4294967294</enable_channel>
+    <global_reset>0</global_reset>
+    <enable_pattern>0</enable_pattern>
+  </TDCControl>
+  <TDCControl mfec="0x3" ccu="0x1" i2c="0x1">
+    <control_parity>0</control_parity>
+    <pll_reset>1</pll_reset>
+    <dll_reset>0</dll_reset>
+    <enable_channel>4294967294</enable_channel>
+    <global_reset>0</global_reset>
+    <enable_pattern>0</enable_pattern>
+  </TDCControl>
+  <TDCSetup mfec="0x3" ccu="0x1" i2c="0x17">
+    <setup_parity>1</setup_parity>
+    <enable_ttl_hit>0</enable_ttl_hit>
+    <enable_ttl_clock>0</enable_ttl_clock>
+    <enable_ttl_reset>1</enable_ttl_reset>
+    <enable_ttl_control>1</enable_ttl_control>
+    <enable_ttl_serial>1</enable_ttl_serial>
+    <enable_pair>1</enable_pair>
+    <enable_matching>1</enable_matching>
+    <roll_over>4095</roll_over>
+    <pll_control>4</pll_control>
+    <dll_mode>2</dll_mode>
+    <mode_rc>1</mode_rc>
+    <mode_rc_compression>1</mode_rc_compression>
+    <enable_leading>1</enable_leading>
+    <enable_trailing>1</enable_trailing>
+    <rc_adjust>1343</rc_adjust>
+    <coarse_count_offset>0</coarse_count_offset>
+    <trigger_count_offset>0</trigger_count_offset>
+    <enable_relative>1</enable_relative>
+    <match_window>198</match_window>
+    <search_window>198</search_window>
+    <reject_count_offset>0</reject_count_offset>
+    <tdc_id>0</tdc_id>
+  </TDCSetup>
+  
+  <NINOThresholds>
+    <group0 ccu="0x0003" i2c="0x0001" mfec="0x0001">10</group0>
+    <group1 ccu="0x0003" i2c="0x0002" mfec="0x0001">20</group1>
+    <group2 ccu="0x0003" i2c="0x0003" mfec="0x0001">30</group2>
+    <group3 ccu="0x0003" i2c="0x0004" mfec="0x0001">40</group3>
+  </NINOThresholds>
+</TDCRegister>

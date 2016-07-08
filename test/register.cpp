@@ -7,35 +7,57 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-  PPSTimingMB::TDCSetup s;
-  s.Dump(2);
+  vector<unsigned char> word;
+  word.push_back(0xe0);
+  word.push_back(0xff);
+  word.push_back(0xff);
+  word.push_back(0xff);
+  word.push_back(0x1f);
+  PPSTimingMB::TDCControl control(word);
+  control.ComputeParity();
+  control.Dump(3);
 
   return 0;
 
-  PPSTimingMB::TDCControl c;
-  /*c.SetEnablePattern(PPSTimingMB::TDCControl::OutputDisabled);
-  c.DumpRegister(3);
-  c.SetEnablePattern(PPSTimingMB::TDCControl::OutputEnabled);*/
-  cout << "Enabled channels: " << c.GetEnabledChannels() << endl;
-  c.DisableAllChannels();
-  cout << "Enabled channels: " << c.GetEnabledChannels() << endl;
-  c.DumpRegister(3);
+  {
+    vector<unsigned char> words;
+    //words.push_back(0x55); // 01010101
+    words.push_back(0x57); // 01010111
+    PPSTimingMB::TDCRegister r(8, words);
+    r.DumpRegister(3);
+    cout << "parity=" << r.ComputeParityBit() << endl;
 
-  PPSTimingMB::TDCStatus st;
-  st.Dump(3);
-  PPSTimingMB::TDCStatus::ErrorType err = st.Error();
-  cout << "Global error? " << err.GlobalError() << endl;
-
-  for (unsigned int i=0; i<PPSTimingMB::GetNumTDCSetupRegisters(); i++) {
-    PPSTimingMB::TDCSetupRegister reg = static_cast<PPSTimingMB::TDCSetupRegister>(i);
-    //cout << "register " << reg << ": " << s.GetValue(reg) << endl;
+    return 0;
   }
 
-  PPSTimingMB::TDCSetupRegister reg[] = { PPSTimingMB::rPLLControl, PPSTimingMB::rEnableMatching };
-  cout << reg[0] << " -- " << reg[1] << endl;
+  {
+    PPSTimingMB::TDCSetup s;
+    s.Dump(2);
 
-  PPSTimingMB::TDCInternalCoreTest ict;
-  ict.Dump();
+    PPSTimingMB::TDCControl c;
+    cout << "Enabled channels: " << c.GetEnabledChannels() << endl;
+    c.DisableAllChannels();
+    cout << "Enabled channels: " << c.GetEnabledChannels() << endl;
+    c.DumpRegister(3);
+
+    PPSTimingMB::TDCStatus st;
+    st.Dump(3);
+    PPSTimingMB::TDCStatus::ErrorType err = st.Error();
+    cout << "Global error? " << err.GlobalError() << endl;
+
+    for (unsigned int i=0; i<PPSTimingMB::GetNumTDCSetupRegisters(); i++) {
+      PPSTimingMB::TDCSetupRegister reg = static_cast<PPSTimingMB::TDCSetupRegister>(i);
+      //cout << "register " << reg << ": " << s.GetValue(reg) << endl;
+    }
+  }
+
+  {
+    PPSTimingMB::TDCSetupRegister reg[] = { PPSTimingMB::rPLLControl, PPSTimingMB::rEnableMatching };
+    cout << reg[0] << " -- " << reg[1] << endl;
+
+    PPSTimingMB::TDCInternalCoreTest ict;
+    ict.Dump();
+  }
 
   return 0;
 }

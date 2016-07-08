@@ -6,7 +6,12 @@
 
 namespace PPSTimingMB
 {
-  typedef enum TDCControlRegister { rEnablePattern=0, rGlobalReset, rEnableChannel, rDLLReset, rPLLReset, rControlParity, rNumControlRegisters } TDCControlRegister;
+  typedef enum TDCControlRegister {
+    rEnablePattern=0, rGlobalReset,
+    rEnableChannel0, rEnableChannel1,
+    rDLLReset, rPLLReset, rControlParity,
+    rNumControlRegisters
+  } TDCControlRegister;
   std::ostream& operator<<(std::ostream& out, const TDCControlRegister& sp);
   inline unsigned short GetNumTDCControlRegisters() { return rNumControlRegisters; }
   /**
@@ -62,16 +67,27 @@ namespace PPSTimingMB
         return GetBits(kEnableChannel+id, 1);
       }
       inline void SetEnabledChannels(uint32_t ch) {
-        SetBits(kEnableChannel, ch&0xffff, 16);
-        SetBits(kEnableChannel+16, (ch>>16), 16);
+        SetEnabledChannels(ch&0xffff, (ch>>16)&0xffff);
+      }
+      inline void SetEnabledChannels(uint16_t group0, uint16_t group1) {
+        SetEnabledChannelsGroup0(group0); SetEnabledChannelsGroup1(group1);
+      }
+      inline void SetEnabledChannelsGroup0(uint16_t poi) { SetBits(kEnableChannel, poi&0xffff, 16); }
+      inline void SetEnabledChannelsGroup1(uint16_t poi) { SetBits(kEnableChannel+16, poi&0xffff, 16); }
+      inline uint16_t GetEnabledChannelsGroup0() const {
+        return GetBits(kEnableChannel, 16);
+      }
+      inline uint16_t GetEnabledChannelsGroup1() const {
+        return GetBits(kEnableChannel+16, 16);
       }
       inline uint32_t GetEnabledChannels() const {
-        uint16_t word1 = GetBits(kEnableChannel, 16), word2 = GetBits(kEnableChannel+16, 16);
+        uint16_t word1 = GetEnabledChannelsGroup0(), word2 = GetEnabledChannelsGroup1();
         return static_cast<uint32_t>(word1|(word2<<16));
       }
 
-      void SetControlParity(const bool cp=true) { SetBits(kControlParity, cp, 1); }
-      inline bool GetControlParity() const { return GetBits(kControlParity, 1); }
+      void SetParity(const bool cp=true) { SetBits(kControlParity, cp, 1); }
+      inline bool GetParity() const { return GetBits(kControlParity, 1); }
+      void ComputeParity() { SetParity(TDCRegister::ComputeParityBit(0, TDC_CONTROL_BITS_NUM-1)); }
 
       /// Printout all useful values of this control register into an output stream
       void Dump(int verb=1, std::ostream& os=std::cout) const;

@@ -388,12 +388,15 @@ namespace PPSTimingMB
         return static_cast<bool>(GetBits(kEnablePair, 1));
       }
       /// Set the parity of setup data (should be an even parity)
-      inline void SetSetupParity(const bool sp=true) {
+      inline void SetParity(const bool sp=true) {
         SetBits(kSetupParity, sp, 1);
       }
       /// Extract the parity of setup data (should be an even parity)
-      inline bool GetSetupParity() const {
+      inline bool GetParity() const {
         return static_cast<bool>(GetBits(kSetupParity, 1));
+      }
+      inline void ComputeParity() {
+        SetParity(TDCRegister::ComputeParityBit(0, TDC_SETUP_BITS_NUM-1));
       }
 
       /// Ensure that the critical constant values are properly set in the setup word

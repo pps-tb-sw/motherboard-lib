@@ -94,9 +94,17 @@ namespace PPSTimingMB
       /// Printout all useful information handled by the register
       void DumpRegister(unsigned short verb=1, std::ostream& os=std::cout, const bit max_bits=-1) const;
       /// Ensure that the critical constant values are properly set in the register word
-      virtual void SetConstantValues()=0;
+      inline void SetConstantValues() {;}
+      /// Return a given value as a 32-bit word
       template<class T> inline uint32_t GetValue(const T&) { return 0; }
 
+      /// Compute the parity bit of the full register word
+      inline bool ComputeParityBit(unsigned short begin=0, short end=-1) const {
+        if (end<0) end = fWordSize;
+        unsigned short parity = 0;
+        for (unsigned short i=begin; i<end; i++) { parity += GetBits(i, 1); }
+        return (parity%2==0);
+      }
     protected:
       /**
        * Set a fixed amount of bits in the full register word
@@ -117,6 +125,13 @@ namespace PPSTimingMB
       inline void Clear() {
         for (uint8_t i=0; i<fNumWords; i++) { fWord[i] = 0; }
       }
+
+      /*inline bool ComputeParityBit(unsigned short begin=0, unsigned short end=-1) const {
+        if (end<0) end = fWordSize;
+        bool parity = false;
+        for (uint8_t i=begin; i<end; i++) { parity += GetBits(i, 1); }
+        return (parity%2);
+      }*/
 
       /// Pointer to this register's word
       word_t* fWord;

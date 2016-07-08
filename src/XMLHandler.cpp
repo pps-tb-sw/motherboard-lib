@@ -55,47 +55,75 @@ namespace PPSTimingMB
   }
 
   std::string
-  XMLHandler::WriteRegister(const TDCControl& r)
+  XMLHandler::WriteRegister(const TDCControl& r, const BoardAddress& addr)
   {
     XMLCh str[100];
 
     XMLString::transcode("TDCRegister", str, 99);
     fDocument = fImpl->createDocument(0, str, 0);
     
-    PopulateControlRegister(r);
+    PopulateControlRegister(r, addr);
 
     return XMLString();
   }
 
   std::string
-  XMLHandler::WriteRegister(const TDCSetup& r)
+  XMLHandler::WriteRegister(const TDCSetup& r, const BoardAddress& addr)
   {
     XMLCh str[100];
 
     XMLString::transcode("TDCRegister", str, 99);
     fDocument = fImpl->createDocument(0, str, 0);
 
-    PopulateSetupRegister(r);
+    PopulateSetupRegister(r, addr);
 
     return XMLString();
   }
 
   std::string
-  XMLHandler::WriteRegister(const TDCControl& c, const TDCSetup& s)
+  XMLHandler::WriteRegister(const NINOThresholds& n)
   {
     XMLCh str[100];
 
     XMLString::transcode("TDCRegister", str, 99);
     fDocument = fImpl->createDocument(0, str, 0);
 
-    PopulateControlRegister(c);
-    PopulateSetupRegister(s);
+    PopulateNINOThresholds(n);
+
+    return XMLString();
+  }
+
+  std::string
+  XMLHandler::WriteRegister(const TDCControl& c, const TDCSetup& s, const BoardAddress& addr)
+  {
+    XMLCh str[100];
+
+    XMLString::transcode("TDCRegister", str, 99);
+    fDocument = fImpl->createDocument(0, str, 0);
+
+    PopulateControlRegister(c, addr);
+    PopulateSetupRegister(s, addr);
+    
+    return XMLString();
+  }
+
+  std::string
+  XMLHandler::WriteRegister(const TDCControl& c, const TDCSetup& s, const NINOThresholds& n, const BoardAddress& addr)
+  {
+    XMLCh str[100];
+
+    XMLString::transcode("TDCRegister", str, 99);
+    fDocument = fImpl->createDocument(0, str, 0);
+
+    PopulateControlRegister(c, addr);
+    PopulateSetupRegister(s, addr);
+    PopulateNINOThresholds(n);
     
     return XMLString();
   }
 
   void
-  XMLHandler::PopulateControlRegister(const TDCControl& r)
+  XMLHandler::PopulateControlRegister(const TDCControl& r, const BoardAddress& addr)
   {
     XMLCh str[100];
 
@@ -103,18 +131,40 @@ namespace PPSTimingMB
     DOMElement* elem = fDocument->createElement(str);
     fROOT = fDocument->getDocumentElement();
 
-    AddProperty(elem, "control_parity", r.GetControlParity());
-    AddProperty(elem, "pll_reset",      r.GetPLLReset());
-    AddProperty(elem, "dll_reset",      r.GetDLLReset());
-    AddProperty(elem, "enable_channel", r.GetEnabledChannels());
-    AddProperty(elem, "global_reset",   r.GetGlobalReset());
-    AddProperty(elem, "enable_pattern", static_cast<unsigned int>(r.GetEnablePattern()));
+    SetAddressAttributes(elem, addr);
+
+    AddProperty(elem, "pll_reset",             r.GetPLLReset());
+    AddProperty(elem, "dll_reset",             r.GetDLLReset());
+    /*AddProperty(elem, "enable_channel", r.GetEnabledChannels());*/
+    AddProperty(elem, "enable_channel_group0", r.GetEnabledChannelsGroup0());
+    AddProperty(elem, "enable_channel_group1", r.GetEnabledChannelsGroup1());
+    AddProperty(elem, "global_reset",          r.GetGlobalReset());
+    AddProperty(elem, "enable_pattern",        static_cast<unsigned int>(r.GetEnablePattern()));
 
     fROOT->appendChild(elem);
   }
 
   void
-  XMLHandler::PopulateSetupRegister(const TDCSetup& r)
+  XMLHandler::PopulateNINOThresholds(const NINOThresholds& r)
+  {
+    XMLCh str[100];
+
+    XMLString::transcode("NINOThresholds", str, 99);
+    DOMElement* elem = fDocument->createElement(str);
+    fROOT = fDocument->getDocumentElement();
+
+    unsigned int i = 0;
+    for (NINOThresholds::Register::const_iterator it=r.GetValues().begin(); it!=r.GetValues().end(); it++, i++) {
+      std::ostringstream os; os << "group" << std::dec << i;
+      DOMElement* thr = (DOMElement*)AddProperty(elem, os.str().c_str(), it->second);
+      SetAddressAttributes(thr, it->first);
+    }
+
+    fROOT->appendChild(elem);
+  }
+
+  void
+  XMLHandler::PopulateSetupRegister(const TDCSetup& r, const BoardAddress& addr)
   {
     XMLCh str[100];
 
@@ -122,7 +172,8 @@ namespace PPSTimingMB
     DOMElement* elem = fDocument->createElement(str);
     fROOT = fDocument->getDocumentElement();
 
-    AddProperty(elem, "setup_parity",         r.GetSetupParity());
+    SetAddressAttributes(elem, addr);
+
     AddProperty(elem, "enable_ttl_hit",       r.GetEnableTTLHit());
     AddProperty(elem, "enable_ttl_clock",     r.GetEnableTTLClock());
     AddProperty(elem, "enable_ttl_reset",     r.GetEnableTTLReset());
@@ -203,36 +254,43 @@ namespace PPSTimingMB
     fROOT->appendChild(elem);
   }
 
-  void
-  XMLHandler::ReadRegister(std::string s, TDCControl* c)
+  bool
+  XMLHandler::ReadRegister(std::string s, TDCControl* c, const BoardAddress& addr)
   {
-    std::vector<PropertiesMap> maps = ParseRegister(s);
-    for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
-      if (map->GetProperty("register_name")!="TDCControl") {
-        //std::cerr << "WARNING: trying to read a register of type " << map->GetProperty("register_name") << " in a TDCControl object" << std::endl;
-        continue;
-      }
-
-      if (map->HasProperty("control_parity")) c->SetControlParity(map->GetUIntProperty("control_parity"));
-      if (map->HasProperty("pll_reset"))      c->SetPLLReset(map->GetUIntProperty("pll_reset"));
-      if (map->HasProperty("dll_reset"))      c->SetDLLReset(map->GetUIntProperty("dll_reset"));
-      if (map->HasProperty("enable_channel")) c->SetEnabledChannels(map->GetUIntProperty("enable_channel"));
-      if (map->HasProperty("global_reset"))   c->SetGlobalReset(map->GetUIntProperty("global_reset"));
-      if (map->HasProperty("enable_pattern")) c->SetEnablePattern(static_cast<TDCControl::EnablePattern>(map->GetUIntProperty("enable_pattern")));
+    std::vector<PropertiesMap> maps = ParseRegister(s, addr);
+    if (!maps.size()) {
+      std::cerr << "FAILED to retrieve a TDCControl register with" << std::endl;
+      addr.Dump(std::cerr);
+      return false;
     }
+    for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
+      if (map->GetProperty("register_name")!="TDCControl") { continue; }
+
+      if (map->HasProperty("pll_reset"))             c->SetPLLReset(map->GetUIntProperty("pll_reset"));
+      if (map->HasProperty("dll_reset"))             c->SetDLLReset(map->GetUIntProperty("dll_reset"));
+      if (map->HasProperty("enable_channel"))        c->SetEnabledChannels(map->GetUIntProperty("enable_channel"));
+      if (map->HasProperty("enable_channel_group0")) c->SetEnabledChannelsGroup0(map->GetUIntProperty("enable_channel_group0"));
+      if (map->HasProperty("enable_channel_group1")) c->SetEnabledChannelsGroup1(map->GetUIntProperty("enable_channel_group1"));
+      if (map->HasProperty("global_reset"))          c->SetGlobalReset(map->GetUIntProperty("global_reset"));
+      if (map->HasProperty("enable_pattern"))        c->SetEnablePattern(static_cast<TDCControl::EnablePattern>(map->GetUIntProperty("enable_pattern")));
+    }
+
+    c->ComputeParity();
+    return true;
   }
 
-  void
-  XMLHandler::ReadRegister(std::string s, TDCSetup* r)
+  bool
+  XMLHandler::ReadRegister(std::string s, TDCSetup* r, const BoardAddress& addr)
   {
-    std::vector<PropertiesMap> maps = ParseRegister(s);
+    std::vector<PropertiesMap> maps = ParseRegister(s, addr);
+    if (!maps.size()) {
+      std::cerr << "FAILED to retrieve a TDCSetup register with" << std::endl;
+      addr.Dump(std::cerr);
+      return false;
+    }
     for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
-      if (map->GetProperty("register_name")!="TDCSetup") {
-        //std::cerr << "WARNING: trying to read a register of type " << map->GetProperty("register_name") << " in a TDCSetup object" << std::endl;
-        continue;
-      }
+      if (map->GetProperty("register_name")!="TDCSetup") { continue; }
 
-      if (map->HasProperty("setup_parity"))         r->SetSetupParity(map->GetUIntProperty("setup_parity"));
       if (map->HasProperty("enable_ttl_hit"))       r->SetEnableTTLHit(map->GetUIntProperty("enable_ttl_hit"));
       if (map->HasProperty("enable_ttl_clock"))     r->SetEnableTTLClock(map->GetUIntProperty("enable_ttl_clock"));
       if (map->HasProperty("enable_ttl_reset"))     r->SetEnableTTLReset(map->GetUIntProperty("enable_ttl_reset"));
@@ -310,12 +368,34 @@ namespace PPSTimingMB
       if (map->HasProperty("enable_error_mark")) r->SetEnableErrorMark(map->GetUIntProperty("enable_error_mark"));
       if (map->HasProperty("test_select")) r->SetTest(map->GetUIntProperty("test_select"));
     }
+
+    r->ComputeParity();
+    return true;
   }
 
-  void
-  XMLHandler::AddProperty(DOMElement* elem, const char* name, const char* value)
+  bool
+  XMLHandler::ReadRegister(std::string s, NINOThresholds* n)
   {
-    if (!elem) return;
+    std::vector<PropertiesMap> maps = ParseRegister(s, BoardAddress(0,0,0));
+    if (!maps.size()) {
+      std::cerr << "FAILED to retrieve a NINO thresholds register" << std::endl;
+      return false;
+    }
+    for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
+      if (map->GetProperty("register_name")!="NINOThresholds") { continue; }
+      if (map->HasProperty("group0")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group0"); n->SetValue(prop.first, prop.second); }
+      if (map->HasProperty("group1")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group1"); n->SetValue(prop.first, prop.second); }
+      if (map->HasProperty("group2")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group2"); n->SetValue(prop.first, prop.second); }
+      if (map->HasProperty("group3")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group3"); n->SetValue(prop.first, prop.second); }
+    }
+
+    return true;
+  }
+
+  DOMNode*
+  XMLHandler::AddProperty(DOMNode* elem, const char* name, const char* value)
+  {
+    if (!elem) return 0;
     XMLCh str[100];
 
     XMLString::transcode(name, str, 99);
@@ -328,6 +408,21 @@ namespace PPSTimingMB
     DOMText* textNode = fDocument->createTextNode(str);
     child->appendChild(textNode);
     //fROOT->appendChild(first);
+    //
+    return child;
+  }
+
+  void
+  XMLHandler::SetAddressAttributes(DOMElement* elem, const BoardAddress& addr)
+  {
+    XMLCh key[100], value[100];
+    std::stringstream mfec_addr, ccu_addr, i2c_addr;
+    mfec_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << addr.mfec;
+    ccu_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << addr.ccu;
+    i2c_addr << "0x" << std::setfill ('0') << std::setw(4) << std::hex << addr.i2c;
+    XMLString::transcode("mfec", key, 99); XMLString::transcode(mfec_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
+    XMLString::transcode("ccu", key, 99); XMLString::transcode(ccu_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
+    XMLString::transcode("i2c", key, 99); XMLString::transcode(i2c_addr.str().c_str(), value, 99); elem->setAttribute(key, value);
   }
 
   std::string
@@ -354,7 +449,7 @@ namespace PPSTimingMB
   }
 
   std::vector<XMLHandler::PropertiesMap>
-  XMLHandler::ParseRegister(std::string reg)
+  XMLHandler::ParseRegister(std::string reg, const BoardAddress& addr)
   {
     XercesDOMParser* parser = new XercesDOMParser;
     parser->setValidationScheme(XercesDOMParser::Val_Never);
@@ -374,20 +469,49 @@ namespace PPSTimingMB
       DOMNodeList* registers = root->getChildNodes();
       for (unsigned int i=0; i<registers->getLength(); i++) {
         if (registers->item(i)->getNodeType()!=DOMNode::ELEMENT_NODE) continue;
+
+        DOMNamedNodeMap* attr = registers->item(i)->getAttributes();
+        bool found_mfec = false, found_ccu = false, found_i2c = false;
+        for (unsigned int j=0; j<attr->getLength(); j++) {
+          char* key = XMLString::transcode(attr->item(j)->getNodeName()), *value = XMLString::transcode(attr->item(j)->getNodeValue());
+          if ((strcmp(key, "mfec")==0)) {
+            unsigned int mfec_addr = (strcspn(value, "0x")==0) ? static_cast<unsigned long>(strtol(value, NULL, 0)) : static_cast<unsigned int>(atoi(value));
+            if (mfec_addr==addr.mfec) found_mfec = true;
+          }
+          if ((strcmp(key, "ccu")==0)) {
+            unsigned int ccu_addr = (strcspn(value, "0x")==0) ? static_cast<unsigned long>(strtol(value, NULL, 0)) : static_cast<unsigned int>(atoi(value));
+            if (ccu_addr==addr.ccu) found_ccu = true;
+          }
+          if ((strcmp(key, "i2c")==0)) {
+            unsigned int i2c_addr = (strcspn(value, "0x")==0) ? static_cast<unsigned long>(strtol(value, NULL, 0)) : static_cast<unsigned int>(atoi(value));
+            if (i2c_addr==addr.i2c) found_i2c = true;
+          }
+        }
+
         PropertiesMap map;
 
         char* key = XMLString::transcode(registers->item(i)->getNodeName()); map.AddProperty("register_name", key); XMLString::release(&key);
         DOMNodeList* children = registers->item(i)->getChildNodes();
+
+        if (map.GetProperty("register_name")!="NINOThresholds" and (!found_mfec or !found_ccu or !found_i2c)) continue;
+
+        //std::cout << "Found a " << map.GetProperty("register_name") << " for mfec=" << addr.mfec << ", ccu=" << addr.ccu << ", i2c=" << addr.i2c << std::endl;
+
         if (!children) return out;
         const XMLSize_t nodeCount = children->getLength();
-        for (unsigned int i=0; i<nodeCount; i++) {
-          DOMNode* currentNode = children->item(i);
+        for (unsigned int j=0; j<nodeCount; j++) {
+          DOMNode* currentNode = children->item(j);
           if (!currentNode->getNodeType() or currentNode->getNodeType()!=DOMNode::ELEMENT_NODE) continue;
           char* key = XMLString::transcode(currentNode->getNodeName());
           DOMText* prop = dynamic_cast<DOMText*>(currentNode->getFirstChild());
           char* value = XMLString::transcode(prop->getWholeText());
-          //std::cout << "----->" << key << " = " << value << std::endl;
-          map.AddProperty(key, value);
+          DOMNamedNodeMap* attr = currentNode->getAttributes();
+          std::ostringstream os_val; os_val << value;
+          for (unsigned int k=0; k<attr->getLength(); k++) {
+            char* att_key = XMLString::transcode(attr->item(k)->getNodeName()), *att_value = XMLString::transcode(attr->item(k)->getNodeValue());
+            os_val << "\n" << att_key << ":" << att_value;
+          }
+          map.AddProperty(key, os_val.str().c_str());
           XMLString::release(&key); XMLString::release(&value);
         }
 
@@ -419,7 +543,41 @@ namespace PPSTimingMB
   XMLHandler::PropertiesMap::GetUIntProperty(const char* name)
   {
     std::string prop = GetProperty(name);
-    if (prop=="") return 0;
+    if (prop.empty()) return 0;
     return atoi(prop.c_str());
+  }
+
+  std::map<std::string,std::string>
+  XMLHandler::PropertiesMap::GetStructuredProperty(const char* name)
+  {
+    std::map<std::string,std::string> out;
+    std::string prop = GetProperty(name);
+    if (prop.empty()) return out;
+    size_t pos;
+    std::stringstream ss(prop);
+    while (getline(ss, prop, '\n')) {
+      if (prop.empty()) continue;
+      if ((pos=prop.find(":"))!=std::string::npos) { out.insert(std::pair<std::string,std::string>(prop.substr(0, pos), prop.substr(pos+1, prop.size()))); }
+      else { out.insert(std::pair<std::string,std::string>("value", prop)); }
+    }
+    return out;
+  }
+
+  std::pair<BoardAddress, unsigned int>
+  XMLHandler::PropertiesMap::GetNINOThresholdValue(const char* name)
+  {
+    BoardAddress addr(0, 0, 0);
+    std::pair<BoardAddress, unsigned int> out(addr, 0);
+
+    std::map<std::string,std::string> prop = GetStructuredProperty(name);
+    //if (prop.size()!=4) return out;
+    const char* mfec_str = prop["mfec"].c_str(), *ccu_str = prop["ccu"].c_str(), *i2c_str = prop["i2c"].c_str(), *value_str = prop["value"].c_str();
+    unsigned int mfec_addr = (strcspn(mfec_str, "0x")==0) ? static_cast<unsigned long>(strtol(mfec_str, NULL, 0)) : static_cast<unsigned int>(atoi(mfec_str)),
+                 ccu_addr = (strcspn(ccu_str, "0x")==0) ? static_cast<unsigned long>(strtol(ccu_str, NULL, 0)) : static_cast<unsigned int>(atoi(ccu_str)),
+                 i2c_addr = (strcspn(i2c_str, "0x")==0) ? static_cast<unsigned long>(strtol(i2c_str, NULL, 0)) : static_cast<unsigned int>(atoi(i2c_str)),
+                 value = (strcspn(value_str, "0x")==0) ? static_cast<unsigned long>(strtol(value_str, NULL, 0)) : static_cast<unsigned int>(atoi(value_str));
+
+    addr = BoardAddress(mfec_addr, ccu_addr, i2c_addr);
+    return std::pair<BoardAddress, unsigned int>(addr, value);
   }
 }
