@@ -28,6 +28,7 @@ namespace PPSTimingMB
     SetBypassInputs(false); // bit 44
     SetReadoutFIFOSize(256); // maximum
     SetMaxEventSize(-1); // no limit
+
     SetRejectFIFOFull(true);
     SetEnableReadoutOccupancy(false);
     SetEnableReadoutSeparator(false);
@@ -36,15 +37,12 @@ namespace PPSTimingMB
     SetKeepToken(true);
 
     SetEnableRelative(true);
-    SetEnableAutomaticReject(false);
+    SetEnableAutomaticReject(true);
 
-    /*SetEventCountOffset(0); // FIXME needs confirmation
-    SetTriggerCountOffset(0);*/
-
-    SetEnableSetCountersOnBunchReset(false); // FIXME not yet discussed...
+    SetEnableSetCountersOnBunchReset(true);
     SetEnableMasterResetCode(false);
     SetEnableMasterResetOnEventReset(false);
-    SetEnableResetChannelBufferWhenSeparator(false); // FIXME not yet discussed...
+    SetEnableResetChannelBufferWhenSeparator(false);
     SetEnableSeparatorOnEventReset(false);
     SetEnableSeparatorOnBunchReset(false);
     SetEnableDirectEventReset(true);
@@ -55,8 +53,8 @@ namespace PPSTimingMB
     SetDLLControl(0x1);
 
     //SetDeadTime(DT_5ns); // FIXME do we force the dead time value?
-    //SetTestInvert(false);
-    //SetTestMode(false);
+    SetTestInvert(false);
+    SetTestMode(false);
 
     SetModeRCCompression(true);
     SetModeRC(true);
@@ -71,7 +69,7 @@ namespace PPSTimingMB
 
     SetIOClockSource(IO_clock_40);
     SetCoreClockSource(Core_clock_40);
-    SetDLLClockSource(DLL_clock_40);
+    SetDLLClockSource(DLL_pll_clock_320);
 
     SetRollOver(0xfff); // 4095
     SetEnableTTLSerial(true);
@@ -84,17 +82,18 @@ namespace PPSTimingMB
     SetTriggerMatchingMode(true);
     SetLeadingMode(true);
     SetTrailingMode(true);
+    SetWidthResolution(W_100ps);
 
     SetRCAdjustment(0, 0x7);
     SetRCAdjustment(1, 0x7);
     SetRCAdjustment(2, 0x4);
     SetRCAdjustment(3, 0x2);
-
+    SetVernierOffset(0);
     SetCoarseCountOffset(0);
-    SetTriggerCountOffset(0);
-    SetMatchWindow(198);
-    SetSearchWindow(198);
-    SetRejectCountOffset(0);
+    SetTriggerCountOffset(3692);
+    SetMatchWindow(1);
+    SetSearchWindow(9);
+    SetRejectCountOffset(1832);
     SetTDCId(0);
 
     SetEnableJTAGReadout(false);
