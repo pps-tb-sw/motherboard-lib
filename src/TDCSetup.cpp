@@ -115,7 +115,7 @@ namespace PPSTimingMB
     }
     os << std::endl;
     os << " Edge resolution:            " << GetEdgeResolution() << std::endl
-       << " Maximal event size:         " << GetMaxEventSize() << std::endl
+       << " Maximal event size:         " << static_cast<unsigned short>(GetMaxEventSize()) << std::endl
        << " Reject events if FIFO full? " << GetRejectFIFOFull() << std::endl
        << " Channels offset/DLL adjustments:" << std::endl
        << "   +---------------------------------------------------------+" << std::endl;

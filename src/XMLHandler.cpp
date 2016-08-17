@@ -453,9 +453,10 @@ namespace PPSTimingMB
   {
     XercesDOMParser* parser = new XercesDOMParser;
     parser->setValidationScheme(XercesDOMParser::Val_Never);
-    parser->setDoNamespaces(false);
-    parser->setDoSchema(false);
-    parser->setLoadExternalDTD(false);
+    /*parser->setDoSchema(false);
+    parser->setLoadExternalDTD(false);*/
+    parser->useScanner(XMLUni::fgWFXMLScanner);
+    parser->setDoNamespaces(true);
 
     std::vector<PropertiesMap> out;
 

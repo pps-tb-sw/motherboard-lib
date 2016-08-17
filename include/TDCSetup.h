@@ -235,10 +235,7 @@ namespace PPSTimingMB
       inline void SetEnableReadoutSeparator(const bool ro=true) {
         if (!GetEnableReadoutOccupancy()) {
           std::cerr << "Warning: Trying to enable the separator readout "
-                    << "while the occupancy readout is disabled!" << std::endl
-                    << "Enabling this occupancy readout automatically..."
-                    << std::endl;
-          SetEnableReadoutOccupancy(true);
+                    << "while the occupancy readout is disabled!" << std::endl;
         }
         SetBits(kEnableReadoutSeparator, ro, 1);
       }

@@ -8,6 +8,10 @@ all: register reverse xml pre
 pre:
 	@cd .. && $(MAKE) -s
 
+bugtracker: bugtracker.cpp | pre
+	@echo "Building $@..."
+	@$(CC) $^ -o $@ -L$(LIB_DIR) -Llib -lMB -Wl,-R$(LIB_DIR),-Rlib -I$(INC_DIR) -g -lxerces-c
+
 register: register.cpp | pre
 	@echo "Building $@..."
 	@$(CC) $^ -o $@ -L$(LIB_DIR) -Llib -lMB -Wl,-R$(LIB_DIR),-Rlib -I$(INC_DIR) -g
