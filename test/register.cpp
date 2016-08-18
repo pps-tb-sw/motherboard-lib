@@ -7,13 +7,14 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-  vector<unsigned char> word;
+  /*vector<unsigned char> word;
   word.push_back(0xe0);
   word.push_back(0xff);
   word.push_back(0xff);
   word.push_back(0xff);
   word.push_back(0x1f);
-  PPSTimingMB::TDCControl control(word);
+  PPSTimingMB::TDCControl control(word);*/
+  PPSTimingMB::TDCControl control;
   control.ComputeParity();
   control.Dump(3);
 
