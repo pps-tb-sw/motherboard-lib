@@ -49,7 +49,7 @@ namespace PPSTimingMB
     SetEnableDirectBunchReset(true);
     SetEnableDirectTrigger(true);
 
-    SetLowPowerMode(true);
+    SetLowPowerMode(false);
     SetDLLControl(0x1);
 
     //SetDeadTime(DT_5ns); // FIXME do we force the dead time value?
