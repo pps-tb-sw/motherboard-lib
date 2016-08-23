@@ -81,6 +81,8 @@ namespace PPSTimingMB
       inline bool TriggerFIFOEmpty() const { return static_cast<bool>(GetBits(kTriggerFIFOEmpty, 1)); }
       /// Is the DLL in lock state?
       inline bool DLLLock() const { return static_cast<bool>(GetBits(kDLLLock, 1)); }
+      /// Check if the SETUP sequence is correct
+      inline bool InvertedSetup() const { return static_cast<bool>(GetBits(kInvertedSetup, 1)); }
 
       /// Printout all useful values of this status register into an output stream
       void Dump(int verb=1, std::ostream& os=std::cout) const;
@@ -96,6 +98,7 @@ namespace PPSTimingMB
       static const bit kTriggerFIFOFull = 58;
       static const bit kTriggerFIFOEmpty = 59;
       static const bit kDLLLock = 60;
+      static const bit kInvertedSetup = 61;
   };
 }
 
