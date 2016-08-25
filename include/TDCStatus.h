@@ -26,31 +26,28 @@ namespace PPSTimingMB
 
       /// Type of error encountered by the HPTDC
       typedef struct ErrorType {
-        ErrorType(uint16_t word) {
-          Vernier              =  word     &0x1;
-          Coarse               = (word>> 1)&0x1;
-          ChannelSelect        = (word>> 2)&0x1;
-          L1BufferParity       = (word>> 3)&0x1;
-          TriggerFIFOParity    = (word>> 4)&0x1;
-          TriggerMatchingState = (word>> 5)&0x1;
-          ReadoutFIFOParity    = (word>> 6)&0x1;
-          ReadoutState         = (word>> 7)&0x1;
-          SetupParity          = (word>> 8)&0x1;
-          ControlParity        = (word>> 9)&0x1;
-          JTAGInstruction      = (word>>10)&0x1;
-        }
-        /// Error related on the parity of any register/buffer
-        bool ParityError() const { return (L1BufferParity or TriggerFIFOParity or ReadoutFIFOParity or SetupParity or ControlParity); }
-        /// Error related to the Vernier or Coarse measurement
-        bool MeasurementError() const { return (Vernier or Coarse); }
-        /// Has any error occured?
-        bool GlobalError() const { return (MeasurementError() or ChannelSelect or ParityError() or JTAGInstruction); }
+        ErrorType(uint16_t word) : word(word) {;}
+        uint16_t word;
 
-        bool Vernier, Coarse, ChannelSelect;
-        bool L1BufferParity;
-        bool TriggerFIFOParity, TriggerMatchingState;
-        bool ReadoutFIFOParity, ReadoutState;
-        bool SetupParity, ControlParity, JTAGInstruction;
+        //--- Combined error bits
+        /// Error related on the parity of any register/buffer
+        bool ParityError() const { return (L1BufferParity() or TriggerFIFOParity() or ReadoutFIFOParity() or SetupParity() or ControlParity()); }
+        /// Error related to the Vernier or Coarse measurement
+        bool MeasurementError() const { return (Vernier() or Coarse()); }
+        /// Has any error occured?
+        bool GlobalError() const { return (MeasurementError() or ChannelSelect() or ParityError() or JTAGInstruction()); }
+        //--- Individual error bits
+        bool Vernier() const              { return (word    )&0x1; }
+        bool Coarse() const               { return (word>> 1)&0x1; }
+        bool ChannelSelect() const        { return (word>> 2)&0x1; }
+        bool L1BufferParity() const       { return (word>> 3)&0x1; }
+        bool TriggerFIFOParity() const    { return (word>> 4)&0x1; }
+        bool TriggerMatchingState() const { return (word>> 5)&0x1; }
+        bool ReadoutFIFOParity() const    { return (word>> 6)&0x1; }
+        bool ReadoutState() const         { return (word>> 7)&0x1; }
+        bool SetupParity() const          { return (word>> 8)&0x1; }
+        bool ControlParity() const        { return (word>> 9)&0x1; }
+        bool JTAGInstruction() const      { return (word>>10)&0x1; }
       } ErrorType;
       /// Printout the error type(s) into the output stream
       friend std::ostream& operator<<(std::ostream& out, const ErrorType& err);

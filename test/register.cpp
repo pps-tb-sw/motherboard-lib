@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
   //stat.Dump(0);
   std::ostringstream os;
   stat.Dump(0, os);
-  std::cout << "--->" << os.str() << std::endl;
+  std::cout << os.str() << std::endl;
   
 
   return 0;
