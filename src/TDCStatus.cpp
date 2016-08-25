@@ -10,20 +10,23 @@ namespace PPSTimingMB
   void
   TDCStatus::Dump(int verb, std::ostream& os) const
   {
-    os << "===================="
-       << " TDC Status register dump "
-       << "====================" << std::endl;
+    if (verb>0)
+      os << "===================="
+         << " TDC Status register dump "
+         << "====================" << std::endl;
     if (verb>1) DumpRegister(verb, os);
     os << " Error flags:               " << std::endl << Error() << std::endl
        << " Has token?                 " << HasToken() << std::endl
        << " FIFO full?                 " << FIFOFull() << std::endl
        << " FIFO empty?                " << FIFOEmpty() << std::endl
        << " L1 occupancy:          " << std::right << static_cast<unsigned int>(L1Occupancy()) << std::left << std::endl
-       << " TriggerFIFO occupancy: " << std::right << static_cast<unsigned int>(TriggerFIFOOccupancy()) << std::left << std::endl
-       << " TriggerFIFO full?          " << TriggerFIFOFull() << std::endl
-       << " TriggerFIFO empty?         " << TriggerFIFOEmpty() << std::endl
+       << " Trigger FIFO occupancy:    " << std::right << static_cast<unsigned int>(TriggerFIFOOccupancy()) << std::left << std::endl
+       << " Trigger FIFO full?         " << TriggerFIFOFull() << std::endl
+       << " Trigger FIFO empty?        " << TriggerFIFOEmpty() << std::endl
        << " DLL lock?                  " << DLLLock() << std::endl
-       << "===================================================================" << std::endl;
+       << " Inverted setup word?       " << InvertedSetup() << std::endl;
+    if (verb>0)
+      os << "===================================================================" << std::endl;
   }
 
   std::ostream&

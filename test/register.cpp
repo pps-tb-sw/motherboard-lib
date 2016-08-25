@@ -14,9 +14,15 @@ int main(int argc, char* argv[])
   word.push_back(0xff);
   word.push_back(0x1f);
   PPSTimingMB::TDCControl control(word);*/
-  PPSTimingMB::TDCControl control;
+  /*PPSTimingMB::TDCControl control;
   control.ComputeParity();
-  control.Dump(3);
+  control.Dump(3);*/
+  PPSTimingMB::TDCStatus stat;
+  //stat.Dump(0);
+  std::ostringstream os;
+  stat.Dump(0, os);
+  std::cout << "--->" << os.str() << std::endl;
+  
 
   return 0;
 
