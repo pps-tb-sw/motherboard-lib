@@ -204,11 +204,12 @@ namespace PPSTimingMB
         SetBits(kMaxEventSize, size, 4);
       }
       /// Extract the maximum number of hits per event
-      inline uint8_t GetMaxEventSize() const {
+      inline short GetMaxEventSize() const {
         uint8_t max = static_cast<uint8_t>(GetBits(kMaxEventSize, 4));
         if (max==0) return 0;
-        else if (max<0xA) return (1<<(max-1));
-        else return -1;
+        else if (max<0x9) return (1<<(max-1));
+        else if (max==0x9) return -1;
+        else return -2;
       }
       /**
        * Set whether or not hits are rejected once FIFO is full.
