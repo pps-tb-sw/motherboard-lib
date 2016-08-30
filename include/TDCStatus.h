@@ -66,7 +66,8 @@ namespace PPSTimingMB
       inline bool FIFOEmpty() const { return static_cast<bool>(GetBits(kReadoutFIFOEmpty, 1)); }
       /// Occupancy of L1 buffer in channels of a group (or all groups)
       inline uint32_t L1Occupancy(unsigned short group=-1) const {
-        uint32_t out = static_cast<uint32_t>(GetBits(kL1Occupancy, 32));
+        uint16_t word1 = GetBits(kL1Occupancy, 16), word2 = GetBits(kL1Occupancy+16, 16);
+        uint32_t out = static_cast<uint32_t>(word1|(word2<<16));
         if (group<0 or group>3) return out; // whole 32-bit word combining all groups
         return static_cast<uint32_t>((out>>group)&0xff); // only 8 bits of selected group
       }

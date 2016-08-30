@@ -103,7 +103,7 @@ namespace PPSTimingMB
         if (end<0) end = fWordSize;
         unsigned short parity = 0;
         for (unsigned short i=begin; i<end; i++) { parity += GetBits(i, 1); }
-        return (parity%2==0);
+        return (parity%2!=0);
       }
     protected:
       /**
