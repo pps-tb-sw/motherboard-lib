@@ -71,12 +71,12 @@ namespace PPSTimingMB
       
       /// Set one bit(s) subset in the register word
       inline void SetWord(const unsigned int i, const word_t word) {
-        if (i<0 or i>=fNumWords) return;
+        if (i>=fNumWords) return;
         fWord[i] = word;
       }
       /// Retrieve one subset from the register word
       inline word_t GetWord(const unsigned int i) const {
-        if (i<0 or i>=fNumWords) return -1;
+        if (i>=fNumWords) return -1;
         return fWord[i];
       }
       /// Retrieve the whole array of sub-words composing this register

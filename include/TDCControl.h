@@ -47,7 +47,7 @@ namespace PPSTimingMB
       inline bool GetPLLReset() const { return GetBits(kPLLReset, 1); }
 
       inline void EnableChannel(unsigned int id) {
-        if (id<0 or id>=TDC_NUM_CHANNELS) return;
+        if (id>=TDC_NUM_CHANNELS) return;
         SetBits(kEnableChannel+id, 1, 1);
       }
       inline void EnableAllChannels() {
@@ -55,7 +55,7 @@ namespace PPSTimingMB
         for (unsigned int i=0; i<TDC_NUM_CHANNELS; i++) EnableChannel(i);
       }
       inline void DisableChannel(unsigned int id) {
-        if (id<0 or id>=TDC_NUM_CHANNELS) return;
+        if (id>=TDC_NUM_CHANNELS) return;
         SetBits(kEnableChannel+id, 0, 1);
       }
       inline void DisableAllChannels() { 
@@ -63,7 +63,7 @@ namespace PPSTimingMB
         for (unsigned int i=0; i<TDC_NUM_CHANNELS; i++) DisableChannel(i);
       }
       inline bool IsChannelEnabled(unsigned int id) const {
-        if (id<0 or id>=TDC_NUM_CHANNELS) return false;
+        if (id>=TDC_NUM_CHANNELS) return false;
         return GetBits(kEnableChannel+id, 1);
       }
       inline void SetEnabledChannels(uint32_t ch) {

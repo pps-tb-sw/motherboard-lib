@@ -1,4 +1,4 @@
-CC = g++
+CC = clang
 RM = rm
 
 CFLAGS = -fPIC -g -Wall

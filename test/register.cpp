@@ -2,6 +2,7 @@
 #include "TDCSetup.h"
 #include "TDCStatus.h"
 #include "TDCInternalCoreTest.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -17,7 +18,27 @@ int main(int argc, char* argv[])
   /*PPSTimingMB::TDCControl control;
   control.ComputeParity();
   control.Dump(3);*/
-  PPSTimingMB::TDCStatus stat;
+
+  vector<unsigned char> word;
+  /*word.push_back(0x0);
+  word.push_back(0x0);
+  word.push_back(0x20);
+  word.push_back(0x0);
+  word.push_back(0x40);
+  word.push_back(0x40);
+  word.push_back(0x0);
+  word.push_back(0x38);*/
+  //std::reverse(word.begin(), word.end());
+  word.push_back(0x0);
+  word.push_back(0x31);
+  word.push_back(0x1c);
+  word.push_back(0x0);
+  word.push_back(0x0);
+  word.push_back(0x0);
+  word.push_back(0x0);
+  word.push_back(0x38);
+
+  PPSTimingMB::TDCStatus stat(word);
   //stat.Dump(0);
   std::ostringstream os;
   stat.Dump(0, os);
