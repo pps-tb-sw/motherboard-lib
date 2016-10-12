@@ -90,10 +90,10 @@ namespace PPSTimingMB
     SetRCAdjustment(3, 0x2);
     SetVernierOffset(0);
     SetCoarseCountOffset(0);
-    SetTriggerCountOffset(3692);
+    SetTriggerCountOffset(200);
     SetMatchWindow(1);
     SetSearchWindow(9);
-    SetRejectCountOffset(1832);
+    SetRejectCountOffset(201);
     SetTDCId(0);
 
     SetEnableJTAGReadout(false);
