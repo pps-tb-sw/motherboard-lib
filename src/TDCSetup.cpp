@@ -88,12 +88,15 @@ namespace PPSTimingMB
     SetRCAdjustment(1, 0x7);
     SetRCAdjustment(2, 0x4);
     SetRCAdjustment(3, 0x2);
+
+    // offsets and hits search window
     SetVernierOffset(0);
     SetCoarseCountOffset(0);
-    SetTriggerCountOffset(200);
-    SetMatchWindow(1);
-    SetSearchWindow(9);
-    SetRejectCountOffset(201);
+    SetTriggerCountOffset(214);
+    SetMatchWindow(4);
+    SetSearchWindow(12);
+    SetRejectCountOffset(215);
+
     SetTDCId(0);
 
     SetEnableJTAGReadout(false);
