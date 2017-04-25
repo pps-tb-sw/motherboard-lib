@@ -15,18 +15,18 @@ namespace PPSTimingMB
   class NINOThresholds
   {
    public:
-    typedef std::map<BoardAddress, unsigned int> Register;
+    typedef std::map<unsigned short, unsigned int> Register;
 
     /// Construct the object out of the four threshold values
-    inline NINOThresholds() {;}
+    inline NINOThresholds() {}
     /// Retrieve the number of threshold values held in this container
     inline size_t NumThresholds() const { return fThresholds.size(); }
 
     /// Set the NINO threshold value associated to an addressed module
-    void SetValue(const BoardAddress&, unsigned int);
+    void SetValue(unsigned short, unsigned int);
     /// Retrieve the NINO threshold value associated to an addressed module
-    inline unsigned int GetValue(const BoardAddress& addr) const {
-      Register::const_iterator it = fThresholds.find(addr);
+    inline unsigned int GetValue(unsigned short group) const {
+      Register::const_iterator it = fThresholds.find(group);
       if (it!=fThresholds.end()) return it->second;
       return 0;
     }
@@ -35,7 +35,7 @@ namespace PPSTimingMB
     void Dump(std::ostream& os=std::cout) const;
 
    private:
-    /// NINO threshold for channels 0-7
+    /// NINO threshold for all groups
     Register fThresholds;
   };
 }
