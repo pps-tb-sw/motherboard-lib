@@ -387,6 +387,10 @@ namespace PPSTimingMB
       if (map->HasProperty("group1")) { n->SetValue(1, map->GetUIntProperty("group1")); }
       if (map->HasProperty("group2")) { n->SetValue(2, map->GetUIntProperty("group2")); }
       if (map->HasProperty("group3")) { n->SetValue(3, map->GetUIntProperty("group3")); }
+      if (map->HasProperty("group4")) { n->SetValue(4, map->GetUIntProperty("group4")); }
+      if (map->HasProperty("group5")) { n->SetValue(5, map->GetUIntProperty("group5")); }
+      if (map->HasProperty("group6")) { n->SetValue(6, map->GetUIntProperty("group6")); }
+      if (map->HasProperty("group7")) { n->SetValue(7, map->GetUIntProperty("group7")); }
     }
 
     return true;
