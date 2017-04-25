@@ -36,6 +36,14 @@ namespace PPSTimingMB
     else if (a.i2c<b.i2c) return true;
     return false;
   }
+  inline std::ostream& operator<<(std::ostream& os, const BoardAddress& add) {
+    os << std::hex
+       << "MFEC=0x" << add.mfec
+       << ", CCU=0x" << add.ccu
+       << ", I2C=0x" << add.i2c
+       << std::dec;
+    return os;
+  }
 
 }
 

@@ -494,7 +494,7 @@ namespace PPSTimingMB
         char* key = XMLString::transcode(registers->item(i)->getNodeName()); map.AddProperty("register_name", key); XMLString::release(&key);
         DOMNodeList* children = registers->item(i)->getChildNodes();
 
-        if (map.GetProperty("register_name")!="NINOThresholds" and (!found_mfec or !found_ccu or !found_i2c)) continue;
+        if (!found_mfec or !found_ccu or !found_i2c) continue;
 
         //std::cout << "Found a " << map.GetProperty("register_name") << " for mfec=" << addr.mfec << ", ccu=" << addr.ccu << ", i2c=" << addr.i2c << std::endl;
 

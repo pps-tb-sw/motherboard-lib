@@ -19,8 +19,11 @@ int main(int argc, char* argv[])
 
   PPSTimingMB::NINOThresholds n;
   cout << "Reading NINO thresholds..." << endl;
-  h.ReadRegister(os.str(), &n, PPSTimingMB::BoardAddress(0x08, 0x40, 0x18));
+  h.ReadRegister(os.str(), &n, PPSTimingMB::BoardAddress(0x08, 0x40, 0x12));
   n.Dump();
+  for (unsigned short i=0; i<4; i++) {
+    std::cout << "group " << i << ": " << n.GetValue(i) << std::endl;
+  }
 
   return 0;
 }
