@@ -155,11 +155,22 @@ namespace PPSTimingMB
 
     SetAddressAttributes(elem, addr);
 
+    /* Bug
     for (NINOThresholds::Register::const_iterator it=r.GetValues().begin(); it!=r.GetValues().end(); it++) {
       std::ostringstream os; os << "group" << std::dec << it->first;
       AddProperty(elem, os.str().c_str(), it->second);
     }
-
+    */
+    
+    AddProperty(elem, "group0", r.GetValue(0));
+    AddProperty(elem, "group1", r.GetValue(1));
+    AddProperty(elem, "group2", r.GetValue(2));
+    AddProperty(elem, "group3", r.GetValue(3));
+    AddProperty(elem, "group4", r.GetValue(4));
+    AddProperty(elem, "group5", r.GetValue(5));
+    AddProperty(elem, "group6", r.GetValue(6));
+    AddProperty(elem, "group7", r.GetValue(7));
+    
     fROOT->appendChild(elem);
   }
 
