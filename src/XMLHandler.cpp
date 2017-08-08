@@ -217,7 +217,10 @@ namespace PPSTimingMB
     AddProperty(elem, "rc_adjust",                           r.GetRCAdjustmentWord());
     AddProperty(elem, "dll_tap_adjust",                      r.GetDLLAdjustmentWord());
     AddProperty(elem, "coarse_count_offset",                 r.GetCoarseCountOffset());
-    //AddProperty(elem, "offset", r.GetOffset()); //FIXME to be implemented
+    for (unsigned short i=0; i<32; ++i) {
+      std::ostringstream os; os << "offset" << i;
+      AddProperty(elem, os.str().c_str(),                    r.GetChannelOffset(i));
+    }
     AddProperty(elem, "direct_trigger",                      r.GetEnableDirectTrigger());
     AddProperty(elem, "direct_bunch_reset",                  r.GetEnableDirectBunchReset());
     AddProperty(elem, "direct_event_reset",                  r.GetEnableDirectEventReset());
@@ -334,7 +337,10 @@ namespace PPSTimingMB
       if (map->HasProperty("rc_adjust"))                    r->SetRCAdjustmentWord(map->GetUIntProperty("rc_adjust"));
       if (map->HasProperty("dll_tap_adjust"))               r->SetDLLAdjustmentWord(map->GetUIntProperty("dll_tap_adjust"));
       if (map->HasProperty("coarse_count_offset"))          r->SetCoarseCountOffset(map->GetUIntProperty("coarse_count_offset"));
-      //if (map->HasProperty("offset")) r->SetOffset(); //FIXME to be implemented
+      for (unsigned short i=0; i<32; ++i) {
+        std::ostringstream os; os << "offset" << i;
+        if (map->HasProperty(os.str().c_str()))             r->SetChannelOffset(i, map->GetUIntProperty(os.str().c_str()));
+      }
       if (map->HasProperty("direct_trigger"))               r->SetEnableDirectTrigger(map->GetUIntProperty("direct_trigger"));
       if (map->HasProperty("direct_bunch_reset"))           r->SetEnableDirectBunchReset(map->GetUIntProperty("direct_bunch_reset"));
       if (map->HasProperty("direct_event_reset"))           r->SetEnableDirectEventReset(map->GetUIntProperty("direct_event_reset"));
