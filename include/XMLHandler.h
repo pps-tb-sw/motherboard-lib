@@ -6,12 +6,6 @@
 #include <map>
 
 #include <xercesc/dom/DOM.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/parsers/XercesDOMParser.hpp>
-//#include <xercesc/framework/StdOutFormatTarget.hpp> //FIXME for debugging
-#include <xercesc/framework/MemBufFormatTarget.hpp>
-#include <xercesc/framework/MemBufInputSource.hpp>
 
 #include "TDCControl.h"
 #include "TDCSetup.h"

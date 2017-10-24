@@ -1,5 +1,13 @@
 #include "XMLHandler.h"
-#include <regex>
+
+#include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/parsers/XercesDOMParser.hpp>
+//#include <xercesc/framework/StdOutFormatTarget.hpp> //FIXME for debugging
+#include <xercesc/framework/MemBufFormatTarget.hpp>
+#include <xercesc/framework/MemBufInputSource.hpp>
+
+#include <boost/regex.hpp>
 
 XERCES_CPP_NAMESPACE_USE
 
@@ -340,10 +348,10 @@ namespace PPSTimingMB
       if (map->HasProperty("dll_tap_adjust")) {
         std::map<std::string,std::string> adjusts = map->GetStructuredProperty("dll_tap_adjust");
         TDCSetup::RangesValues rv;
-        std::cmatch match;
-        std::regex rgx_match("(\\d+)-(\\d+)");
+        boost::cmatch match;
+        boost::regex rgx_match("(\\d+)-(\\d+)");
         for (std::map<std::string,std::string>::const_iterator it=adjusts.begin(); it!=adjusts.end(); ++it) {
-          if (std::regex_match(it->first.c_str(), match, rgx_match) && match.size()==3) {
+          if (boost::regex_match(it->first.c_str(), match, rgx_match) && match.size()==3) {
             rv.push_back(std::make_pair(std::make_pair(std::stoi(match[1].str()), std::stoi(match[2].str())), std::stoi(it->second)));
           }
         }
