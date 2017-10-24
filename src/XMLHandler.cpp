@@ -1,4 +1,5 @@
 #include "XMLHandler.h"
+#include <regex>
 
 XERCES_CPP_NAMESPACE_USE
 
@@ -336,7 +337,20 @@ namespace PPSTimingMB
       if (map->HasProperty("width_resolution"))             r->SetWidthResolution(static_cast<TDCSetup::WidthResolution>(map->GetUIntProperty("width_resolution")));
       if (map->HasProperty("low_power_mode"))               r->SetLowPowerMode(map->GetUIntProperty("low_power_mode"));
       if (map->HasProperty("rc_adjust"))                    r->SetRCAdjustmentWord(map->GetUIntProperty("rc_adjust"));
-      if (map->HasProperty("dll_tap_adjust"))               r->SetDLLAdjustmentWord(map->GetUIntProperty("dll_tap_adjust"));
+      if (map->HasProperty("dll_tap_adjust")) {
+        std::map<std::string,std::string> adjusts = map->GetStructuredProperty("dll_tap_adjust");
+        TDCSetup::RangesValues rv;
+        std::cmatch match;
+        std::regex rgx_match("(\\d+)-(\\d+)");
+        for (std::map<std::string,std::string>::const_iterator it=adjusts.begin(); it!=adjusts.end(); ++it) {
+          std::cout << "---> " << it->first << "\t" << it->second << std::endl;
+          if (std::regex_match(it->first.c_str(), match, rgx_match) && match.size()==3) {
+            rv.push_back(std::make_pair(std::make_pair(std::stoi(match[1].str()), std::stoi(match[2].str())), std::stoi(it->second)));
+          }
+        }
+        r->SetDLLAdjustmentRanges(rv);
+        //r->SetDLLAdjustmentWord(map->GetUIntProperty("dll_tap_adjust"));
+      }
       if (map->HasProperty("coarse_count_offset"))          r->SetCoarseCountOffset(map->GetUIntProperty("coarse_count_offset"));
       for (unsigned short i=0; i<32; ++i) {
         std::ostringstream os; os << "offset" << i;
@@ -414,7 +428,7 @@ namespace PPSTimingMB
     return true;
   }
 
-  DOMNode*
+  DOMElement*
   XMLHandler::AddProperty(DOMNode* elem, const char* name, const char* value)
   {
     if (!elem) return 0;
@@ -423,7 +437,7 @@ namespace PPSTimingMB
     XMLString::transcode(name, str, 99);
     /*DOMAttr* att = fDocument->createAttribute(str);
     elem->setAttributeNode(att);*/
-    DOMNode* child = fDocument->createElement(str);
+    DOMElement* child = fDocument->createElement(str);
     elem->appendChild(child);
 
     XMLString::transcode(value, str, 99);
@@ -439,9 +453,14 @@ namespace PPSTimingMB
   {
     if (!elem) return;
 
+    XMLCh key[100], value[100];
+    XMLString::transcode("range", key, 99);
+
     for (TDCSetup::RangesValues::const_iterator it=ranges.begin(); it!=ranges.end(); ++it) {
-      std::ostringstream os; os << name << it->first.first << "-" << it->first.second;
-      AddProperty(elem, os.str().c_str(), it->second);
+      DOMElement* node = AddProperty(elem, name, it->second);
+      std::ostringstream os; os << it->first.first << "-" << it->first.second;
+      XMLString::transcode(os.str().c_str(), value, 99);
+      node->setAttribute(key, value);
     }
   }
 
@@ -541,11 +560,16 @@ namespace PPSTimingMB
           char* value = XMLString::transcode(prop->getWholeText());
           DOMNamedNodeMap* attr = currentNode->getAttributes();
           std::ostringstream os_val; os_val << value;
-          for (unsigned int k=0; k<attr->getLength(); k++) {
+          if (attr->getLength()==1) {
+            char* attr_val = XMLString::transcode(attr->item(0)->getNodeValue());
+            map.AddProperty(key, value, attr_val);
+            XMLString::release(&attr_val);
+          }
+          else map.AddProperty(key, value);
+          /*for (unsigned int k=0; k<attr->getLength(); k++) {
             char* att_key = XMLString::transcode(attr->item(k)->getNodeName()), *att_value = XMLString::transcode(attr->item(k)->getNodeValue());
             os_val << "\n" << att_key << ":" << att_value;
-          }
-          map.AddProperty(key, os_val.str().c_str());
+          }*/
           XMLString::release(&key); XMLString::release(&value);
         }
 
@@ -569,7 +593,15 @@ namespace PPSTimingMB
   XMLHandler::PropertiesMap::GetProperty(const char* name)
   {
     if (!HasProperty(name)) return "";
-    std::map<std::string,std::string>::iterator it = fMap.find(name);
+    std::map<std::string,std::map<std::string,std::string> >::iterator it = fMap.find(name);
+    return it->second.begin()->second;
+  }
+
+  std::map<std::string,std::string>
+  XMLHandler::PropertiesMap::GetStructuredProperty(const char* name)
+  {
+    if (!HasProperty(name)) return std::map<std::string,std::string>();
+    std::map<std::string,std::map<std::string,std::string> >::iterator it = fMap.find(name);
     return it->second;
   }
 
@@ -582,7 +614,7 @@ namespace PPSTimingMB
   }
 
   std::map<std::string,std::string>
-  XMLHandler::PropertiesMap::GetStructuredProperty(const char* name)
+  XMLHandler::PropertiesMap::GetComplexProperty(const char* name)
   {
     std::map<std::string,std::string> out;
     std::string prop = GetProperty(name);
@@ -603,7 +635,7 @@ namespace PPSTimingMB
     BoardAddress addr(0, 0, 0);
     std::pair<BoardAddress, unsigned int> out(addr, 0);
 
-    std::map<std::string,std::string> prop = GetStructuredProperty(name);
+    std::map<std::string,std::string> prop = GetComplexProperty(name);
     //if (prop.size()!=4) return out;
     const char* mfec_str = prop["mfec"].c_str(), *ccu_str = prop["ccu"].c_str(), *i2c_str = prop["i2c"].c_str(), *value_str = prop["value"].c_str();
     unsigned int mfec_addr = (strcspn(mfec_str, "0x")==0) ? static_cast<unsigned long>(strtol(mfec_str, NULL, 0)) : static_cast<unsigned int>(atoi(mfec_str)),

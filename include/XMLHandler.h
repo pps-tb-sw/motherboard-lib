@@ -42,7 +42,8 @@ namespace PPSTimingMB
       inline ~PropertiesMap() { fMap.clear(); }
 
       /// Feed a new key/value property to the map
-      inline void AddProperty(const char* name, const char* value) { fMap.insert(std::pair<std::string,std::string>(std::string(name), std::string(value))); }
+      //inline void AddProperty(const char* name, const char* value, const char* attr="") { fMap.insert(std::make_pair(std::string(name),std::make_pair(std::string(attr), std::string(value)))); }
+      inline void AddProperty(const char* name, const char* value, const char* attr="") { fMap[name][attr] = value; }
       /// Check if a key is present in the map
       inline bool HasProperty(const char* name) { return (fMap.count(std::string(name))>0); }
       /// Retrieve the (string) value associated with a key
@@ -50,9 +51,10 @@ namespace PPSTimingMB
       /// Retrieve the (unsigned integer) value associated with a key
       unsigned int GetUIntProperty(const char* name);
       std::map<std::string,std::string> GetStructuredProperty(const char* name);
+      std::map<std::string,std::string> GetComplexProperty(const char* name);
       std::pair<BoardAddress, unsigned int> GetNINOThresholdValue(const char* name);
      private:
-      std::map<std::string,std::string> fMap;
+      std::map<std::string,std::map<std::string,std::string> > fMap;
     };
 
     /// Extract a XML output of a TDCControl register
@@ -102,8 +104,8 @@ namespace PPSTimingMB
     void PopulateSetupRegister(const TDCSetup& s, const BoardAddress&);
     void PopulateNINOThresholds(const NINOThresholds& n, const BoardAddress&);
 
-    DOMNode* AddProperty(DOMNode* elem, const char*, const char*);
-    DOMNode* AddProperty(DOMNode* elem, const char* name, unsigned int value) {
+    DOMElement* AddProperty(DOMNode* elem, const char*, const char*);
+    DOMElement* AddProperty(DOMNode* elem, const char* name, unsigned int value) {
       std::ostringstream os; os << value;
       return AddProperty(elem, name, os.str().c_str());
     }
