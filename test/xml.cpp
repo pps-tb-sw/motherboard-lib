@@ -24,8 +24,9 @@ int main(int argc, char* argv[])
   h.ReadRegister(os.str(), &setup, PPSTimingMB::BoardAddress(0x07, 0x40, 0x18));
   setup.Dump();
   /*for (unsigned short i=0; i<4; i++) {
-    std::cout << "group " << i << ": " << n.GetValue(i) << std::endl;
+    cout << "group " << i << ": " << n.GetValue(i) << endl;
   }*/
+  cout << h.WriteRegister(setup, 0, 0, 0) << endl;
 
   return 0;
 }

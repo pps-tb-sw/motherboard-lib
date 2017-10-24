@@ -107,6 +107,7 @@ namespace PPSTimingMB
       std::ostringstream os; os << value;
       return AddProperty(elem, name, os.str().c_str());
     }
+    void AddRangeProperty(DOMNode* elem, const char* name, unsigned long value, unsigned short num_bits);
     void SetAddressAttributes(DOMElement* elem, const BoardAddress&);
     std::string GetProperty(const char* name);
     unsigned int GetUIntProperty(const char* name);
