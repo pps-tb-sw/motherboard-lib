@@ -22,9 +22,16 @@ namespace PPSTimingMB
     rEnableSetCountersOnBunchReset, rEnableMasterResetCode, rEnableMasterResetOnEventReset,
     rEnableResetChannelBufferWhenSeparator, rEnableSeparatorOnEventReset, rEnableSeparatorOnBunchReset,
     rEnableDirectEventReset, rEnableDirectBunchReset, rEnableDirectTrigger,
-    rOffset0, rOffset1, rOffset2, rOffset3, rOffset4, rOffset5, rOffset6, rOffset7, rOffset8, rOffset9, rOffset10, rOffset11, rOffset12, rOffset13,
-    rOffset14, rOffset15, rOffset16, rOffset17, rOffset18, rOffset19, rOffset20, rOffset21, rOffset22, rOffset23, rOffset24, rOffset25, rOffset26, rOffset27,
-    rOffset28, rOffset29, rOffset30, rOffset31, rCoarseCountOffset, rDLLTapAdjust, rRCAdjust,
+    rOffset0, rOffset1, rOffset2, rOffset3, rOffset4, rOffset5, rOffset6, rOffset7,
+    rOffset8, rOffset9, rOffset10, rOffset11, rOffset12, rOffset13, rOffset14, rOffset15,
+    rOffset16, rOffset17, rOffset18, rOffset19, rOffset20, rOffset21, rOffset22, rOffset23,
+    rOffset24, rOffset25, rOffset26, rOffset27, rOffset28, rOffset29, rOffset30, rOffset31,
+    rCoarseCountOffset,
+    rDLLTapAdjust0, rDLLTapAdjust1, rDLLTapAdjust2, rDLLTapAdjust3, rDLLTapAdjust4, rDLLTapAdjust5, rDLLTapAdjust6, rDLLTapAdjust7,
+    rDLLTapAdjust8, rDLLTapAdjust9, rDLLTapAdjust10, rDLLTapAdjust11, rDLLTapAdjust12, rDLLTapAdjust13, rDLLTapAdjust14, rDLLTapAdjust15,
+    rDLLTapAdjust16, rDLLTapAdjust17, rDLLTapAdjust18, rDLLTapAdjust19, rDLLTapAdjust20, rDLLTapAdjust21, rDLLTapAdjust22, rDLLTapAdjust23,
+    rDLLTapAdjust24, rDLLTapAdjust25, rDLLTapAdjust26, rDLLTapAdjust27, rDLLTapAdjust28, rDLLTapAdjust29, rDLLTapAdjust30, rDLLTapAdjust31,
+    rRCAdjust,
     rLowPowerMode, rWidthSelect, rVernierOffset, rDLLControl, rDeadTime, rTestInvert, rTestMode,
     rTrailing, rLeading, rModeRCCompression, rModeRC, rDLLMode, rPLLControl,
     rSerialClockDelay, rIOClockDelay, rCoreClockDelay, rDLLClockDelay, rSerialClockSource, rIOClockSource, rCoreClockSource, rDLLClockSource, rRollOver,
@@ -299,12 +306,6 @@ namespace PPSTimingMB
         for (int i=0; i<TDC_NUM_CHANNELS; i++) {
           SetDLLAdjustment(i, adj);
         }
-      }
-      inline void SetDLLAdjustmentWord(uint16_t word) {
-        SetBits(kDLLTapAdjust0, word, 12);
-      }
-      inline uint16_t GetDLLAdjustmentWord() const {
-        return GetBits(kDLLTapAdjust0, 12);
       }
       typedef std::vector<std::pair<std::pair<unsigned short,unsigned short>, unsigned short> > RangesValues;
       RangesValues GetDLLAdjustmentRanges() const;
