@@ -104,6 +104,32 @@ namespace PPSTimingMB
     ComputeParity();
   }
 
+  TDCSetup::RangesValues
+  TDCSetup::GetDLLAdjustmentRanges() const
+  {
+    RangesValues out;
+    unsigned short first_chan = 0, prev_adjust = 0;
+    for (unsigned short i=0; i<TDC_NUM_CHANNELS; ++i) {
+      const unsigned short adjust = GetDLLAdjustment(i);
+      if (adjust!=prev_adjust) {
+        out.push_back(std::make_pair(std::make_pair(first_chan, i-1), prev_adjust));
+        prev_adjust = adjust;
+        first_chan = i;
+      }
+      if (i==TDC_NUM_CHANNELS-1)
+        out.push_back(std::make_pair(std::make_pair(first_chan, i), prev_adjust));
+    }
+    return out;
+  }
+
+  void
+  TDCSetup::SetDLLAdjustmentRanges(const TDCSetup::RangesValues& range)
+  {
+    for (TDCSetup::RangesValues::const_iterator it=range.begin(); it!=range.end(); ++it) {
+      for (unsigned short i=it->first.first; i<=it->first.second; ++i) SetDLLAdjustment(i, it->second);
+    }
+  }
+
   void
   TDCSetup::Dump(int verb, std::ostream& os) const
   {

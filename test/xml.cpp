@@ -20,9 +20,13 @@ int main(int argc, char* argv[])
   //PPSTimingMB::NINOThresholds n;
   //cout << "Reading NINO thresholds..." << endl;
   PPSTimingMB::TDCSetup setup;
-  cout << "Reading setup word..." << endl;
+  cerr << "Reading setup word..." << endl;
   h.ReadRegister(os.str(), &setup, PPSTimingMB::BoardAddress(0x07, 0x40, 0x18));
-  setup.Dump();
+  setup.SetDLLAdjustment(10, 5);
+  setup.SetDLLAdjustment(28, 4);
+//  setup.SetDLLAdjustment(29, 4);
+//  setup.SetDLLAdjustment(31, 5);
+  //setup.Dump();
   /*for (unsigned short i=0; i<4; i++) {
     cout << "group " << i << ": " << n.GetValue(i) << endl;
   }*/

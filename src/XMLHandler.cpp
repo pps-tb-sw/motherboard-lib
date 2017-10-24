@@ -216,7 +216,7 @@ namespace PPSTimingMB
     AddProperty(elem, "low_power_mode",                      r.GetLowPowerMode());
     AddProperty(elem, "rc_adjust",                           r.GetRCAdjustmentWord());
     //AddProperty(elem, "dll_tap_adjust",                      r.GetDLLAdjustmentWord());
-    AddRangeProperty(elem, "dll_tap_adjust",                 r.GetDLLAdjustmentWord(), 3);
+    AddRangeProperty(elem, "dll_tap_adjust",                 r.GetDLLAdjustmentRanges());
     AddProperty(elem, "coarse_count_offset",                 r.GetCoarseCountOffset());
     for (unsigned short i=0; i<32; ++i) {
       std::ostringstream os; os << "offset" << i;
@@ -435,22 +435,13 @@ namespace PPSTimingMB
   }
 
   void
-  XMLHandler::AddRangeProperty(DOMNode* elem, const char* name, unsigned long value, unsigned short num_bits)
+  XMLHandler::AddRangeProperty(DOMNode* elem, const char* name, const TDCSetup::RangesValues& ranges)
   {
     if (!elem) return;
-std::cerr << num_bits << std::endl;
 
-    const unsigned short num_words = 32/num_bits;
-    unsigned short prev_word = 0, prev_chan = 0;
-    for (unsigned short i=0; i<num_words; ++i) {
-      const unsigned short word = (value>>(i*num_bits))&((1<<(num_bits+1))-1);
-      if (word!=prev_word || i==num_words-1) {
-        std::ostringstream os; os << name << prev_chan << "-" << i-1;
-        AddProperty(elem, os.str().c_str(), prev_word);
-
-        prev_chan = i;
-        prev_word = word;
-      }
+    for (TDCSetup::RangesValues::const_iterator it=ranges.begin(); it!=ranges.end(); ++it) {
+      std::ostringstream os; os << name << it->first.first << "-" << it->first.second;
+      AddProperty(elem, os.str().c_str(), it->second);
     }
   }
 

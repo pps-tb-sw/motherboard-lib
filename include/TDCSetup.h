@@ -236,10 +236,6 @@ namespace PPSTimingMB
       }
       /// Enable the readout of separators for each event (for debugging purposes, valid if readout of occupancies is enabled)
       inline void SetEnableReadoutSeparator(const bool ro=true) {
-        if (!GetEnableReadoutOccupancy()) {
-          std::cerr << "Warning: Trying to enable the separator readout "
-                    << "while the occupancy readout is disabled!" << std::endl;
-        }
         SetBits(kEnableReadoutSeparator, ro, 1);
       }
       inline bool GetEnableReadoutSeparator() const {
@@ -307,6 +303,9 @@ namespace PPSTimingMB
       inline uint16_t GetDLLAdjustmentWord() const {
         return GetBits(kDLLTapAdjust0, 12);
       }
+      typedef std::vector<std::pair<std::pair<unsigned short,unsigned short>, unsigned short> > RangesValues;
+      RangesValues GetDLLAdjustmentRanges() const;
+      void SetDLLAdjustmentRanges(const RangesValues&);
       /// Set the adjustment of the RC delay line
       inline void SetRCAdjustment(int tap, uint8_t adj) {
         if (tap>3 or tap<0) return;
