@@ -1,7 +1,7 @@
 CC = clang
 RM = rm
 
-CFLAGS = -fPIC -g -Wall
+CFLAGS = -fPIC -g -std=c++11 -Wall
 LDFLAGS = -shared -lxerces-c -g -Wall
 RMFLAGS = -rf
 
