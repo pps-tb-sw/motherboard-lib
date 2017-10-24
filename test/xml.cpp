@@ -5,7 +5,8 @@
 #include "TDCStatus.h"
 #include "NINOThresholds.h"
 
-#include "XMLHandler.h"
+#include "xml/XMLHandler.h"
+#include <boost/regex.hpp>
 
 using namespace std;
 

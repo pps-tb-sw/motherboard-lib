@@ -352,7 +352,7 @@ namespace PPSTimingMB
         boost::regex rgx_match("(\\d+)-(\\d+)");
         for (std::map<std::string,std::string>::const_iterator it=adjusts.begin(); it!=adjusts.end(); ++it) {
           if (boost::regex_match(it->first.c_str(), match, rgx_match) && match.size()==3) {
-            rv.push_back(std::make_pair(std::make_pair(std::stoi(match[1].str()), std::stoi(match[2].str())), std::stoi(it->second)));
+            rv.push_back(std::make_pair(std::make_pair(atoi(match[1].str().c_str()), atoi(match[2].str().c_str())), atoi(it->second.c_str())));
           }
         }
         r->SetDLLAdjustmentRanges(rv);
