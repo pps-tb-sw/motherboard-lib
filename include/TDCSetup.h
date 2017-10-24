@@ -284,6 +284,9 @@ namespace PPSTimingMB
       /// Set the DLL taps adjustments with a resolution of ~10 ps
       inline void SetDLLAdjustment(int tap, uint8_t adj) {
         if (tap>=TDC_NUM_CHANNELS or tap<0) return;
+        if (adj>7) std::cerr << "Warning: illegal DLL adjustment for channel " << tap
+                             << ": max value is 7, "
+                             << "specified value: " << (unsigned int)adj << std::endl;
         SetBits(kDLLTapAdjust0+3*tap, adj, 3);
       }
       /// Set the adjustment of DLL taps

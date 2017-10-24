@@ -343,7 +343,6 @@ namespace PPSTimingMB
         std::cmatch match;
         std::regex rgx_match("(\\d+)-(\\d+)");
         for (std::map<std::string,std::string>::const_iterator it=adjusts.begin(); it!=adjusts.end(); ++it) {
-          std::cout << "---> " << it->first << "\t" << it->second << std::endl;
           if (std::regex_match(it->first.c_str(), match, rgx_match) && match.size()==3) {
             rv.push_back(std::make_pair(std::make_pair(std::stoi(match[1].str()), std::stoi(match[2].str())), std::stoi(it->second)));
           }

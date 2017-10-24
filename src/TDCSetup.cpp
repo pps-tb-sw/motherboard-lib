@@ -152,12 +152,14 @@ namespace PPSTimingMB
          << ":   0x" << std::setfill('0')
          << std::setw(3) << std::hex << static_cast<int>(GetChannelOffset(i))
          << " / 0x"
-         << std::setw(3) << static_cast<int>(GetDLLAdjustment(i)) << std::dec << std::setfill(' ')
+         << std::setw(3) << std::hex << static_cast<int>(GetDLLAdjustment(i))
+         << std::dec << std::setfill(' ')
          << "   |  Ch.  " << std::setw(2) << i+TDC_NUM_CHANNELS/2
          << ":   0x" << std::setfill('0')
          << std::setw(3) << std::hex << static_cast<int>(GetChannelOffset(i+TDC_NUM_CHANNELS/2))
          << " / 0x"
-         << std::setw(3) << static_cast<int>(GetDLLAdjustment(i+TDC_NUM_CHANNELS/2)) << std::dec << std::setfill(' ')
+         << std::setw(3) << std::hex << static_cast<int>(GetDLLAdjustment(i+TDC_NUM_CHANNELS/2))
+         << std::dec << std::setfill(' ')
          << " |" << std::endl;
     }
     os << "   +---------------------------------------------------------+" << std::endl
