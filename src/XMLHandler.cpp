@@ -61,7 +61,7 @@ namespace PPSTimingMB
 
     XMLString::transcode("TDCRegister", str, 99);
     fDocument = fImpl->createDocument(0, str, 0);
-    
+
     PopulateControlRegister(r, addr);
 
     return XMLString();
@@ -103,7 +103,7 @@ namespace PPSTimingMB
 
     PopulateControlRegister(c, addr);
     PopulateSetupRegister(s, addr);
-    
+
     return XMLString();
   }
 
@@ -118,7 +118,7 @@ namespace PPSTimingMB
     PopulateControlRegister(c, addr);
     PopulateSetupRegister(s, addr);
     PopulateNINOThresholds(n);
-    
+
     return XMLString();
   }
 
@@ -154,7 +154,7 @@ namespace PPSTimingMB
     fROOT = fDocument->getDocumentElement();
 
     unsigned int i = 0;
-    for (NINOThresholds::Register::const_iterator it=r.GetValues().begin(); it!=r.GetValues().end(); it++, i++) {
+    for (NINOThresholds::Register::const_iterator it=r.GetValues().begin(); it!=r.GetValues().end(); ++it, ++i) {
       std::ostringstream os; os << "group" << std::dec << i;
       DOMElement* thr = (DOMElement*)AddProperty(elem, os.str().c_str(), it->second);
       SetAddressAttributes(thr, it->first);
@@ -209,7 +209,7 @@ namespace PPSTimingMB
       addr.Dump(std::cerr);
       return false;
     }
-    for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
+    for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); ++map) {
       if (map->GetProperty("register_name")!="TDCControl") { continue; }
 
       if (map->HasProperty("pll_reset"))             c->SetPLLReset(map->GetUIntProperty("pll_reset"));
@@ -234,7 +234,7 @@ namespace PPSTimingMB
       addr.Dump(std::cerr);
       return false;
     }
-    for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
+    for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); ++map) {
       if (map->GetProperty("register_name")!="TDCSetup") { continue; }
 
       if (map->HasProperty("enable_ttl_hit"))       r->SetEnableTTLHit(map->GetUIntProperty("enable_ttl_hit"));
@@ -273,7 +273,7 @@ namespace PPSTimingMB
       std::cerr << "FAILED to retrieve a NINO thresholds register" << std::endl;
       return false;
     }
-    for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); map++) {
+    for (std::vector<PropertiesMap>::iterator map=maps.begin(); map!=maps.end(); ++map) {
       if (map->GetProperty("register_name")!="NINOThresholds") { continue; }
       if (map->HasProperty("group0")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group0"); n->SetValue(prop.first, prop.second); }
       if (map->HasProperty("group1")) { std::pair<BoardAddress, unsigned int> prop = map->GetNINOThresholdValue("group1"); n->SetValue(prop.first, prop.second); }
@@ -336,7 +336,7 @@ namespace PPSTimingMB
     const XMLByte* w = ft.getRawBuffer();
 
     std::ostringstream os;
-    for (unsigned int i=0; i<ft.getLen(); i++) { os << (char)w[i]; }
+    for (unsigned int i=0; i<ft.getLen(); ++i) { os << (char)w[i]; }
     return os.str();
   }
 
@@ -359,12 +359,12 @@ namespace PPSTimingMB
       if (!root) return out;
 
       DOMNodeList* registers = root->getChildNodes();
-      for (unsigned int i=0; i<registers->getLength(); i++) {
+      for (unsigned int i=0; i<registers->getLength(); ++i) {
         if (registers->item(i)->getNodeType()!=DOMNode::ELEMENT_NODE) continue;
 
         DOMNamedNodeMap* attr = registers->item(i)->getAttributes();
         bool found_mfec = false, found_ccu = false, found_i2c = false;
-        for (unsigned int j=0; j<attr->getLength(); j++) {
+        for (unsigned int j=0; j<attr->getLength(); ++j) {
           char* key = XMLString::transcode(attr->item(j)->getNodeName()), *value = XMLString::transcode(attr->item(j)->getNodeValue());
           if ((strcmp(key, "mfec")==0)) {
             unsigned int mfec_addr = (strcspn(value, "0x")==0) ? static_cast<unsigned long>(strtol(value, NULL, 0)) : static_cast<unsigned int>(atoi(value));
@@ -391,7 +391,7 @@ namespace PPSTimingMB
 
         if (!children) return out;
         const XMLSize_t nodeCount = children->getLength();
-        for (unsigned int j=0; j<nodeCount; j++) {
+        for (unsigned int j=0; j<nodeCount; ++j) {
           DOMNode* currentNode = children->item(j);
           if (!currentNode->getNodeType() or currentNode->getNodeType()!=DOMNode::ELEMENT_NODE) continue;
           char* key = XMLString::transcode(currentNode->getNodeName());
@@ -399,7 +399,7 @@ namespace PPSTimingMB
           char* value = XMLString::transcode(prop->getWholeText());
           DOMNamedNodeMap* attr = currentNode->getAttributes();
           std::ostringstream os_val; os_val << value;
-          for (unsigned int k=0; k<attr->getLength(); k++) {
+          for (unsigned int k=0; k<attr->getLength(); ++k) {
             char* att_key = XMLString::transcode(attr->item(k)->getNodeName()), *att_value = XMLString::transcode(attr->item(k)->getNodeValue());
             os_val << "\n" << att_key << ":" << att_value;
           }
