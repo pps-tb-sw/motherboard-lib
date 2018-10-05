@@ -22,7 +22,16 @@ namespace PPSTimingMB
     rEnableSetCountersOnBunchReset, rEnableMasterResetCode, rEnableMasterResetOnEventReset,
     rEnableResetChannelBufferWhenSeparator, rEnableSeparatorOnEventReset, rEnableSeparatorOnBunchReset,
     rEnableDirectEventReset, rEnableDirectBunchReset, rEnableDirectTrigger,
-    rOffset, rCoarseCountOffset, rDLLTapAdjust, rRCAdjust,
+    rOffset0, rOffset1, rOffset2, rOffset3, rOffset4, rOffset5, rOffset6, rOffset7,
+    rOffset8, rOffset9, rOffset10, rOffset11, rOffset12, rOffset13, rOffset14, rOffset15,
+    rOffset16, rOffset17, rOffset18, rOffset19, rOffset20, rOffset21, rOffset22, rOffset23,
+    rOffset24, rOffset25, rOffset26, rOffset27, rOffset28, rOffset29, rOffset30, rOffset31,
+    rCoarseCountOffset,
+    rDLLTapAdjust0, rDLLTapAdjust1, rDLLTapAdjust2, rDLLTapAdjust3, rDLLTapAdjust4, rDLLTapAdjust5, rDLLTapAdjust6, rDLLTapAdjust7,
+    rDLLTapAdjust8, rDLLTapAdjust9, rDLLTapAdjust10, rDLLTapAdjust11, rDLLTapAdjust12, rDLLTapAdjust13, rDLLTapAdjust14, rDLLTapAdjust15,
+    rDLLTapAdjust16, rDLLTapAdjust17, rDLLTapAdjust18, rDLLTapAdjust19, rDLLTapAdjust20, rDLLTapAdjust21, rDLLTapAdjust22, rDLLTapAdjust23,
+    rDLLTapAdjust24, rDLLTapAdjust25, rDLLTapAdjust26, rDLLTapAdjust27, rDLLTapAdjust28, rDLLTapAdjust29, rDLLTapAdjust30, rDLLTapAdjust31,
+    rRCAdjust,
     rLowPowerMode, rWidthSelect, rVernierOffset, rDLLControl, rDeadTime, rTestInvert, rTestMode,
     rTrailing, rLeading, rModeRCCompression, rModeRC, rDLLMode, rPLLControl,
     rSerialClockDelay, rIOClockDelay, rCoreClockDelay, rDLLClockDelay, rSerialClockSource, rIOClockSource, rCoreClockSource, rDLLClockSource, rRollOver,
@@ -204,11 +213,12 @@ namespace PPSTimingMB
         SetBits(kMaxEventSize, size, 4);
       }
       /// Extract the maximum number of hits per event
-      inline uint8_t GetMaxEventSize() const {
+      inline short GetMaxEventSize() const {
         uint8_t max = static_cast<uint8_t>(GetBits(kMaxEventSize, 4));
         if (max==0) return 0;
-        else if (max<0xA) return (1<<(max-1));
-        else return -1;
+        else if (max<0x9) return (1<<(max-1));
+        else if (max==0x9) return -1;
+        else return -2;
       }
       /**
        * Set whether or not hits are rejected once FIFO is full.
@@ -233,13 +243,6 @@ namespace PPSTimingMB
       }
       /// Enable the readout of separators for each event (for debugging purposes, valid if readout of occupancies is enabled)
       inline void SetEnableReadoutSeparator(const bool ro=true) {
-        if (!GetEnableReadoutOccupancy()) {
-          std::cerr << "Warning: Trying to enable the separator readout "
-                    << "while the occupancy readout is disabled!" << std::endl
-                    << "Enabling this occupancy readout automatically..."
-                    << std::endl;
-          SetEnableReadoutOccupancy(true);
-        }
         SetBits(kEnableReadoutSeparator, ro, 1);
       }
       inline bool GetEnableReadoutSeparator() const {
@@ -288,6 +291,9 @@ namespace PPSTimingMB
       /// Set the DLL taps adjustments with a resolution of ~10 ps
       inline void SetDLLAdjustment(int tap, uint8_t adj) {
         if (tap>=TDC_NUM_CHANNELS or tap<0) return;
+        if (adj>7) std::cerr << "Warning: illegal DLL adjustment for channel " << tap
+                             << ": max value is 7, "
+                             << "specified value: " << (unsigned int)adj << std::endl;
         SetBits(kDLLTapAdjust0+3*tap, adj, 3);
       }
       /// Set the adjustment of DLL taps
@@ -301,12 +307,9 @@ namespace PPSTimingMB
           SetDLLAdjustment(i, adj);
         }
       }
-      inline void SetDLLAdjustmentWord(uint16_t word) {
-        SetBits(kDLLTapAdjust0, word, 12);
-      }
-      inline uint16_t GetDLLAdjustmentWord() const {
-        return GetBits(kDLLTapAdjust0, 12);
-      }
+      typedef std::vector<std::pair<std::pair<unsigned short,unsigned short>, unsigned short> > RangesValues;
+      RangesValues GetDLLAdjustmentRanges() const;
+      void SetDLLAdjustmentRanges(const RangesValues&);
       /// Set the adjustment of the RC delay line
       inline void SetRCAdjustment(int tap, uint8_t adj) {
         if (tap>3 or tap<0) return;
@@ -624,15 +627,6 @@ namespace PPSTimingMB
       /// Selection of clock source for DLL
       inline void SetDLLClockSource(const DLLClockSource dcs) { SetBits(kDLLClockSource, dcs, 3); }
       inline DLLClockSource GetDLLClockSource() const { return static_cast<DLLClockSource>(GetBits(kDLLClockSource, 3)); }
-
-      /// Printout all useful values of this setup register into an output stream
-      void Dump(int verb=1, std::ostream& os=std::cout) const;
-      std::string GetXML() const;
-      uint32_t GetValue(const TDCSetupRegister& v);
-
-    private:
-      //////////////////////// Private set'ers and get'ers ////////////////////////
-
       /**
        * \brief Delay of internal serial clock
        * \param[in] delay_clock Use of direct clock (0) or delayed clock (1)
@@ -642,6 +636,7 @@ namespace PPSTimingMB
         uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
         SetBits(kSerialClockDelay, word, 4);
       }
+      inline void SetSerialClockDelayWord(const uint8_t word) { SetBits(kSerialClockDelay, word, 4); }
       inline uint8_t GetSerialClockDelay() const { return GetBits(kSerialClockDelay, 4); }
       /**
        * \brief Delay of internal I/O clock
@@ -652,6 +647,7 @@ namespace PPSTimingMB
         uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
         SetBits(kIOClockDelay, word, 4);
       }
+      inline void SetIOClockDelayWord(const uint8_t word) { SetBits(kIOClockDelay, word, 4); }
       inline uint8_t GetIOClockDelay() const { return GetBits(kIOClockDelay, 4); }
       /**
        * \brief Delay of internal core clock
@@ -662,6 +658,7 @@ namespace PPSTimingMB
         uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
         SetBits(kCoreClockDelay, word, 4);
       }
+      inline void SetCoreClockDelayWord(const uint8_t word) { SetBits(kCoreClockDelay, word, 4); }
       inline uint8_t GetCoreClockDelay() const { return GetBits(kCoreClockDelay, 4); }
       /**
        * \brief Delay of internal DLL clock
@@ -672,7 +669,15 @@ namespace PPSTimingMB
         uint8_t word = ((delay&0x7)|((delay_clock&0x1)<<3));
         SetBits(kDLLClockDelay, word, 4);
       }
+      inline void SetDLLClockDelayWord(const uint8_t word) { SetBits(kDLLClockDelay, word, 4); }
       inline uint8_t GetDLLClockDelay() const { return GetBits(kDLLClockDelay, 4); }
+
+      /// Printout all useful values of this setup register into an output stream
+      void Dump(int verb=1, std::ostream& os=std::cout) const;
+      std::string GetXML() const;
+      uint32_t GetValue(const TDCSetupRegister& v);
+
+    private:
 
       // List of LSBs for all sub-words in the full ~700-bits setup word
       static const bit kTestSelect = 0;

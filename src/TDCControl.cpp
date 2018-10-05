@@ -28,6 +28,7 @@ namespace PPSTimingMB
   void
   TDCControl::SetConstantValues()
   {
+    SetEnablePattern(OutputEnabled);
     EnableAllChannels();
     ComputeParity();
   }

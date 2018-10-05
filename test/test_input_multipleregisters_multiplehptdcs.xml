@@ -31,23 +31,76 @@
     <enable_ttl_reset>1</enable_ttl_reset>
     <enable_ttl_control>1</enable_ttl_control>
     <enable_ttl_serial>1</enable_ttl_serial>
-    <enable_pair>1</enable_pair>
+    <enable_pair>0</enable_pair>
     <enable_matching>1</enable_matching>
     <roll_over>4095</roll_over>
+    <dll_clock_source>0</dll_clock_source>
+    <core_clock_source>0</core_clock_source>
+    <io_clock_source>0</io_clock_source>
+    <serial_clock_source>0</serial_clock_source>
+    <dll_clock_delay>0</dll_clock_delay>
+    <core_clock_delay>0</core_clock_delay>
+    <io_clock_delay>0</io_clock_delay>
+    <serial_clock_delay>0</serial_clock_delay>
     <pll_control>4</pll_control>
     <dll_mode>2</dll_mode>
     <mode_rc>1</mode_rc>
     <mode_rc_compression>1</mode_rc_compression>
     <enable_leading>1</enable_leading>
     <enable_trailing>1</enable_trailing>
+    <test_mode>0</test_mode>
+    <test_invert>0</test_invert>
+    <dead_time>0</dead_time>
+    <dll_control>1</dll_control>
+    <vernier_offset>0</vernier_offset>
+    <width_resolution>0</width_resolution>
+    <low_power_mode>1</low_power_mode>
     <rc_adjust>1343</rc_adjust>
+    <dll_tap_adjust>0</dll_tap_adjust>
     <coarse_count_offset>0</coarse_count_offset>
+    <direct_trigger>1</direct_trigger>
+    <direct_bunch_reset>1</direct_bunch_reset>
+    <direct_event_reset>1</direct_event_reset>
+    <separator_on_bunch_reset>0</separator_on_bunch_reset>
+    <separator_on_event_reset>0</separator_on_event_reset>
+    <reset_channel_buffer_when_separator>0</reset_channel_buffer_when_separator>
+    <master_reset_on_event_reset>0</master_reset_on_event_reset>
+    <master_reset_code>0</master_reset_code>
+    <set_counters_on_bunch_reset>0</set_counters_on_bunch_reset>
     <trigger_count_offset>0</trigger_count_offset>
+    <event_count_offset>0</event_count_offset>
+    <automatic_reject>0</automatic_reject>
     <enable_relative>1</enable_relative>
+    <overflow_detection>1</overflow_detection>
+    <readout_separator>0</readout_separator>
+    <readout_occupancy>1</readout_occupancy>
+    <reject_fifo_full>1</reject_fifo_full>
+    <max_event_size>0</max_event_size>
+    <edge_resolution>0</edge_resolution>
     <match_window>198</match_window>
     <search_window>198</search_window>
     <reject_count_offset>0</reject_count_offset>
+    <readout_fifo_size>256</readout_fifo_size>
+    <bypass_inputs>0</bypass_inputs>
     <tdc_id>0</tdc_id>
+    <jtag_readout>0</jtag_readout>
+    <serial>0</serial>
+    <bytewise>0</bytewise>
+    <master>1</master>
+    <keep_token>1</keep_token>
+    <global_header>0</global_header>
+    <global_trailer>0</global_trailer>
+    <local_header>1</local_header>
+    <local_trailer>1</local_trailer>
+    <token_delay>0</token_delay>
+    <readout_speed>0</readout_speed>
+    <strobe_select>0</strobe_select>
+    <serial_delay>0</serial_delay>
+    <readout_speed_single_cycle>0</readout_speed_single_cycle>
+    <enable_error>2047</enable_error>
+    <enable_error_bypass>0</enable_error_bypass>
+    <enable_error_mark>1</enable_error_mark>
+    <test_select>0</test_select>
   </TDCSetup>
   
   <NINOThresholds>

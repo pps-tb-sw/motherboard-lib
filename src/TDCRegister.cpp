@@ -14,7 +14,7 @@ namespace PPSTimingMB
             if (i!=0) os << " << Word " << std::setfill(' ') << std::setw(2) << std::dec << i-1;
             os << std::endl << "  Word " << std::setw(2) << std::dec << i << " >> |";
           }
-          os << " 0x" << std::hex << std::setw(3) << std::setfill('0') << fWord[i] << " |";
+          os << " 0x" << std::hex << std::setw(2) << std::setfill('0') << fWord[i] << " |";
         }
         os << std::setfill(' ') << std::dec << std::endl;
       }

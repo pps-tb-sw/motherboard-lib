@@ -6,12 +6,6 @@
 #include <map>
 
 #include <xercesc/dom/DOM.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/parsers/XercesDOMParser.hpp>
-//#include <xercesc/framework/StdOutFormatTarget.hpp> //FIXME for debugging
-#include <xercesc/framework/MemBufFormatTarget.hpp>
-#include <xercesc/framework/MemBufInputSource.hpp>
 
 #include "TDCControl.h"
 #include "TDCSetup.h"
@@ -42,7 +36,8 @@ namespace PPSTimingMB
       inline ~PropertiesMap() { fMap.clear(); }
 
       /// Feed a new key/value property to the map
-      inline void AddProperty(const char* name, const char* value) { fMap.insert(std::pair<std::string,std::string>(std::string(name), std::string(value))); }
+      //inline void AddProperty(const char* name, const char* value, const char* attr="") { fMap.insert(std::make_pair(std::string(name),std::make_pair(std::string(attr), std::string(value)))); }
+      inline void AddProperty(const char* name, const char* value, const char* attr="") { fMap[name][attr] = value; }
       /// Check if a key is present in the map
       inline bool HasProperty(const char* name) { return (fMap.count(std::string(name))>0); }
       /// Retrieve the (string) value associated with a key
@@ -50,9 +45,10 @@ namespace PPSTimingMB
       /// Retrieve the (unsigned integer) value associated with a key
       unsigned int GetUIntProperty(const char* name);
       std::map<std::string,std::string> GetStructuredProperty(const char* name);
+      std::map<std::string,std::string> GetComplexProperty(const char* name);
       std::pair<BoardAddress, unsigned int> GetNINOThresholdValue(const char* name);
      private:
-      std::map<std::string,std::string> fMap;
+      std::map<std::string,std::map<std::string,std::string> > fMap;
     };
 
     /// Extract a XML output of a TDCControl register
@@ -73,10 +69,14 @@ namespace PPSTimingMB
     /// Parse a TDCSetup register out of a XML configuration file
     bool ReadRegister(std::string, TDCSetup* s, const BoardAddress& addr);
 
+     /// Extract a XML output of a NINO Thresholds register
+    inline std::string WriteRegister(const NINOThresholds& n, unsigned int mfec, unsigned int ccu, unsigned int i2c) { return WriteRegister(n, BoardAddress(mfec, ccu, i2c)); }
     /// Extract a XML output of a NINO thresholds register
-    std::string WriteRegister(const NINOThresholds& n);
+    std::string WriteRegister(const NINOThresholds& n, const BoardAddress& addr);
     /// Parse a NINO thresholds register out of a XML configuration file
-    bool ReadRegister(std::string, NINOThresholds* n);
+    inline bool ReadRegister(std::string str, NINOThresholds* n, unsigned int mfec, unsigned int ccu, unsigned int i2c) { return ReadRegister(str, n, BoardAddress(mfec, ccu, i2c)); }
+    /// Parse a NINO thresholds register out of a XML configuration file
+    bool ReadRegister(std::string, NINOThresholds* n, const BoardAddress& addr);
 
     /// Extract a XML output of a TDCControl and a TDCSetup register
     inline std::string WriteRegister(const TDCControl& c, const TDCSetup& s, unsigned int mfec, unsigned int ccu, unsigned int i2c) { return WriteRegister(c, s, BoardAddress(mfec, ccu, i2c)); }
@@ -96,13 +96,14 @@ namespace PPSTimingMB
 
     void PopulateControlRegister(const TDCControl& c, const BoardAddress&);
     void PopulateSetupRegister(const TDCSetup& s, const BoardAddress&);
-    void PopulateNINOThresholds(const NINOThresholds& n);
+    void PopulateNINOThresholds(const NINOThresholds& n, const BoardAddress&);
 
-    DOMNode* AddProperty(DOMNode* elem, const char*, const char*);
-    DOMNode* AddProperty(DOMNode* elem, const char* name, unsigned int value) {
+    DOMElement* AddProperty(DOMNode* elem, const char*, const char*);
+    DOMElement* AddProperty(DOMNode* elem, const char* name, unsigned int value) {
       std::ostringstream os; os << value;
       return AddProperty(elem, name, os.str().c_str());
     }
+    void AddRangeProperty(DOMNode* elem, const char* name, const TDCSetup::RangesValues&);
     void SetAddressAttributes(DOMElement* elem, const BoardAddress&);
     std::string GetProperty(const char* name);
     unsigned int GetUIntProperty(const char* name);

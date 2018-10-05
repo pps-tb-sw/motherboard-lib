@@ -26,31 +26,28 @@ namespace PPSTimingMB
 
       /// Type of error encountered by the HPTDC
       typedef struct ErrorType {
-        ErrorType(uint16_t word) {
-          Vernier              =  word     &0x1;
-          Coarse               = (word>> 1)&0x1;
-          ChannelSelect        = (word>> 2)&0x1;
-          L1BufferParity       = (word>> 3)&0x1;
-          TriggerFIFOParity    = (word>> 4)&0x1;
-          TriggerMatchingState = (word>> 5)&0x1;
-          ReadoutFIFOParity    = (word>> 6)&0x1;
-          ReadoutState         = (word>> 7)&0x1;
-          SetupParity          = (word>> 8)&0x1;
-          ControlParity        = (word>> 9)&0x1;
-          JTAGInstruction      = (word>>10)&0x1;
-        }
-        /// Error related on the parity of any register/buffer
-        bool ParityError() const { return (L1BufferParity or TriggerFIFOParity or ReadoutFIFOParity or SetupParity or ControlParity); }
-        /// Error related to the Vernier or Coarse measurement
-        bool MeasurementError() const { return (Vernier or Coarse); }
-        /// Has any error occured?
-        bool GlobalError() const { return (MeasurementError() or ChannelSelect or ParityError() or JTAGInstruction); }
+        ErrorType(uint16_t word) : word(word) {;}
+        uint16_t word;
 
-        bool Vernier, Coarse, ChannelSelect;
-        bool L1BufferParity;
-        bool TriggerFIFOParity, TriggerMatchingState;
-        bool ReadoutFIFOParity, ReadoutState;
-        bool SetupParity, ControlParity, JTAGInstruction;
+        //--- Combined error bits
+        /// Error related on the parity of any register/buffer
+        bool ParityError() const { return (L1BufferParity() or TriggerFIFOParity() or ReadoutFIFOParity() or SetupParity() or ControlParity()); }
+        /// Error related to the Vernier or Coarse measurement
+        bool MeasurementError() const { return (Vernier() or Coarse()); }
+        /// Has any error occured?
+        bool GlobalError() const { return (MeasurementError() or ChannelSelect() or ParityError() or JTAGInstruction()); }
+        //--- Individual error bits
+        bool Vernier() const              { return (word    )&0x1; }
+        bool Coarse() const               { return (word>> 1)&0x1; }
+        bool ChannelSelect() const        { return (word>> 2)&0x1; }
+        bool L1BufferParity() const       { return (word>> 3)&0x1; }
+        bool TriggerFIFOParity() const    { return (word>> 4)&0x1; }
+        bool TriggerMatchingState() const { return (word>> 5)&0x1; }
+        bool ReadoutFIFOParity() const    { return (word>> 6)&0x1; }
+        bool ReadoutState() const         { return (word>> 7)&0x1; }
+        bool SetupParity() const          { return (word>> 8)&0x1; }
+        bool ControlParity() const        { return (word>> 9)&0x1; }
+        bool JTAGInstruction() const      { return (word>>10)&0x1; }
       } ErrorType;
       /// Printout the error type(s) into the output stream
       friend std::ostream& operator<<(std::ostream& out, const ErrorType& err);
@@ -69,7 +66,8 @@ namespace PPSTimingMB
       inline bool FIFOEmpty() const { return static_cast<bool>(GetBits(kReadoutFIFOEmpty, 1)); }
       /// Occupancy of L1 buffer in channels of a group (or all groups)
       inline uint32_t L1Occupancy(unsigned short group=-1) const {
-        uint32_t out = static_cast<uint32_t>(GetBits(kL1Occupancy, 32));
+        uint16_t word1 = GetBits(kL1Occupancy, 16), word2 = GetBits(kL1Occupancy+16, 16);
+        uint32_t out = static_cast<uint32_t>(word1|(word2<<16));
         if (group<0 or group>3) return out; // whole 32-bit word combining all groups
         return static_cast<uint32_t>((out>>group)&0xff); // only 8 bits of selected group
       }
@@ -81,6 +79,8 @@ namespace PPSTimingMB
       inline bool TriggerFIFOEmpty() const { return static_cast<bool>(GetBits(kTriggerFIFOEmpty, 1)); }
       /// Is the DLL in lock state?
       inline bool DLLLock() const { return static_cast<bool>(GetBits(kDLLLock, 1)); }
+      /// Check if the SETUP sequence is correct
+      inline bool InvertedSetup() const { return static_cast<bool>(GetBits(kInvertedSetup, 1)); }
 
       /// Printout all useful values of this status register into an output stream
       void Dump(int verb=1, std::ostream& os=std::cout) const;
@@ -96,6 +96,7 @@ namespace PPSTimingMB
       static const bit kTriggerFIFOFull = 58;
       static const bit kTriggerFIFOEmpty = 59;
       static const bit kDLLLock = 60;
+      static const bit kInvertedSetup = 61;
   };
 }
 

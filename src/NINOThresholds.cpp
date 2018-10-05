@@ -3,9 +3,9 @@
 namespace PPSTimingMB
 {
   void
-  NINOThresholds::SetValue(const BoardAddress& addr, unsigned int value)
+  NINOThresholds::SetValue(unsigned short group, unsigned int value)
   {
-    fThresholds[addr] = value;
+    fThresholds[group] = value;
   }
 
   void
@@ -13,7 +13,7 @@ namespace PPSTimingMB
   {
     out << "NINO Thresholds:" << std::endl;
     for (Register::const_iterator it=fThresholds.begin(); it!=fThresholds.end(); it++) {
-      out << " * I2C address: " << it->first.i2c << " --> value: " << it->second << std::endl;
+      out << " * group: " << it->first << " --> value: " << it->second << std::endl;
     }
   }
 }
