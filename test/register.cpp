@@ -7,20 +7,19 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-
-  vector<unsigned char> word;
-  word.push_back(0xe0);
-  word.push_back(0xff);
-  word.push_back(0xff);
-  word.push_back(0xff);
-  word.push_back(0x1f);
-  PPSTimingMB::TDCControl control(word);
-  control.ComputeParity();
-  control.Dump(3);
-
-  return 0;
-
   {
+    vector<unsigned char> word;
+    word.push_back(0xe0);
+    word.push_back(0xff);
+    word.push_back(0xff);
+    word.push_back(0xff);
+    word.push_back(0x1f);
+    PPSTimingMB::TDCControl control(word);
+    control.ComputeParity();
+    control.Dump(3);
+  }
+
+  /*{
     vector<unsigned char> words;
     //words.push_back(0x55); // 01010101
     words.push_back(0x57); // 01010111
@@ -29,11 +28,11 @@ int main(int argc, char* argv[])
     cout << "parity=" << r.ComputeParityBit() << endl;
 
     return 0;
-  }
+  }*/
 
   {
     PPSTimingMB::TDCSetup s;
-    s.Dump(2);
+    s.Dump(3);
 
     PPSTimingMB::TDCControl c;
     cout << "Enabled channels: " << c.GetEnabledChannels() << endl;
